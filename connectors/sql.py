@@ -3,11 +3,13 @@ from urllib.parse import quote_plus
 from sqlalchemy import create_engine, text
 import polars as pl
 import pandas as pd
+import logging
 
 class SQLConnector:
 
     def __init__(self, pipeline, database_name: str):
         self.pipeline = pipeline
+        self.logger = logging.getLogger(f'{pipeline.pipeline_name}.transform')
         if database_name not in DATABASES:
             raise ValueError(f'Unknown db!')
         

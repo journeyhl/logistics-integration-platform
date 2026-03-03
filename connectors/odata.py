@@ -2,11 +2,12 @@ import pyodata
 import requests
 from requests_ntlm import HttpNtlmAuth
 import xmltodict
-
+import logging
 
 class ODATAConnector:
     def __init__(self, pipeline):
         self.pipeline = pipeline
+        self.logger = logging.getLogger(f'{pipeline.pipeline_name}.transform')
         self.session = requests.Session()
         self.session.auth = ('***REMOVED***', '***REMOVED***')
         pass

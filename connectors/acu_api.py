@@ -1,8 +1,10 @@
 from config.settings import ACUMATICA_API
 import requests
+import logging
 class AcumaticaAPI:
     def __init__(self, pipeline):
         self.pipeline = pipeline
+        self.logger = logging.getLogger(f'{pipeline.pipeline_name}.transform')
         self.version = '22.200.001'
         self.auth_type = 'Cookie'
         self.uri = 'https://erp.journeyhl.com/entity'
@@ -41,10 +43,8 @@ class AcumaticaAPI:
         }
         try:
             response = self.session.put(f'{self.base_uri}/Shipment', json=body)
-            bp = 'here'
             status = 'success'
         except Exception as e:
-            bp = 'here'
             status = 'failure'
         finally:
             self._logout()

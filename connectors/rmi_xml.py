@@ -3,10 +3,12 @@ from config.settings import RMI_XML
 import json
 import xmltodict
 from datetime import datetime
+import logging
 
 class RMIXMLConnector:
     def __init__(self, pipeline):
         self.pipeline = pipeline
+        self.logger = logging.getLogger(f'{pipeline.pipeline_name}.transform')
         self.login()
         self.send_url = 'https://jhl.returnsmanagement.com/webserviceV2/rma/rmaservice.asmx'
         self.send_headers = {

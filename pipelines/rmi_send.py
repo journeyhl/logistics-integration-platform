@@ -1,6 +1,7 @@
 from pipelines import Pipeline
 from connectors import ODATAConnector, SQLConnector, RMIXMLConnector
 from transform.rmi_send import Transform
+
 class SendToRMI(Pipeline):
     def __init__(self):
         super().__init__('SendToRMI')
@@ -10,10 +11,6 @@ class SendToRMI(Pipeline):
         self.rmi = RMIXMLConnector(self)
         
         
-
-    # def extract_odata(self):
-    #     data_extract = self.odata_source.get_data(self.url)
-    #     return data_extract
     
     def extract(self):
         with open('sql/SendToRMI.sql', 'r') as f:

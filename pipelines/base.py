@@ -79,5 +79,5 @@ class Pipeline(ABC):
             'pipeline': self.pipeline_name,
             'status': 'success',
             'extracted': data_extract,
-
+            'transformed': data_transformed
         }
