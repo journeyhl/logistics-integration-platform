@@ -7,7 +7,7 @@ import logging
 class ODATAConnector:
     def __init__(self, pipeline):
         self.pipeline = pipeline
-        self.logger = logging.getLogger(f'{pipeline.pipeline_name}.transform')
+        self.logger = logging.getLogger(f'{pipeline.pipeline_name}.odata')
         self.session = requests.Session()
         self.session.auth = ('***REMOVED***', '***REMOVED***')
         pass

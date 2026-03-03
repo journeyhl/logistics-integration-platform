@@ -4,7 +4,7 @@ import logging
 class AcumaticaAPI:
     def __init__(self, pipeline):
         self.pipeline = pipeline
-        self.logger = logging.getLogger(f'{pipeline.pipeline_name}.transform')
+        self.logger = logging.getLogger(f'{pipeline.pipeline_name}.acu_api')
         self.version = '22.200.001'
         self.auth_type = 'Cookie'
         self.uri = 'https://erp.journeyhl.com/entity'
@@ -42,13 +42,16 @@ class AcumaticaAPI:
             } 
         }
         try:
-            response = self.session.put(f'{self.base_uri}/Shipment', json=body)
-            status = 'success'
+            response = self.session.put(f'{self.base_uri}/Shipment', json=body).status_code
+            if response == 200:
+                self.logger.info(f'{ShipmentNbr} marked as SentToWH successfully!')
+            else:              
+                self.logger.error(f'{ShipmentNbr} failed when updating SentToWH! Error {response}')
+                
         except Exception as e:
-            status = 'failure'
-        finally:
-            self._logout()
-        return status
+            bp = 'handle this'
+        return response, body
 
     def _logout(self):
         self.session.post('https://erp.journeyhl.com/entity/auth/logout')
+        self.logger.info('Logged out of Acumatica API session')

@@ -55,6 +55,10 @@ class Pipeline(ABC):
     def load(self):
         pass
 
+    @abstractmethod
+    def log_results(self):
+        pass
+
 
     def run(self):
         self.run_timestamp = datetime.now()
@@ -74,10 +78,12 @@ class Pipeline(ABC):
         self.logger.info('Loading...')
         data_loaded = self.load(data_transformed)
 
-
+        self.logger.info('Logging...')
+        self.log_results(data_loaded)
         return{
             'pipeline': self.pipeline_name,
             'status': 'success',
             'extracted': data_extract,
-            'transformed': data_transformed
+            'transformed': data_transformed,
+            'loaded': data_loaded
         }

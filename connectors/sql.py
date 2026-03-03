@@ -9,7 +9,7 @@ class SQLConnector:
 
     def __init__(self, pipeline, database_name: str):
         self.pipeline = pipeline
-        self.logger = logging.getLogger(f'{pipeline.pipeline_name}.transform')
+        self.logger = logging.getLogger(f'{pipeline.pipeline_name}.{database_name}')
         if database_name not in DATABASES:
             raise ValueError(f'Unknown db!')
         
@@ -43,4 +43,14 @@ class SQLConnector:
 
     def query_db(self, query: str):        
         data_extract = pl.read_database(query, self.engine)
+        self.logger.info(f'Extracted {data_extract.height} rows')
         return data_extract
+    
+
+    def insert_df(self, df_data_loaded: pl.DataFrame):
+        df_data_loaded.write_database(table_name='rmi_log', 
+                                      connection=self.engine,
+                                      if_table_exists='append',
+                                      
+                                      )
+        bp = 'here'

@@ -5,6 +5,7 @@ import logging
 class Transform:
     def __init__(self, pipeline):
         self.pipeline = pipeline
+        self.logger = logging.getLogger(f'{pipeline.pipeline_name}.transform')
         pass
 
 
@@ -18,4 +19,5 @@ class Transform:
                 data_formatted[row['RMANumber']].append(row)
                 bp = 'here'
             bp = 'here'
+        self.logger.info(f'Transformed {data_extract.height} rows to {len(data_formatted)} shipments')
         return data_formatted

@@ -8,7 +8,7 @@ import logging
 class RMIXMLConnector:
     def __init__(self, pipeline):
         self.pipeline = pipeline
-        self.logger = logging.getLogger(f'{pipeline.pipeline_name}.transform')
+        self.logger = logging.getLogger(f'{pipeline.pipeline_name}.rmi_api')
         self.login()
         self.send_url = 'https://jhl.returnsmanagement.com/webserviceV2/rma/rmaservice.asmx'
         self.send_headers = {
@@ -57,10 +57,13 @@ class RMIXMLConnector:
         for shipment in type_3:
             self.post_3(shipment)
         bp = 'here'
+        self.pipeline.acu_api._logout()
         return self.results
 
 
     def post_W(self, shipment):
+        line_str = f'1 line' if len(shipment) == 1 else f'{len(shipment)} lines'
+        self.logger.info(f'Preparing {shipment[0]['RMANumber']} - {line_str}')
         row_text = self._format_w_lines(shipment)
 
         send_str = f'''<?xml version="1.0" encoding="utf-8"?>
@@ -93,30 +96,39 @@ class RMIXMLConnector:
     </CreateNew>
   </soap:Body>
 </soap:Envelope>'''
-        print(send_str)
+        # print(send_str)
         try:
-          test = len(shipment)
-          rmi_response = requests.post(self.send_url, data=send_str, headers=self.send_headers)
-          acu_response = self.pipeline.acu_api.sent_to_wh(shipment[0]['RMANumber'], shipment[0]['CustomerID'])
+          rmi_response = requests.post(self.send_url, data=send_str, headers=self.send_headers).status_code
+          if rmi_response == 200:
+            self.logger.info(f'{shipment[0]['RMANumber']} posted successfully!')
+          else:              
+            self.logger.error(f'{shipment[0]['RMANumber']} failed! Error {rmi_response}')
+          acu_response, acu_payload = self.pipeline.acu_api.sent_to_wh(shipment[0]['RMANumber'], shipment[0]['CustomerID'])
           info = {
-              'ShipmentNbr': shipment[0]['RMANumber'],
-              'Lines': len(shipment),
-              'RMIstatus': 'success',
-              'AcuStatus': acu_response if acu_response else 'failure',
-              'Time': datetime.now()
+              'shipment_nbr': shipment[0]['RMANumber'],
+              'lines': len(shipment),
+              'rmi_response': rmi_response,
+              'rmi_payload': send_str,
+              'acu_response': acu_response,
+              'acu_payload': acu_payload,
+              'shipment_data': shipment,
+              'timestamp': datetime.now()
           }
           
         except Exception as e:
           info = {
-              'ShipmentNbr': shipment[0]['RMANumber'],
-              'Lines': len(shipment),
-              'Status': 'failure',
-              'AcuStatus': acu_response if acu_response else 'failure',
-              'Time': datetime.now()
+              'shipment_nbr': shipment[0]['RMANumber'],
+              'lines': len(shipment),
+              'rmi_response': rmi_response,
+              'rmi_payload': send_str,
+              'acu_response': acu_response,
+              'acu_payload': acu_payload,
+              'shipment_data': shipment,
+              'timestamp': datetime.now()
           }
           bp = 'here'
         self.results.append(info)
-        return send_str
+        return info
 
 
     
