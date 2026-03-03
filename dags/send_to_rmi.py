@@ -16,7 +16,7 @@ from dataclasses import asdict
 def rmi_pipeline():    
     @task
     def send_to_rmi(shipment):
-        from pipelines import SendToRMI
-        rmi_pipeline = SendToRMI()
+        from pipelines import SendShipments
+        rmi_pipeline = SendShipments()
         completed_rmi_pipeline = rmi_pipeline.load(shipment)
         

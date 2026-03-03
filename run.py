@@ -1,7 +1,7 @@
-from pipelines import Pipeline, SendToRMI, FormatData
+from pipelines import Pipeline, SendShipments, FormatData
 
 
-rmi = SendToRMI()
+rmi = SendShipments()
 # rmi = FormatData('sql/SendToRMI.sql')
 result = rmi.run()
 

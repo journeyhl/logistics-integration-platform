@@ -2,9 +2,9 @@ from pipelines import Pipeline
 from connectors import ODATAConnector, SQLConnector, RMIXMLConnector
 from transform.rmi_send import Transform
 import polars as pl
-class SendToRMI(Pipeline):
+class SendShipments(Pipeline):
     def __init__(self):
-        super().__init__('SendToRMI')
+        super().__init__('rmi-send-shipments')
         self.url = 'https://erp.journeyhl.com/ODATA/JHL/JHL RMI Shipment API'
         self.odata_source = ODATAConnector(self)
         self.transformer = Transform(self)
@@ -13,7 +13,7 @@ class SendToRMI(Pipeline):
         
     
     def extract(self):
-        with open('sql/SendToRMI.sql', 'r') as f:
+        with open('sql/SendShipments.sql', 'r') as f:
             self.query = f.read()
         data_extract = self.acudb.query_db(self.query)
         return data_extract

@@ -54,8 +54,8 @@ class RMIXMLConnector:
                 type_3.append(data)
         for shipment in type_w:
             self.post_W(shipment)
-        for shipment in type_3:
-            self.post_3(shipment)
+        # for shipment in type_3:
+        #     self.post_3(shipment)
         bp = 'here'
         self.pipeline.acu_api._logout()
         return self.results
@@ -134,7 +134,8 @@ class RMIXMLConnector:
     
 
     
-
+#send immediately
+#
     def post_3(self, shipment):
         row_text = self._format_3_lines(shipment)
 
