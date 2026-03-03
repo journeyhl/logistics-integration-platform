@@ -42,10 +42,13 @@ class AcumaticaAPI:
         try:
             response = self.session.put(f'{self.base_uri}/Shipment', json=body)
             bp = 'here'
+            status = 'success'
         except Exception as e:
             bp = 'here'
+            status = 'failure'
         finally:
             self._logout()
+        return status
 
     def _logout(self):
         self.session.post('https://erp.journeyhl.com/entity/auth/logout')

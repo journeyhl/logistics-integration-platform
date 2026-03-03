@@ -99,7 +99,8 @@ class RMIXMLConnector:
           info = {
               'ShipmentNbr': shipment[0]['RMANumber'],
               'Lines': len(shipment),
-              'Status': 'success',
+              'RMIstatus': 'success',
+              'AcuStatus': acu_response if acu_response else 'failure',
               'Time': datetime.now()
           }
           
@@ -108,6 +109,7 @@ class RMIXMLConnector:
               'ShipmentNbr': shipment[0]['RMANumber'],
               'Lines': len(shipment),
               'Status': 'failure',
+              'AcuStatus': acu_response if acu_response else 'failure',
               'Time': datetime.now()
           }
           bp = 'here'
