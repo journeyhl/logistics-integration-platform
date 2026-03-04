@@ -98,16 +98,17 @@ class RMIXMLConnector:
 </soap:Envelope>'''
         # print(send_str)
         try:
-          rmi_response = requests.post(self.send_url, data=send_str, headers=self.send_headers).status_code
-          if rmi_response == 200:
+          rmi_response = requests.post(self.send_url, data=send_str, headers=self.send_headers)
+          status_code = rmi_response.status_code
+          if status_code == 200:
             self.logger.info(f'{shipment[0]['RMANumber']} posted successfully!')
           else:              
-            self.logger.error(f'{shipment[0]['RMANumber']} failed! Error {rmi_response}')
+            self.logger.error(f'{shipment[0]['RMANumber']} failed! Error {status_code}')
           acu_response, acu_payload = self.pipeline.acu_api.sent_to_wh(shipment[0]['RMANumber'], shipment[0]['CustomerID'])
           info = {
               'shipment_nbr': shipment[0]['RMANumber'],
               'lines': len(shipment),
-              'rmi_response': rmi_response,
+              'rmi_response': status_code,
               'rmi_payload': send_str,
               'acu_response': acu_response,
               'acu_payload': acu_payload,
@@ -119,7 +120,7 @@ class RMIXMLConnector:
           info = {
               'shipment_nbr': shipment[0]['RMANumber'],
               'lines': len(shipment),
-              'rmi_response': rmi_response,
+              'rmi_response': status_code,
               'rmi_payload': send_str,
               'acu_response': acu_response,
               'acu_payload': acu_payload,
