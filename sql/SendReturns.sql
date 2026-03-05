@@ -3,9 +3,7 @@ select s.OrderNbr ReturnNbr
 	 , j.Status AcuStatus
 	 , s.OrderNbr RMANumber
 	 , coalesce(sl.OrigOrderNbr, s.CustomerOrderNbr) OriginalOrderNbr
-	 , sl.OrigOrderNbr OrderNbr
-	 , s.CustomerOrderNbr
-	 , case when sl.OrigOrderType = 'RC' then '3' else 'W' end RMAType
+	 , case when sl.OrderType = 'RC' then '3' else 'W' end RMAType
 	 , '' RMASubType
 	 , s.ShipVia
 	 , case when s.ShipVia is null or s.ShipVia = 'GROUND' then 'FDXG'
@@ -40,6 +38,7 @@ select s.OrderNbr ReturnNbr
 	 , cast(k.ValueNumeric as int) SentToWH
 	 , '' SerialNumber
 	 , rtrim(c.AcctCD) CustomerID
+	 , s.OrderType
 from SOOrder s
 inner join SOLine sl on s.CompanyID = sl.CompanyID and s.OrderType = sl.OrderType and s.OrderNbr = sl.OrderNbr
 inner join SOContact sc on s.CompanyID = sc.CompanyID and s.ShipContactID = sc.ContactID and s.CustomerID = sc.CustomerID
@@ -48,7 +47,7 @@ inner join BAccount c on s.CompanyID = c.CompanyID and s.CustomerID = c.BAccount
 inner join InventoryItem i on s.CompanyID = i.CompanyID and sl.InventoryID = i.InventoryID
 inner join INItemClass ic on s.CompanyID = ic.CompanyID and i.ItemClassID = ic.ItemClassID
 inner join INSite isi on s.CompanyID = isi.CompanyID and sl.SiteID = isi.SiteID
-left join SOShipmentKvExt k on s.CompanyID = k.CompanyID and s.NoteID = k.RecordID and k.FieldName = 'AttributeSHP2WH'
+left join SOShipmentKvExt k on s.CompanyID = k.CompanyID and s.NoteID = k.RecordID and k.FieldName = 'AttributeRCSHP2WH'
 left join JJStatusLookup j on s.Status = j.CStatus and j.Tbl = 'SOShipment'
 where s.CompanyID = 2
 and isi.SiteCD = 'RMI'

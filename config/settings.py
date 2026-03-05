@@ -19,9 +19,9 @@ DATABASES = {
     }
 }
 
-RMI_XML = {
-    'username': os.getenv('RMI_XML_USERNAME'),
-    'password': os.getenv('RMI_XML_PASSWORD')
+RMI = {
+    'username': os.getenv('RMI_USERNAME'),
+    'password': os.getenv('RMI_PASSWORD')
 }
 
 ACUMATICA_API = {

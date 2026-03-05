@@ -31,6 +31,8 @@ select s.ShipmentNbr IFReference
 	 , i.Descr SOItemDescr
 	 , i.Descr RPItemDescr
 	 , case when i.descr like '%cpo%' then 'CPO'
+			when i.descr like '%pre own%' then 'CPO'
+			when i.descr like '%pre-own%' then 'CPO'
 			when ic.Descr like '%part%' or ic.Descr = 'Misc. Other' then 'Parts'
 			when ic.Descr like '%Product%' or i.inventorycd = '08568' then 'NEW-RESTCK'
 		else null end RPLocation

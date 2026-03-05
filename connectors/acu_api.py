@@ -42,15 +42,38 @@ class AcumaticaAPI:
             } 
         }
         try:
-            response = self.session.put(f'{self.base_uri}/Shipment', json=body).status_code
-            if response == 200:
+            response = self.session.put(f'{self.base_uri}/Shipment', json=body)
+            status_code = response.status_code
+            if status_code == 200:
                 self.logger.info(f'{ShipmentNbr} marked as SentToWH successfully!')
             else:              
-                self.logger.error(f'{ShipmentNbr} failed when updating SentToWH! Error {response}')
+                self.logger.error(f'{ShipmentNbr} failed when updating SentToWH! Error {status_code}')
                 
         except Exception as e:
             bp = 'handle this'
-        return response, body
+        return status_code, body
+
+
+    def rc_sent_to_wh(self, OrderNbr, OrderType, CustomerID):
+        body = {
+            "CustomerID": { "value": {f"CustomerID"} },
+            "OrderType": {"value": {f"OrderType"}},
+            "OrderNbr": { "value": {f"OrderNbr"}},
+            "custom": {
+                "Document": {
+                    "AttributeRCSHP2WH": {
+                        "value": True
+                    }
+                }
+            } 
+        }
+        try:
+            response = self.session.put(f'{self.base_uri}/Order', json=body)
+            status_code = response.status_code
+        except Exception as e:
+            bp = 'here'
+
+
 
     def _logout(self):
         self.session.post('https://erp.journeyhl.com/entity/auth/logout')

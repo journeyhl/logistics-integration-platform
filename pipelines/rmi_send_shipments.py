@@ -29,6 +29,8 @@ class SendShipments(Pipeline):
     
     def log_results(self, data_loaded: list):
         df_loaded = pl.DataFrame(data_loaded)
-        df_loaded = df_loaded.select(['shipment_nbr', 'lines', 'rmi_response', 'rmi_payload', 'acu_response', 'timestamp'])
-        self.centralstore.insert_df(df_loaded)
+        df_loaded = df_loaded.with_columns(pl.lit('Shipment').alias('Type'))
+        df_loaded = df_loaded.rename({'key': 'KeyValue', 'lines': 'Lines', 'rmi_response': 'RMI_Response', 'rmi_payload': 'RMI_Payload', 'acu_response': 'ACU_Response', 'timestamp': 'Timestamp'})
+        df_loaded = df_loaded.select(['Type', 'KeyValue', 'Lines', 'RMI_Response', 'RMI_Payload', 'ACU_Response', 'Timestamp'])
+        self.centralstore.insert_df(df_loaded, 'rmi_send_log')
         pass
