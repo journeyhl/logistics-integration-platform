@@ -54,6 +54,7 @@ class RMIXMLConnector:
             elif data[0]['RMAType'] == '3':
                 type_3.append(data)
 
+        bp = 'here'
         for shipment in type_w:
             self.post_W(shipment)
 
