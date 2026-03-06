@@ -39,6 +39,7 @@ select s.OrderNbr ReturnNbr
 	 , '' SerialNumber
 	 , rtrim(c.AcctCD) CustomerID
 	 , s.OrderType
+	 , s.OrderDate
 from SOOrder s
 inner join SOLine sl on s.CompanyID = sl.CompanyID and s.OrderType = sl.OrderType and s.OrderNbr = sl.OrderNbr
 inner join SOContact sc on s.CompanyID = sc.CompanyID and s.ShipContactID = sc.ContactID and s.CustomerID = sc.CustomerID
@@ -53,5 +54,6 @@ where s.CompanyID = 2
 and isi.SiteCD = 'RMI'
 and s.Status = 'N'
 and s.OrderType = 'RC'
+--and s.OrderDate > '20260301'
 --and k.ValueNumeric = 0
 order by ReturnNbr, LineNumber
