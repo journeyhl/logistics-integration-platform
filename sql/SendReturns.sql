@@ -1,4 +1,4 @@
-select top 6 s.OrderNbr ReturnNbr
+select s.OrderNbr ReturnNbr
 	 , 'Import' IFCompany
 	 , j.Status AcuStatus
 	 , s.OrderNbr RMANumber
