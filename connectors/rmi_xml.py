@@ -177,14 +177,25 @@ class RMIXMLConnector:
     </CreateNew>
   </soap:Body>
 </soap:Envelope>'''
-        print(send_str)
+        # print(send_str)
+        msg = ''
+        result = ''
         try:
           rmi_response = requests.post(self.send_url, data=send_str, headers=self.send_headers)
           status_code = rmi_response.status_code
-          if status_code == 200:
-            self.logger.info(f'{return_order[0]['ReturnNbr']} posted successfully!')
-          else:              
-            self.logger.error(f'{return_order[0]['ReturnNbr']} failed! Error {status_code}')
+          try:             
+            response_dict = xmltodict.parse(rmi_response.text)
+          except:
+             result = 'false'
+          if status_code == 200 or result == 'false':
+            response_dict = xmltodict.parse(rmi_response.text)
+            result = response_dict['soap:Envelope']['soap:Body']['CreateNewResponse']['CreateNewResult']
+            if result != 'false':
+              self.logger.info(f'{return_order[0]['ReturnNbr']} posted successfully!')
+          else:
+            if result['Message']:
+               msg = result['Message']
+            self.logger.error(f'{return_order[0]['ReturnNbr']} failed! Error {status_code}. {msg}')
           acu_response, acu_payload = self.pipeline.acu_api.rc_sent_to_wh(return_order[0]['ReturnNbr'],
                                                                           return_order[0]['OrderType'], 
                                                                           return_order[0]['CustomerID'])
@@ -203,7 +214,7 @@ class RMIXMLConnector:
           info = {
               'key': return_order[0]['ReturnNbr'],
               'lines': len(return_order),
-              'rmi_response': status_code,
+              'rmi_response': f'{status_code}. {msg}',
               'rmi_payload': send_str,
               'acu_response': acu_response,
               'acu_payload': acu_payload,

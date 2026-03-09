@@ -56,9 +56,9 @@ class AcumaticaAPI:
 
     def rc_sent_to_wh(self, OrderNbr, OrderType, CustomerID):
         body = {
-            "CustomerID": { "value": {f"CustomerID"} },
-            "OrderType": {"value": {f"OrderType"}},
-            "OrderNbr": { "value": {f"OrderNbr"}},
+            "CustomerID": { "value": f"{CustomerID}" },
+            "OrderType": {"value": f"{OrderType}"},
+            "OrderNbr": { "value": f"{OrderNbr}"},
             "custom": {
                 "Document": {
                     "AttributeRCSHP2WH": {
@@ -68,10 +68,17 @@ class AcumaticaAPI:
             } 
         }
         try:
-            response = self.session.put(f'{self.base_uri}/Order', json=body)
+            response = self.session.put(f'{self.base_uri}/SalesOrder', json=body)
             status_code = response.status_code
+            if status_code == 200:
+                self.logger.info(f'{OrderNbr} marked as SentToWH successfully!')
+            else:              
+                self.logger.error(f'{OrderNbr} failed when updating SentToWH! Error {status_code}')
+            return status_code, body
         except Exception as e:
             bp = 'here'
+            raise
+
 
 
 

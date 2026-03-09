@@ -1,11 +1,8 @@
-
 from pipelines import Pipeline
 from connectors import SQLConnector, RMIXMLConnector
 from transform.rmi_send import Transform
 import polars as pl
-
 class SendReturns(Pipeline):
-
     def __init__(self):
         super().__init__('rmi-send-returns')
         self.transformer = Transform(self)
@@ -13,7 +10,7 @@ class SendReturns(Pipeline):
 
 
     def extract(self):
-        with open('RMI-Returns.sql', 'r') as f:
+        with open('sql/SendReturns.sql', 'r') as f:
             query = f.read()
         data_extract = self.acudb.query_db(query)
         return data_extract
@@ -32,4 +29,4 @@ class SendReturns(Pipeline):
         df_loaded = df_loaded.rename({'key': 'KeyValue', 'lines': 'Lines', 'rmi_response': 'RMI_Response', 'rmi_payload': 'RMI_Payload', 'acu_response': 'ACU_Response', 'timestamp': 'Timestamp'})
         df_loaded = df_loaded.select(['Type', 'KeyValue', 'Lines', 'RMI_Response', 'RMI_Payload', 'ACU_Response', 'Timestamp'])
         self.centralstore.insert_df(df_loaded, 'rmi_send_log')
-        return super().log_results()
+        pass

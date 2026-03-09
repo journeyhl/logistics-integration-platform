@@ -1,4 +1,4 @@
-select s.OrderNbr ReturnNbr
+select top 6 s.OrderNbr ReturnNbr
 	 , 'Import' IFCompany
 	 , j.Status AcuStatus
 	 , s.OrderNbr RMANumber
@@ -21,9 +21,9 @@ select s.OrderNbr ReturnNbr
 	 , sa.CountryID ShipToCountry
 	 , sl.LineNbr LineNumber
 	 , rtrim(i.InventoryCD) DFPart
-	 , cast(sl.ShippedQty as int) DFQuantity
+	 , cast(sl.OrderQty as int) DFQuantity
 	 , rtrim(i.InventoryCD) RPPart
-	 , cast(sl.ShippedQty as int) RPQuantity
+	 , cast(sl.OrderQty as int) RPQuantity
 	 , '' Serialnumber, '' DFCategory, '' DFComments
 	 , rtrim(c.acctcd) AcctCD
 
@@ -48,12 +48,12 @@ inner join BAccount c on s.CompanyID = c.CompanyID and s.CustomerID = c.BAccount
 inner join InventoryItem i on s.CompanyID = i.CompanyID and sl.InventoryID = i.InventoryID
 inner join INItemClass ic on s.CompanyID = ic.CompanyID and i.ItemClassID = ic.ItemClassID
 inner join INSite isi on s.CompanyID = isi.CompanyID and sl.SiteID = isi.SiteID
-left join SOShipmentKvExt k on s.CompanyID = k.CompanyID and s.NoteID = k.RecordID and k.FieldName = 'AttributeRCSHP2WH'
+left join SOOrderKvExt k on s.CompanyID = k.CompanyID and s.NoteID = k.RecordID and k.FieldName = 'AttributeRCSHP2WH'
 left join JJStatusLookup j on s.Status = j.CStatus and j.Tbl = 'SOShipment'
 where s.CompanyID = 2
 and isi.SiteCD = 'RMI'
 and s.Status = 'N'
 and s.OrderType = 'RC'
 --and s.OrderDate > '20260301'
---and k.ValueNumeric = 0
-order by ReturnNbr, LineNumber
+and (k.ValueNumeric is null or k.ValueNumeric != 1)
+order by s.OrderDate desc, ReturnNbr, LineNumber
