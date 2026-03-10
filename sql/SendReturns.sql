@@ -49,7 +49,7 @@ inner join InventoryItem i on s.CompanyID = i.CompanyID and sl.InventoryID = i.I
 inner join INItemClass ic on s.CompanyID = ic.CompanyID and i.ItemClassID = ic.ItemClassID
 inner join INSite isi on s.CompanyID = isi.CompanyID and sl.SiteID = isi.SiteID
 left join SOOrderKvExt k on s.CompanyID = k.CompanyID and s.NoteID = k.RecordID and k.FieldName = 'AttributeRCSHP2WH'
-left join JJStatusLookup j on s.Status = j.CStatus and j.Tbl = 'SOShipment'
+left join JJStatusLookup j on s.Status = j.CStatus and j.Tbl = 'SOOrder'
 where s.CompanyID = 2
 and isi.SiteCD = 'RMI'
 and s.Status = 'N'

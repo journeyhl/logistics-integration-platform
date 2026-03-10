@@ -7,6 +7,6 @@ bp = 'here'
 
 
 
-# rmi_returns = SendReturns()
-# returns_result = rmi_returns.run()
-# bp = 'here'
+rmi_returns = SendReturns()
+returns_result = rmi_returns.run()
+bp = 'here'
