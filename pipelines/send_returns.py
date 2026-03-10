@@ -25,7 +25,6 @@ class SendReturns(Pipeline):
     
     def log_results(self, data_loaded: list):
         if len(data_loaded) > 0:
-            self.logger.info('Logging')
             df_loaded = pl.DataFrame(data_loaded)
             df_loaded = df_loaded.with_columns(pl.lit('Return').alias('Type'))
             df_loaded = df_loaded.rename({'key': 'KeyValue', 'lines': 'Lines', 'rmi_response': 'RMI_Response', 'rmi_payload': 'RMI_Payload', 'acu_response': 'ACU_Response', 'timestamp': 'Timestamp'})
