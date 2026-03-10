@@ -50,8 +50,9 @@ inner join INItemClass ic on s.CompanyID = ic.CompanyID and i.ItemClassID = ic.I
 inner join INSite isi on s.CompanyID = isi.CompanyID and s.SiteID = isi.SiteID
 left join SOShipmentKvExt k on s.CompanyID = k.CompanyID and s.NoteID = k.RecordID and k.FieldName = 'AttributeSHP2WH'
 left join JJStatusLookup j on s.Status = j.CStatus and j.Tbl = 'SOShipment'
-where s.CompanyID = 2
-and isi.SiteCD = 'RMI'
+where s.CompanyID = 2 and 
+isi.SiteCD = 'RMI' and sl.OrigOrderType != 'RC'
 and s.Status not in('C', 'L', 'F', 'I')
 and k.ValueNumeric = 0
+-- s.ShipmentNbr = '076733' and sl.LineNbr = 1		--This line is to send one offs
 order by IFReference, LineNumber

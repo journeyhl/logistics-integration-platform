@@ -28,9 +28,10 @@ class SendShipments(Pipeline):
         return data_loaded
     
     def log_results(self, data_loaded: list):
-        df_loaded = pl.DataFrame(data_loaded)
-        df_loaded = df_loaded.with_columns(pl.lit('Shipment').alias('Type'))
-        df_loaded = df_loaded.rename({'key': 'KeyValue', 'lines': 'Lines', 'rmi_response': 'RMI_Response', 'rmi_payload': 'RMI_Payload', 'acu_response': 'ACU_Response', 'timestamp': 'Timestamp'})
-        df_loaded = df_loaded.select(['Type', 'KeyValue', 'Lines', 'RMI_Response', 'RMI_Payload', 'ACU_Response', 'Timestamp'])
-        self.centralstore.insert_df(df_loaded, 'rmi_send_log')
+        if len(data_loaded) > 0:
+            df_loaded = pl.DataFrame(data_loaded)
+            df_loaded = df_loaded.with_columns(pl.lit('Shipment').alias('Type'))
+            df_loaded = df_loaded.rename({'key': 'KeyValue', 'lines': 'Lines', 'rmi_response': 'RMI_Response', 'rmi_payload': 'RMI_Payload', 'acu_response': 'ACU_Response', 'timestamp': 'Timestamp'})
+            df_loaded = df_loaded.select(['Type', 'KeyValue', 'Lines', 'RMI_Response', 'RMI_Payload', 'ACU_Response', 'Timestamp'])
+            self.centralstore.insert_df(df_loaded, 'rmi_send_log')
         pass

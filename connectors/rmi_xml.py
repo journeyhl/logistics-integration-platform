@@ -68,6 +68,7 @@ class RMIXMLConnector:
 
 
 
+
     def post_W(self, shipment):
         line_str = f'1 line' if len(shipment) == 1 else f'{len(shipment)} lines'
         self.logger.info(f'Preparing {shipment[0]['RMANumber']} - {line_str}')
@@ -106,16 +107,18 @@ class RMIXMLConnector:
         # print(send_str)
         try:
           rmi_response = requests.post(self.send_url, data=send_str, headers=self.send_headers)
-          status_code = rmi_response.status_code
-          if status_code == 200:
-            self.logger.info(f'{shipment[0]['RMANumber']} posted successfully!')
-          else:              
-            self.logger.error(f'{shipment[0]['RMANumber']} failed! Error {status_code}')
+          if rmi_response:
+              self.get_rmi_msg(rmi_response)
+              bp ='here'
+          else:
+              self.rmi_response_str = 'CRITICAL ERROR: No response from RMI!'
+              self.logger.error(self.rmi_response_str)
+              
           acu_response, acu_payload = self.pipeline.acu_api.sent_to_wh(shipment[0]['RMANumber'], shipment[0]['CustomerID'])
           info = {
               'key': shipment[0]['RMANumber'],
               'lines': len(shipment),
-              'rmi_response': status_code,
+              'rmi_response': self.rmi_response_str,
               'rmi_payload': send_str,
               'acu_response': acu_response,
               'acu_payload': acu_payload,
@@ -127,7 +130,7 @@ class RMIXMLConnector:
           info = {
               'key': shipment[0]['RMANumber'],
               'lines': len(shipment),
-              'rmi_response': status_code,
+              'rmi_response': self.rmi_response_str,
               'rmi_payload': send_str,
               'acu_response': acu_response,
               'acu_payload': acu_payload,
@@ -139,9 +142,21 @@ class RMIXMLConnector:
         return info
 
 
-    
-
-    
+    def get_rmi_msg(self, rmi_response: requests.Response):
+        status_code = rmi_response.status_code
+        try:
+            self.rmi_response_info = xmltodict.parse(rmi_response.text)['soap:Envelope']['soap:Body']['CreateNewResponse']['CreateNewResult']
+            if self.rmi_response_info.get('RMA_Number') or self.rmi_response_info.get('RMANumber'):        
+                rma = self.rmi_response_info.get('RMA_Number') if self.rmi_response_info.get('RMA_Number') else self.rmi_response_info.get('RMANumber')       
+                self.rmi_response_str = f'{status_code} {self.rmi_response_info['Message']}: {rma} posted successfully!'
+                self.logger.info(self.rmi_response_str)
+            else:
+                self.rmi_response_str = f'{status_code} ERROR: {self.rmi_response_info['Message']}'
+                self.logger.error(self.rmi_response_str)
+        except:
+            self.rmi_response_info = {'Result': 'false', 'Message': 'Error parsing response'}
+            self.rmi_response_str = f'{status_code} ERROR: {self.rmi_response_info['Message']}'
+            self.logger.error(self.rmi_response_str)
 #send immediately
 #
     def post_3(self, return_order):
@@ -182,27 +197,20 @@ class RMIXMLConnector:
         result = ''
         try:
           rmi_response = requests.post(self.send_url, data=send_str, headers=self.send_headers)
-          status_code = rmi_response.status_code
-          try:             
-            response_dict = xmltodict.parse(rmi_response.text)
-          except:
-             result = 'false'
-          if status_code == 200 or result == 'false':
-            response_dict = xmltodict.parse(rmi_response.text)
-            result = response_dict['soap:Envelope']['soap:Body']['CreateNewResponse']['CreateNewResult']
-            if result != 'false':
-              self.logger.info(f'{return_order[0]['ReturnNbr']} posted successfully!')
+          if rmi_response:
+              self.get_rmi_msg(rmi_response)
+              bp ='here'
           else:
-            if result['Message']:
-               msg = result['Message']
-            self.logger.error(f'{return_order[0]['ReturnNbr']} failed! Error {status_code}. {msg}')
+              self.rmi_response_str = 'CRITICAL ERROR: No response from RMI!'
+              self.logger.error(self.rmi_response_str)
+          
           acu_response, acu_payload = self.pipeline.acu_api.rc_sent_to_wh(return_order[0]['ReturnNbr'],
                                                                           return_order[0]['OrderType'], 
                                                                           return_order[0]['CustomerID'])
           info = {
               'key': return_order[0]['ReturnNbr'],
               'lines': len(return_order),
-              'rmi_response': status_code,
+              'rmi_response': self.rmi_response_str,
               'rmi_payload': send_str,
               'acu_response': acu_response,
               'acu_payload': acu_payload,
@@ -214,7 +222,7 @@ class RMIXMLConnector:
           info = {
               'key': return_order[0]['ReturnNbr'],
               'lines': len(return_order),
-              'rmi_response': f'{status_code}. {msg}',
+              'rmi_response': self.rmi_response_str,
               'rmi_payload': send_str,
               'acu_response': acu_response,
               'acu_payload': acu_payload,

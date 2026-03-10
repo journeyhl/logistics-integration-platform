@@ -1,6 +1,8 @@
 from config.settings import ACUMATICA_API
 import requests
 import logging
+import json
+
 class AcumaticaAPI:
     def __init__(self, pipeline):
         self.pipeline = pipeline
@@ -43,15 +45,10 @@ class AcumaticaAPI:
         }
         try:
             response = self.session.put(f'{self.base_uri}/Shipment', json=body)
-            status_code = response.status_code
-            if status_code == 200:
-                self.logger.info(f'{ShipmentNbr} marked as SentToWH successfully!')
-            else:              
-                self.logger.error(f'{ShipmentNbr} failed when updating SentToWH! Error {status_code}')
-                
+            self.parse_response(response, {'type': 'Shipment', 'attribute': 'AttributeSHP2WH'})
         except Exception as e:
             bp = 'handle this'
-        return status_code, body
+        return self.status_description, body
 
 
     def rc_sent_to_wh(self, OrderNbr, OrderType, CustomerID):
@@ -69,16 +66,40 @@ class AcumaticaAPI:
         }
         try:
             response = self.session.put(f'{self.base_uri}/SalesOrder', json=body)
-            status_code = response.status_code
-            if status_code == 200:
-                self.logger.info(f'{OrderNbr} marked as SentToWH successfully!')
-            else:              
-                self.logger.error(f'{OrderNbr} failed when updating SentToWH! Error {status_code}')
-            return status_code, body
+            self.parse_response(response, {'type': 'Order', 'attribute': 'AttributeRCSHP2WH'})
+            return self.status_description, body
         except Exception as e:
             bp = 'here'
             raise
 
+
+
+
+    def parse_response(self, response: requests.Response, entity_type: dict):
+        status_code = response.status_code
+        if status_code == 200:
+            self.acu_response = json.loads(response.text)
+            for key, value in self.acu_response.items():
+                if "{'value'" in str(value):
+                    self.acu_response[key] = value['value']
+                    bp = 'here'
+                else:
+                    self.acu_response[key] = value
+
+            is_sent = self.acu_response['custom']['Document'][entity_type['attribute']]['value']
+            if self.acu_response['Status'] != 'Open':
+                self.status_description = f'{self.acu_response[f'{entity_type['type']}Nbr']} is {self.acu_response['Status']}! SentToWH = {is_sent}'
+                self.logger.error(self.status_description)
+            elif is_sent:
+                self.status_description = f'{self.acu_response[f'{entity_type['type']}Nbr']} has been sent!' 
+                self.logger.info(self.status_description)
+            else:
+                self.status_description = f'{self.acu_response[f'{entity_type['type']}Nbr']} was not sent and is in Open status!'
+                self.logger.error(self.status_description)
+        else:
+            
+            bp = 'here'
+        
 
 
 
