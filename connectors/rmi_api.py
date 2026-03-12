@@ -131,6 +131,8 @@ class RMIAPIConnector():
                 params={'RMANumber': f'{rma_number}'}
             )
             json_response = json.loads(response.text)
+            if json_response == {'message': 'Bad Request', 'status': 400}:
+                self.logger.error(f'{json_response['status']} ERROR: {json_response['message']}')
             bp = 'here'
             return json_response
         except Exception as e:

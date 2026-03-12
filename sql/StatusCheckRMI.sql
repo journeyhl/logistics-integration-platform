@@ -1,3 +1,4 @@
+
 with AllItemsApart as(
 select distinct RMANumber
 from rmi_ClosedShipments s
@@ -15,5 +16,6 @@ from AllItemsApart
 select distinct a.RMANumber, s.LastChecked, s.RMAStatus, s.DFStatus
 from AllItems a
 left join rmi_RMAStatus s on a.RMANumber = s.RMANumber
-where (s.RMAStatus != 'CLOSED' or s.RMAStatus is null)
+where (s.RMAStatus not in('CLOSED', '') or s.RMAStatus is null)
+and s.RMAStatus is null
 order by s.LastChecked desc
