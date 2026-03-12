@@ -8,7 +8,7 @@ class Transform:
         pass
 
 
-    def transform(self, data_extract):
+    def transform_receipts(self, data_extract):
         table_rows = []
         for item in data_extract:
             row = {
@@ -27,5 +27,34 @@ class Transform:
                 'Cost': item['cost']
                 
             }
+            table_rows.append(row)
+        return table_rows
+    
+    def transform_closed_shipments(self, data_extract):
+        table_rows = []
+        for item in data_extract:
+            for line in item['shipLines']:
+                row = {
+                    'RMANumber': item['rmaNumber'],
+                    'RMAID': item['rmaId'],
+                    'RMALineID': line['rmaLineId'],
+                    'RMAType': item['rmaType'],
+                    'CreateDate': datetime.strptime(item['createDate'], '%Y-%m-%dT%H:%M:%SZ'),
+                    'ShipDate': datetime.strptime(item['shipDate'], '%Y-%m-%dT%H:%M:%SZ'),
+                    'InventoryCD': line['itemNum'],
+                    'QtyShipped': line['qtyShipped'],
+                    'QtyToShip': line['qtytoShip'],
+                    'Location': line['location'],
+                    'ItemCategory': line['category'],
+                    'Descr': line['model'],
+                    'Carrier': item['carrier'],
+                    'CarrierCode': item['carrierCode'],
+                    'Priority': item['priority'],
+                    'Tracking': item['trackingNum'],
+                    'FreightCost': item['freightCost'],
+                    'OutboundShipMethod': item['outboundShipMethod']                    
+                }
+            if len(item['shipLines']) == 0:
+                bp = 'here'
             table_rows.append(row)
         return table_rows

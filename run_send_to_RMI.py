@@ -1,4 +1,4 @@
-from pipelines import Pipeline, SendShipments, FormatData, SendReturns
+from pipelines import Pipeline, SendShipments, SendReturns
 
 
 rmi_shipments = SendShipments()

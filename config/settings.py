@@ -49,5 +49,44 @@ TABLES = {
             'Cost'
         ],
         'update_columns':['ReceiptDate', 'Qty', 'InventoryCD', 'Location', 'ItemType', 'ItemCategory', 'Descr', 'Price', 'Cost']
+    },    
+    'rmi_ClosedShipments':{
+        'keys': ['RMANumber', 'RMAID', 'RMALineID', 'RMAType'],
+        'columns': [
+            'RMANumber',
+            'RMAID',
+            'RMALineID',
+            'RMAType',
+            'CreateDate',
+            'ShipDate',
+            'InventoryCD',
+            'QtyShipped',
+            'QtyToShip',
+            'Location',
+            'ItemCategory',
+            'Descr',
+            'Carrier',
+            'CarrierCode',
+            'Priority',
+            'Tracking',
+            'FreightCost',
+            'OutboundShipMethod'
+        ],
+        'update_columns':[
+            'CreateDate',
+            'ShipDate',
+            'InventoryCD',
+            'QtyShipped',
+            'QtyToShip',
+            'Location',
+            'ItemCategory',
+            'Descr',
+            'Carrier',
+            'CarrierCode',
+            'Priority',
+            'Tracking',
+            'FreightCost',
+            'OutboundShipMethod'
+        ]
     }
 }
