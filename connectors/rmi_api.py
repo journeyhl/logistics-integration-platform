@@ -2,7 +2,7 @@
 import requests
 import logging
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 
 class RMIAPIConnector():
 
@@ -48,7 +48,8 @@ class RMIAPIConnector():
 
     def closed_shipments(self):
         url = f'{self.uri}api/ClosedShipmentsV1'
-        from_date = datetime.today().date().strftime('%Y-%m-%dT%H:%M:%SZ')
+        from_date = datetime.today() - timedelta(days=3)
+        from_date = from_date.date().strftime('%Y-%m-%dT%H:%M:%SZ')
         to_date = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
         headers = {
             **self.headers, 
