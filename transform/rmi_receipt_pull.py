@@ -58,3 +58,30 @@ class Transform:
                 bp = 'here'
             table_rows.append(row)
         return table_rows
+    
+
+
+    def transform_status_records(self, data_extract):
+        table_rows = []
+        for item in [data_extract]:
+            for line in item['rmaLines']:
+                row = {
+                    'RMANumber': item['rmaNumber'],
+                    'RMAID': item['rmaId'],
+                    'RMALineID': line['rmaLineID'],
+                    'RMAType': item['rmaTypeName'],
+                    'RMAStatus': item['rmaStatus'],
+                    'CustomerRef': item['customerRef'],
+                    'RMALineNbr': line['rmaLineNumber'],
+                    'DFStatus': line['dfStatus'],
+                    'InventoryCD': line['dfItem'],
+                    'Qty': line['dfQuantityExp'],
+                    'Descr': line['dfModelNum'],
+                    'RMATypeName': item['rmaTypeDescription'],
+                    'CreateDate': datetime.strptime(item['rmaCreateDate'], '%Y-%m-%dT%H:%M:%SZ'),
+                    'RMILastModifiedDate': datetime.strptime(item['rmaLastModifiedDate'], '%Y-%m-%dT%H:%M:%SZ'),
+                    'LastChecked': datetime.now()
+                }
+                table_rows.append(row)
+
+        return table_rows

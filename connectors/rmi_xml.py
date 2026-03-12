@@ -113,8 +113,12 @@ class RMIXMLConnector:
           else:
               self.rmi_response_str = 'CRITICAL ERROR: No response from RMI!'
               self.logger.error(self.rmi_response_str)
-              
-          acu_response, acu_payload = self.pipeline.acu_api.sent_to_wh(shipment[0]['RMANumber'], shipment[0]['CustomerID'])
+          if 'error' in self.rmi_response_str.lower():
+              acu_response = 'RMI Error, did not attempt SendToWH in Acu'
+              self.logger.warning(acu_response)
+              acu_payload = ''
+          else:              
+              acu_response, acu_payload = self.pipeline.acu_api.sent_to_wh(shipment[0]['RMANumber'], shipment[0]['CustomerID'])
           info = {
               'key': shipment[0]['RMANumber'],
               'lines': len(shipment),
@@ -203,8 +207,12 @@ class RMIXMLConnector:
           else:
               self.rmi_response_str = 'CRITICAL ERROR: No response from RMI!'
               self.logger.error(self.rmi_response_str)
-          
-          acu_response, acu_payload = self.pipeline.acu_api.rc_sent_to_wh(return_order[0]['ReturnNbr'],
+          if 'error' in self.rmi_response_str.lower():
+              acu_response = 'RMI Error, did not attempt RCSendToWH in Acu'
+              self.logger.warning(acu_response)
+              acu_payload = ''
+          else:
+              acu_response, acu_payload = self.pipeline.acu_api.rc_sent_to_wh(return_order[0]['ReturnNbr'],
                                                                           return_order[0]['OrderType'], 
                                                                           return_order[0]['CustomerID'])
           info = {

@@ -88,5 +88,38 @@ TABLES = {
             'FreightCost',
             'OutboundShipMethod'
         ]
-    }
+    }, 
+    'rmi_RMAStatus':{
+        'keys': ['RMANumber', 'RMAID', 'RMALineID', 'RMAType'],
+        'columns': [
+            'RMANumber',
+            'RMAID',
+            'RMALineID',
+            'RMAType',
+            'RMAStatus',
+            'CustomerRef',
+            'RMALineNbr',
+            'DFStatus',
+            'InventoryCD',
+            'Qty',
+            'Descr',
+            'RMATypeName',
+            'CreateDate',
+            'RMILastModifiedDate',
+            'LastChecked'
+        ],
+        'update_columns':[
+            'RMAStatus',
+            'CustomerRef',
+            'RMALineNbr',
+            'DFStatus',
+            'InventoryCD',
+            'Qty',
+            'Descr',
+            'RMATypeName',
+            'CreateDate',
+            'RMILastModifiedDate',
+            'LastChecked'
+        ]
+    },
 }

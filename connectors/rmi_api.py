@@ -128,7 +128,7 @@ class RMIAPIConnector():
                 url = url,
                 headers = headers,
                 json = body,
-                params={'RMANumber': 'AR077872'}
+                params={'RMANumber': f'{rma_number}'}
             )
             json_response = json.loads(response.text)
             bp = 'here'

@@ -9,8 +9,8 @@ select s.ShipmentNbr IFReference
 	 , case when s.ShipVia is null or s.ShipVia = 'GROUND' then 'FDXG'
 		when s.ShipVia = '2DAY' then 'FED2' else null end ShipCode
 	 , 'Fedex' ShipPriority
-	 , sc.FullName ShipToName
-	 , c.AcctName CompanyName
+	 , left(sc.FullName, 35) ShipToName
+	 , left(c.AcctName, 35) CompanyName
 	 , coalesce(sc.email, 'cs@journeyhl.com') ShipToEmailContact
 	 , coalesce(sc.Phone1, sc.Phone2) ShipToPhone
 	 , sa.AddressLine1 ShipToAddress1
@@ -51,8 +51,8 @@ inner join INSite isi on s.CompanyID = isi.CompanyID and s.SiteID = isi.SiteID
 left join SOShipmentKvExt k on s.CompanyID = k.CompanyID and s.NoteID = k.RecordID and k.FieldName = 'AttributeSHP2WH'
 left join JJStatusLookup j on s.Status = j.CStatus and j.Tbl = 'SOShipment'
 where s.CompanyID = 2 and 
-isi.SiteCD = 'RMI' and sl.OrigOrderType != 'RC'
-and s.Status not in('C', 'L', 'F', 'I')
-and k.ValueNumeric = 0
--- s.ShipmentNbr = '076733' and sl.LineNbr = 1		--This line is to send one offs
+-- isi.SiteCD = 'RMI' and sl.OrigOrderType != 'RC'
+-- and s.Status not in('C', 'L', 'F', 'I')
+-- and k.ValueNumeric = 0
+s.ShipmentNbr = '077252' and sl.LineNbr = 1		--This line is to send one offs
 order by IFReference, LineNumber

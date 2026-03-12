@@ -9,8 +9,8 @@ select s.OrderNbr ReturnNbr
 	 , case when s.ShipVia is null or s.ShipVia = 'GROUND' then 'FDXG'
 		when s.ShipVia = '2DAY' then 'FED2' else null end ShipCode
 	 , 'Fedex' ShipPriority
-	 , sc.FullName ShipToName
-	 , c.AcctName CompanyName
+	 , left(sc.FullName, 25) ShipToName
+	 , left(c.AcctName, 25) CompanyName
 	 , coalesce(sc.email, 'cs@journeyhl.com') ShipToEmailContact
 	 , coalesce(sc.Phone1, sc.Phone2) ShipToPhone
 	 , sa.AddressLine1 ShipToAddress1
