@@ -28,3 +28,26 @@ ACUMATICA_API = {
     'username': os.getenv('ACUMATICA_API_USERNAME'),
     'password': os.getenv('ACUMATICA_API_PASSWORD')
 }
+
+
+TABLES = {
+    'rmi_Receipts':{
+        'keys': ['RMANumber', 'ReceiptID', 'RMAID', 'RMALineID'],
+        'columns': [
+            'RMANumber',
+            'ReceiptDate',
+            'ReceiptID',
+            'RMAID',
+            'RMALineID',
+            'Qty',
+            'InventoryCD',
+            'Location',
+            'ItemType',
+            'ItemCategory',
+            'Descr',
+            'Price',
+            'Cost'
+        ],
+        'update_columns':['ReceiptDate', 'Qty', 'InventoryCD', 'Location', 'ItemType', 'ItemCategory', 'Descr', 'Price', 'Cost']
+    }
+}

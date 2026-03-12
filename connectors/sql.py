@@ -1,9 +1,10 @@
-from config.settings import DATABASES
+from config.settings import DATABASES, TABLES
 from urllib.parse import quote_plus
 from sqlalchemy import create_engine, text
 import polars as pl
 import pandas as pd
 import logging
+import pyodbc
 
 class SQLConnector:
 
@@ -16,7 +17,7 @@ class SQLConnector:
         self.database_name = database_name
         self.config = DATABASES[database_name]
         self.engine = self._create_engine()
-        self._pyodbc_connection = None
+        self.pyodbc_connection = pyodbc.connect(self._get_pyodbc_connection())
         pass
 
         
@@ -53,3 +54,46 @@ class SQLConnector:
                                       if_table_exists='append',                                      
                                       )
         bp = 'here'
+
+
+    
+    def checked_upsert(self, table_name: str, data: list):        
+        self.tables = TABLES
+        sql_table = self.tables[table_name]
+        upsert_string = f'''
+if not exists(
+select 1 
+from {table_name}
+where {' = ? and '.join(sql_table['keys'])} = ?
+)
+begin
+insert into {table_name}({', '.join(sql_table['columns'])})
+values({', '.join(['?'] * len(sql_table['columns']))})
+end
+else
+begin
+update {table_name} set {' = ?, '.join(col for col in sql_table['update_columns'])} = ?
+where {' = ? and '.join(sql_table['keys'])} = ?
+end
+'''
+        try:
+            params = [self._dict_to_params(data_dict, sql_table['keys'] + sql_table['columns'] + sql_table['update_columns'] + sql_table['keys']) for data_dict in data]
+            cursor = self.pyodbc_connection.cursor()
+            cursor.fast_executemany = True
+            cursor.executemany(upsert_string, params)
+            self.logger.info(f'{table_name} ╍ Upserted {len(data)} rows')
+            cursor.commit()
+        except Exception as e:
+            self.logger.error({
+                'Table': table_name,
+                'err_msg': e
+            })
+            bp = 'here'
+
+
+
+    
+    def _dict_to_params(self, d: dict, keys: list) -> tuple:
+        return tuple(d[k.replace('[', '').replace(']', '')] for k in keys)
+    
+
