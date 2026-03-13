@@ -10,7 +10,8 @@ class SQLConnector:
 
     def __init__(self, pipeline, database_name: str):
         self.pipeline = pipeline
-        self.logger = logging.getLogger(f'{pipeline.pipeline_name}.{database_name}')
+        # self.logger = logging.getLogger(f'{pipeline.pipeline_name}.{database_name}')
+        self.logger = logging.getLogger(f'{database_name}')
         if database_name not in DATABASES:
             raise ValueError(f'Unknown db!')
         
@@ -22,7 +23,7 @@ class SQLConnector:
 
         
     def _create_engine(self):
-        password = quote_plus(self.config['password'])
+        password = quote_plus(str(self.config['password']))
         connection_string = (
             f"mssql+pyodbc://{self.config['username']}:{password}"
             f"@{self.config['server']}/{self.config['database']}"

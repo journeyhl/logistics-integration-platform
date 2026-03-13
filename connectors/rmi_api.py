@@ -144,7 +144,7 @@ if __name__ == '__main__':
     sys.path.append(str(Path(__file__).resolve().parent.parent))
     from config.settings import RMI
     rmi = RMIAPIConnector('woohoo')
-    test1 = rmi.get_rma()
+    # test1 = rmi.get_rma()
     test = rmi.closed_shipments()
     bp = 'here'
 else:    

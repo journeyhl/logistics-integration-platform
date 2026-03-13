@@ -1,6 +1,5 @@
-import pyodata
+import pyodbc
 import requests
-from requests_ntlm import HttpNtlmAuth
 import xmltodict
 import logging
 
