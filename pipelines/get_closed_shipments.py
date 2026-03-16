@@ -24,6 +24,7 @@ class GetClosedShipmentsFromRMI(Pipeline):
     def load(self, data_transformed):
         data_loaded = self.centralstore.checked_upsert('rmi_ClosedShipments', data_transformed)
         bp = 'here'
+        return data_transformed
 
     def log_results(self):
         pass

@@ -20,7 +20,7 @@ class GetReceiptsFromRMI(Pipeline):
 
     def load(self, data_transformed):
         data_loaded = self.centralstore.checked_upsert('rmi_Receipts', data_transformed)
-        return data_loaded
+        return data_transformed
     
-    def log_results(self, data_loaded):
+    def log_results(self):
         pass

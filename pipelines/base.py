@@ -79,7 +79,7 @@ class Pipeline(ABC):
         data_loaded = self.load(data_transformed)
 
         self.logger.info('Logging...')
-        self.log_results(data_loaded)
+        self.log_results()
         return{
             'pipeline': self.pipeline_name,
             'status': 'success',
