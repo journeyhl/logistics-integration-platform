@@ -4,6 +4,7 @@ if __name__ == '__main__':
     sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from pipelines import Pipeline
+import polars as pl
 
 class CreateAcuReceipt(Pipeline):
     def __init__(self):
@@ -15,8 +16,9 @@ class CreateAcuReceipt(Pipeline):
         bp = 'here'
         return data_extract
 
-    def transform(self, data_extract):
-        data_transformed = data_extract
+    def transform(self, data_extract: pl.DataFrame):
+        data_transformed = data_extract.sql('select distinct RMANumber, CustomerRef from self')
+
         bp = 'here'
         return data_transformed
     
