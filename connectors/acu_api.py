@@ -47,6 +47,7 @@ class AcumaticaAPI:
             response = self.session.put(f'{self.base_uri}/Shipment', json=body)
             self.parse_response(response, {'type': 'Shipment', 'attribute': 'AttributeSHP2WH'})
         except Exception as e:
+            self.status_description = 'FAILURE'
             bp = 'handle this'
         return self.status_description, body
 
@@ -67,10 +68,10 @@ class AcumaticaAPI:
         try:
             response = self.session.put(f'{self.base_uri}/SalesOrder', json=body)
             self.parse_response(response, {'type': 'Order', 'attribute': 'AttributeRCSHP2WH'})
-            return self.status_description, body
         except Exception as e:
+            self.status_description = 'FAILURE'
             bp = 'here'
-            raise
+        return self.status_description, body
 
 
 
@@ -97,7 +98,7 @@ class AcumaticaAPI:
                 self.status_description = f'{self.acu_response[f'{entity_type['type']}Nbr']} was not sent and is in Open status!'
                 self.logger.error(self.status_description)
         else:
-            
+            self.status_description = 'FAILURE'
             bp = 'here'
         
 

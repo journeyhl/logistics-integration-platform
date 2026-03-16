@@ -105,6 +105,7 @@ class RMIXMLConnector:
   </soap:Body>
 </soap:Envelope>'''
         # print(send_str)
+        acu_response, acu_payload = None, None
         try:
           rmi_response = requests.post(self.send_url, data=send_str, headers=self.send_headers)
           if rmi_response:
@@ -199,6 +200,7 @@ class RMIXMLConnector:
         # print(send_str)
         msg = ''
         result = ''
+        acu_response, acu_payload = None, None
         try:
           rmi_response = requests.post(self.send_url, data=send_str, headers=self.send_headers)
           if rmi_response:
