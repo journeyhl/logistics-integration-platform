@@ -10,9 +10,7 @@ class SendReturns(Pipeline):
 
 
     def extract(self):
-        with open('sql/SendReturns.sql', 'r') as f:
-            query = f.read()
-        data_extract = self.acudb.query_db(query)
+        data_extract = self.acudb.query_db(self.acudb.queries.SendReturns.query)
         return data_extract
     
     def transform(self, data_extract):

@@ -3,14 +3,15 @@ from datetime import datetime
 import logging
 import polars as pl
 from connectors import SQLConnector, AcumaticaAPI
+from connectors.sql import CentralStoreQueries, AcumaticaDbQueries
 import colorlog
-from typing import TypeVar, Generic
+from typing import TypeVar, Generic, Any
 
 T = TypeVar('T', list, dict)
 
 class MillisecondFormatter(colorlog.ColoredFormatter):
-    def formatTime(self, time_record, datefmt = None):
-        time = datetime.fromtimestamp(time_record.created)
+    def formatTime(self, record, datefmt = None):
+        time = datetime.fromtimestamp(record.created)
         if datefmt:
             new_time = time.strftime(datefmt)[:-3]
             return new_time
@@ -19,8 +20,8 @@ class MillisecondFormatter(colorlog.ColoredFormatter):
 class Pipeline(ABC):
     def __init__(self, pipeline_name):
         self.pipeline_name = pipeline_name
-        self.centralstore = SQLConnector(self, 'db_CentralStore')
-        self.acudb = SQLConnector(self, 'AcumaticaDb')
+        self.centralstore: SQLConnector[CentralStoreQueries] = SQLConnector(self, 'db_CentralStore')
+        # self.acudb: SQLConnector[AcumaticaDbQueries] = SQLConnector(self, 'AcumaticaDb')
         self.acu_api = AcumaticaAPI(self)
         self.logger = logging.getLogger(pipeline_name)
 
@@ -44,20 +45,16 @@ class Pipeline(ABC):
 
 
     @abstractmethod
-    def extract(self):
-        pass
+    def extract(self, *args, **kwargs) -> Any: ...
 
     @abstractmethod
-    def transform(self):
-        pass
+    def transform(self, data_extract) -> Any: ...
 
     @abstractmethod
-    def load(self):
-        pass
+    def load(self, data_transformed) -> Any: ...
 
     @abstractmethod
-    def log_results(self):
-        pass
+    def log_results(self, data_loaded) -> Any: ...
 
 
     def run(self):
@@ -72,7 +69,6 @@ class Pipeline(ABC):
 
         self.logger.info('Transforming...')
         data_transformed = self.transform(data_extract)
-
 
 
         self.logger.info('Loading...')

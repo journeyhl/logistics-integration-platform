@@ -13,9 +13,7 @@ class SendShipments(Pipeline):
         
     
     def extract(self):
-        with open('sql/SendShipments.sql', 'r') as f:
-            self.query = f.read()
-        data_extract = self.acudb.query_db(self.query)
+        data_extract = self.acudb.query_db(self.acudb.queries.SendShipments.query)
         return data_extract
     
     def transform(self, data_extract):

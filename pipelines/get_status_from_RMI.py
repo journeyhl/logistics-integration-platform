@@ -11,12 +11,10 @@ class GetStatusFromRMI(Pipeline):
     def __init__(self):
         super().__init__('rmi_status')
         self.rmi = RMIAPIConnector(self)
-        with open('sql/StatusCheckRMI.sql', 'r') as f:
-            self.query = f.read()
-        self.data = self.centralstore.query_db(self.query).to_series().to_list()
+        self.data = self.centralstore.query_db(self.centralstore.queries.StatusCheckRMI.query).to_series().to_list()
         self.transformer = Transform(self)
 
-    def extract(self, RMANumber):
+    def extract(self, RMANumber):  # type: ignore[override]
         data_extract = self.rmi.get_rma(RMANumber)
         return data_extract
     
@@ -32,7 +30,7 @@ class GetStatusFromRMI(Pipeline):
         data_loaded = self.centralstore.checked_upsert('rmi_RMAStatus', data_transformed)
         return data_loaded
     
-    def log_results(self):
+    def log_results(self, data_loaded):
         pass
     
 

@@ -1,12 +1,52 @@
 from config.settings import DATABASES, TABLES
 from urllib.parse import quote_plus
 from sqlalchemy import create_engine, text
+from pathlib import Path
 import polars as pl
 import pandas as pd
 import logging
 import pyodbc
+from dataclasses import dataclass
+from typing import Generic, TypeVar
 
-class SQLConnector:
+
+@dataclass(frozen=True)
+class Query:
+    name: str
+    query: str
+
+
+class Queries:
+    def __init__(self, database_name: str):
+        queries_dir = Path(__file__).resolve().parent.parent / 'sql' / 'queries' / database_name
+        for sql_file in queries_dir.glob('*.sql'):
+            setattr(self, sql_file.stem, Query(name=sql_file.stem, query=sql_file.read_text()))
+
+    def __getattr__(self, name: str) -> Query:
+        raise AttributeError(f"No query named '{name}'")
+
+
+class CentralStoreQueries(Queries):
+    ReturnsPendingReciept: Query
+    StatusCheckRMI: Query
+
+
+class AcumaticaDbQueries(Queries):
+    SendReturns: Query
+    SendShipments: Query
+
+
+_QUERY_CLASSES: dict[str, type[Queries]] = {
+    'db_CentralStore': CentralStoreQueries,
+    'AcumaticaDb': AcumaticaDbQueries,
+}
+
+QT = TypeVar('QT', bound=Queries)
+
+
+class SQLConnector(Generic[QT]):
+    queries: QT
+
 
     def __init__(self, pipeline, database_name: str):
         self.pipeline = pipeline
@@ -14,11 +54,12 @@ class SQLConnector:
         self.logger = logging.getLogger(f'{database_name}')
         if database_name not in DATABASES:
             raise ValueError(f'Unknown db!')
-        
+
         self.database_name = database_name
         self.config = DATABASES[database_name]
         self.engine = self._create_engine()
         self.pyodbc_connection = pyodbc.connect(self._get_pyodbc_connection())
+        self.queries = _QUERY_CLASSES.get(database_name, Queries)(database_name)  # type: ignore[assignment]
         pass
 
         
@@ -50,6 +91,15 @@ class SQLConnector:
     
 
     def insert_df(self, df_data_loaded: pl.DataFrame, table_name: str):
+        '''_summary_
+
+        _extended_summary_
+
+        :param df_data_loaded: _description_
+        :type df_data_loaded: pl.DataFrame
+        :param table_name: _description_
+        :type table_name: str
+        '''
         df_data_loaded.write_database(table_name=table_name, 
                                       connection=self.engine,
                                       if_table_exists='append',                                      
