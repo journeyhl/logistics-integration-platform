@@ -5,8 +5,11 @@ import json
 
 class AcumaticaAPI:
     def __init__(self, pipeline):
+        if type(pipeline) == str:            
+            self.logger = logging.getLogger(f'{pipeline}.acu_api')
+        else:
+            self.logger = logging.getLogger(f'{pipeline.pipeline_name}.acu_api')
         self.pipeline = pipeline
-        self.logger = logging.getLogger(f'{pipeline.pipeline_name}.acu_api')
         self.version = '22.200.001'
         self.auth_type = 'Cookie'
         self.uri = 'https://erp.journeyhl.com/entity'
@@ -52,6 +55,38 @@ class AcumaticaAPI:
         return self.status_description, body
 
 
+    def customers(self, query=None, limit=100):
+        params = {
+            "$expand": "MainContact,MainContact/Address",
+            "$select": "CustomerID,CustomerName,CustomerClass,MainContact/Email,"
+                       "MainContact/Phone1,MainContact/Address/AddressLine1,"
+                       "MainContact/Address/AddressLine2,MainContact/Address/City,"
+                       "MainContact/Address/State,MainContact/Address/PostalCode,"
+                       "CreatedDateTime,LastModifiedDateTime",
+            "$top": str(limit),
+        }
+        if query:
+            params["$filter"] = query
+        response = self.session.get(f'{self.base_uri}/Customer', params=params)
+        response.raise_for_status()
+        return response.json()
+
+    def contact(self, query=None, limit=100):
+        params = {
+            "$expand": "Address",
+            "$select": "ContactID,FirstName,LastName,Email,Phone1,Phone2,"
+                    "JobTitle,Status,BusinessAccount,"
+                    "Address/AddressLine1,Address/AddressLine2,"
+                    "Address/City,Address/State,Address/PostalCode",
+            "$filter": query,
+            "$top": str(limit),
+        }
+        if query:
+            params["$filter"] = query
+        response = self.session.get(f'{self.base_uri}/Contact', params=params)
+        response.raise_for_status()
+        return response.json()
+
     def rc_sent_to_wh(self, OrderNbr, OrderType, CustomerID):
         body = {
             "CustomerID": { "value": f"{CustomerID}" },
@@ -65,6 +100,7 @@ class AcumaticaAPI:
                 }
             } 
         }
+        
         try:
             response = self.session.put(f'{self.base_uri}/SalesOrder', json=body)
             self.parse_response(response, {'type': 'Order', 'attribute': 'AttributeRCSHP2WH'})
@@ -101,7 +137,6 @@ class AcumaticaAPI:
             self.status_description = 'FAILURE'
             bp = 'here'
         
-
 
 
     def _logout(self):
