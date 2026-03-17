@@ -23,16 +23,18 @@ class CreateAcuReceipt(Pipeline):
         return data_extract
 
     def transform(self, data_extract: dict[str, pl.DataFrame]):
-        data_transformed = self.transformer.transform(data_extract)
-        
-        # central_shipments = "', '".join(order for order in central_transformed)
-        # test = f"select * from self where ReturnNbr in('{central_shipments})"
-        # acu_transformed = data_extract['acu_extract'].sql(f"select * from self where ReturnNbr in('{central_shipments}')")
-        bp = 'here'
-        return 
+        data_transformed = self.transformer.transform(data_extract)       
+        return data_transformed
     
     def load(self, data_transformed):
-        data_loaded = data_transformed
+
+        data_loaded = []
+        for order in data_transformed:
+            shipment_data = self.acu_api.sales_order_get_shipment(order)
+            if shipment_data['ShipmentNbr']:
+                bp = 'Add Package'
+            else:
+                data_loaded.append(self.acu_api.sales_order_create_receipt(order))
         return data_loaded
     
     def log_results(self, data_loaded):

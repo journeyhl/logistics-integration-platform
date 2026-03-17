@@ -48,7 +48,7 @@ class RMIAPIConnector():
 
     def closed_shipments(self):
         url = f'{self.uri}api/ClosedShipmentsV1'
-        from_date = datetime.today() - timedelta(days=7)
+        from_date = datetime.today() - timedelta(days=21)
         from_date = from_date.date().strftime('%Y-%m-%dT%H:%M:%SZ')
         to_date = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
         headers = {
@@ -78,7 +78,7 @@ class RMIAPIConnector():
 
     def get_receipts(self):
         url = f'{self.uri}api/Receipts'
-        from_date = datetime.today() - timedelta(days=7)
+        from_date = datetime.today() - timedelta(days=21)
         from_date = from_date.date().strftime('%Y-%m-%dT%H:%M:%SZ')
         to_date = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
         headers = {

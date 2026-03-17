@@ -1,5 +1,6 @@
 select s.OrderNbr ReturnNbr
 	 , sl.LineNbr LineNumber
+	 , s.OrderType
 	 , rtrim(i.InventoryCD) InventoryCD
 	 , cast(sl.OrderQty as int) Qty
 	 , rtrim(c.acctcd) AcctCD
@@ -8,7 +9,6 @@ select s.OrderNbr ReturnNbr
 	 , ic.Descr ItemClass
 	 , cast(k.ValueNumeric as int) SentToWH
 	 , rtrim(c.AcctCD) CustomerID
-	 , s.OrderType
 	 , s.OrderDate
 	 , j.Status AcuStatus
 	 , coalesce(sl.OrigOrderNbr, s.CustomerOrderNbr) OriginalOrderNbr
@@ -38,7 +38,7 @@ left join SOOrderKvExt k on s.CompanyID = k.CompanyID and s.NoteID = k.RecordID 
 left join JJStatusLookup j on s.Status = j.CStatus and j.Tbl = 'SOOrder'
 where s.CompanyID = 2
 and isi.SiteCD = 'RMI'
-and s.Status = 'N'
+and s.Status in('N')
 and s.OrderType = 'RC'
 --and s.OrderDate > '20260301'
 and k.ValueNumeric = 1

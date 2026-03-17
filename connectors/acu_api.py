@@ -2,7 +2,7 @@ from config.settings import ACUMATICA_API
 import requests
 import logging
 import json
-
+from datetime import datetime, timedelta
 class AcumaticaAPI:
     def __init__(self, pipeline):
         if type(pipeline) == str:            
@@ -33,26 +33,6 @@ class AcumaticaAPI:
             response.raise_for_status()
         except Exception as e:
             self._logout()
-
-    def sent_to_wh(self, ShipmentNbr, CustomerID):
-        body = {
-            "CustomerID": { "value": f"{CustomerID}" },
-            "ShipmentNbr": { "value": f"{ShipmentNbr}" },
-            "custom": {
-                "Document": {
-                    "AttributeSHP2WH": {
-                        "value": True
-                    }
-                }
-            } 
-        }
-        try:
-            response = self.session.put(f'{self.base_uri}/Shipment', json=body)
-            self.parse_response(response, {'type': 'Shipment', 'attribute': 'AttributeSHP2WH'})
-        except Exception as e:
-            self.status_description = 'FAILURE'
-            bp = 'handle this'
-        return self.status_description, body
 
 
     def customers(self, query=None, limit=100):
@@ -87,6 +67,62 @@ class AcumaticaAPI:
         response.raise_for_status()
         return response.json()
 
+
+
+#region SalesOrder
+    def sales_order_create_receipt(self, order_data):
+        self.logger.info(f'Creating Receipt for {order_data['OrderNbr']}')
+        body = {
+            "entity":{
+                "CustomerID": { "value": f"{order_data['AcctCD']}" },
+                "OrderType": {"value": f"{order_data['OrderType']}"},
+                "OrderNbr": { "value": f"{order_data['OrderNbr']}"}
+            }
+        }
+        try:
+            response = self.session.post(f'{self.base_uri}/SalesOrder/SalesOrderCreateReceipt', json=body)
+            bp = 'here'
+        except Exception as e:
+            bp = 'here'
+        bp = 'here'
+
+    def sales_order_get_shipment(self, order_data):        
+        shipment_data = {
+            'ShipmentNbr': None,
+            'CustomerID': None,
+            'Description': None,
+            'ExtRefNbr': None                    
+        }
+        self.logger.info(f'Checking for any shipments on {order_data['OrderNbr']}')
+        try:
+            response = self.session.get(f'{self.base_uri}/SalesOrder/{order_data['OrderType']}/{order_data['OrderNbr']}?$expand=Shipments')
+            order_info = response.json()
+        except Exception as e:
+            order_info = None
+            self.logger.error(f'Error getting {order_data['OrderNbr']}')
+        
+        if order_info:
+            self.logger.info(f'{order_data['OrderNbr']} parsed successfully. Status: {order_info['Status']['value']}, Shipments: {len(order_info['Shipments'])}')
+            shipment = next((shipment for shipment in order_info['Shipments']
+                                if datetime.strptime(shipment['LastModifiedDateTime']['value'][:-6], '%Y-%m-%dT%H:%M:%S.%f') >= datetime.now() - timedelta(minutes=10)
+                                ), None)
+            if shipment:
+                ShipmentNbr = shipment['ShipmentNbr']['value']
+                CustomerID = order_info['CustomerID'].get('value')
+                Description = order_info['Description'].get('value')
+                ExtRefNbr = order_info['ExternalRef'].get('value')
+                shipment_data = {
+                    'ShipmentNbr': ShipmentNbr,
+                    'CustomerID': CustomerID,
+                    'Description': Description,
+                    'ExtRefNbr': ExtRefNbr                    
+                }
+                self.logger.info(f'{ShipmentNbr} found for {order_data['OrderNbr']}')
+            else:
+                self.logger.warning(f'No Shipment found for {order_data['OrderNbr']}')
+        return shipment_data
+    
+    
     def rc_sent_to_wh(self, OrderNbr, OrderType, CustomerID):
         body = {
             "CustomerID": { "value": f"{CustomerID}" },
@@ -108,6 +144,52 @@ class AcumaticaAPI:
             self.status_description = 'FAILURE'
             bp = 'here'
         return self.status_description, body
+    #endregion SalesOrder
+
+    #region Shipment
+
+
+
+
+    def add_package(self, order_data):
+        try:
+            bp = 'here'
+        except Exception as e:
+            self.logger.error(f'Error adding package to {order_data['OrderNbr']}')
+
+    def sent_to_wh(self, ShipmentNbr, CustomerID):
+        '''sent_to_wh`(self, ShipmentNbr, CustomerID)`
+        ===
+        Marks a Shipment's Ship to Warehouse attribute to true. (AttributeSHP2WH)
+
+        :param:   
+
+            __ShipmentNbr__ (str): ShipmentNbr of Shipment to update
+            
+            __CustomerID__ (str): CustomerID or AcctCD of Customer on Shipment
+            
+
+        '''
+        body = {
+            "CustomerID": { "value": f"{CustomerID}" },
+            "ShipmentNbr": { "value": f"{ShipmentNbr}" },
+            "custom": {
+                "Document": {
+                    "AttributeSHP2WH": {
+                        "value": True
+                    }
+                }
+            } 
+        }
+        try:
+            response = self.session.put(f'{self.base_uri}/Shipment', json=body)
+            self.parse_response(response, {'type': 'Shipment', 'attribute': 'AttributeSHP2WH'})
+        except Exception as e:
+            self.status_description = 'FAILURE'
+            bp = 'handle this'
+        return self.status_description, body
+
+    #endregion Shipment
 
 
 

@@ -11,17 +11,22 @@ class Transform:
 
         central_transformed = data_extract['central_extract']
         acu_transformed = data_extract['acu_extract']
+        data_transformed = []
         for order in acu_transformed.iter_rows(named=True):
             match = next((
                 rmi_order for rmi_order in central_transformed.iter_rows(named=True)
-                    if order['ReturnNbr'] == rmi_order['RMANumber']
+                    if order['ReturnNbr'] == rmi_order['RMANumber'].replace('-1', '')
                     ), None)
             if match != None:
-                bp = 'here'
-            bp = 'here'
-
-        
-        # central_transformed = data_extract['central_extract'].sql('select distinct RMANumber from self').to_series().to_list()
-        # acu_transformed = data_extract['acu_extract'].sql(f'select distinct ReturnNbr from self')
-        bp = 'here'
-        return {}
+                order_formatted = {
+                    'OrderType': order['OrderType'],
+                    'OrderNbr': order['ReturnNbr'],
+                    'AcctCD': order['AcctCD'],
+                    'AcuInventoryCD': order['InventoryCD'],
+                    'AcuQty': order['Qty'],
+                    'RMIInventoryCD': match['InventoryCD'],
+                    'RMIQty': match['Qty'] 
+                }
+                data_transformed.append(order_formatted)
+        self.logger.info(f'Matched {len(data_transformed)} rows')
+        return data_transformed
