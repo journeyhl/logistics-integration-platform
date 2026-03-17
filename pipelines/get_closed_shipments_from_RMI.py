@@ -26,5 +26,5 @@ class GetClosedShipmentsFromRMI(Pipeline):
         bp = 'here'
         return data_transformed
 
-    def log_results(self):
+    def log_results(self, data_loaded):
         pass
