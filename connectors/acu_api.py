@@ -49,10 +49,14 @@ class AcumaticaAPI:
         
         if order_info:
             self.logger.info(f'{order_data['OrderNbr']} parsed successfully. Status: {order_info['Status']['value']}, Shipments: {len(order_info['Shipments'])}')
-
-            shipment = next((shipment for shipment in order_info['Shipments']
-                                if datetime.strptime(shipment['LastModifiedDateTime']['value'][:-6], '%Y-%m-%dT%H:%M:%S.%f') >= datetime.now() - timedelta(minutes=10)
-                                ), None)
+            if len(order_info['Shipments']) > 1:
+                shipment = next((shipment for shipment in order_info['Shipments']
+                                    if datetime.strptime(shipment['LastModifiedDateTime']['value'][:-6], '%Y-%m-%dT%H:%M:%S.%f') >= datetime.now() - timedelta(minutes=10)
+                                    ), None)
+            elif len(order_info['Shipments']) != 0:
+                shipment = order_info['Shipments'][0]
+            else:
+                shipment = None
             if shipment:
                 shipment_data = {
                     'ShipmentNbr': shipment['ShipmentNbr'].get('value'),
@@ -130,12 +134,35 @@ class AcumaticaAPI:
     #region Shipment
 
     def shipment_details(self, shipment_data: dict):
+        '''shipment_details`(self, shipment_data)`
+        ===
+        * Gets Customer details
+
+        * API Method: **GET**
+
+        Parameters
+        ---
+        <hr>
+
+            __shipment_data__ (dict): Dictionary containing details of Shipment
+        
+        Returns
+        ---
+        <hr>
+
+            __response.json()__ (dict): Parsed Dictionary of response from API
+        '''
         try:
-            response = self.session.get()
+            response = self.session.get(f'{self.base_uri}/Shipment/{shipment_data['ShipmentNbr']}?$expand=Details,Packages')
+            response_details = self.parse_shipment_details(shipment_data, response)
+            # if response_details['package_count'] == 0:
             bp = 'here'
         except Exception as e:
-            self.logger.error(f'Error adding package to {shipment_data['ShipmentNbr']} ({shipment_data['OrderNbr']})')
+            self.logger.error(f'Error getting packages for {shipment_data['ShipmentNbr']} ({shipment_data['OrderNbr']})')
+        bp = 'here'
 
+    def add_package(self, shipment_data):
+        bp = 'here'
 
     def sent_to_wh(self, ShipmentNbr, CustomerID):
         '''sent_to_wh`(self, ShipmentNbr, CustomerID)`
@@ -182,6 +209,32 @@ class AcumaticaAPI:
 
 
 #region Utility
+    def parse_shipment_details(self, shipment_data, response):
+        try:
+            response = response.json()
+        except Exception as e:
+            self.logger.error(f'Could not parse response!')
+            return {
+                'data': response,
+                'status': 'Error'
+            }
+        package_count = response['PackageCount']['value']
+        line_count = len(response['Details'])
+        details = [{
+            'LineNbr': line['LineNbr']['value'],
+            'InventoryCD': line['InventoryID']['value'],
+            'LineNbr': line['LineNbr']['value'],
+        } for line in response['Details']]
+
+        shipment_details = {
+            **shipment_data,
+            'package_count': package_count,
+            'line_count': line_count,
+            'details': details
+        }
+        self.logger.info(f'{response['ShipmentNbr']['value']} - Packages: {package_count}. Lines: {line_count}')
+        return shipment_details
+
     def parse_response(self, response: requests.Response, entity_type: dict):
         status_code = response.status_code
         if status_code == 200:

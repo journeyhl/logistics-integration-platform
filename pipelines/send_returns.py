@@ -2,6 +2,7 @@ from pipelines import Pipeline
 from connectors import SQLConnector, RMIXMLConnector
 from transform.rmi_send import Transform
 import polars as pl
+import json
 class SendReturns(Pipeline):
     def __init__(self):
         super().__init__('rmi-send-returns')
@@ -23,6 +24,7 @@ class SendReturns(Pipeline):
     
     def log_results(self, data_loaded: list):
         if len(data_loaded) > 0:
+            data_loaded = [{k: json.dumps(v) if isinstance(v, dict) else v for k, v in row.items()} for row in data_loaded]
             df_loaded = pl.DataFrame(data_loaded)
             df_loaded = df_loaded.with_columns(pl.lit('Return').alias('Type'))
             df_loaded = df_loaded.rename({'key': 'KeyValue', 'lines': 'Lines', 'rmi_response': 'RMI_Response', 'rmi_payload': 'RMI_Payload', 'acu_response': 'ACU_Response', 'timestamp': 'Timestamp'})
