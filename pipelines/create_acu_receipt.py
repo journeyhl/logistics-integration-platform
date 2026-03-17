@@ -32,6 +32,7 @@ class CreateAcuReceipt(Pipeline):
         for order in data_transformed:
             shipment_data = self.acu_api.sales_order_get_shipment(order)
             if shipment_data['ShipmentNbr']:
+                self.acu_api.sh
                 bp = 'Add Package'
             else:
                 data_loaded.append(self.acu_api.sales_order_create_receipt(order))

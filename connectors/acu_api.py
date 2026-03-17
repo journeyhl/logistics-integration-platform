@@ -21,54 +21,6 @@ class AcumaticaAPI:
         self.session = requests.Session()
         self._auth()
 
-    def _auth(self):
-        auth_url = 'https://erp.journeyhl.com/entity/auth/login'
-        body = {
-            "name": self.username,
-            "password": self.password,
-            "company": self.company
-        }
-        try:
-            response = self.session.post(url=auth_url, json=body)
-            response.raise_for_status()
-        except Exception as e:
-            self._logout()
-
-
-    def customers(self, query=None, limit=100):
-        params = {
-            "$expand": "MainContact,MainContact/Address",
-            "$select": "CustomerID,CustomerName,CustomerClass,MainContact/Email,"
-                       "MainContact/Phone1,MainContact/Address/AddressLine1,"
-                       "MainContact/Address/AddressLine2,MainContact/Address/City,"
-                       "MainContact/Address/State,MainContact/Address/PostalCode,"
-                       "CreatedDateTime,LastModifiedDateTime",
-            "$top": str(limit),
-        }
-        if query:
-            params["$filter"] = query
-        response = self.session.get(f'{self.base_uri}/Customer', params=params)
-        response.raise_for_status()
-        return response.json()
-
-    def contact(self, query=None, limit=100):
-        params = {
-            "$expand": "Address",
-            "$select": "ContactID,FirstName,LastName,Email,Phone1,Phone2,"
-                    "JobTitle,Status,BusinessAccount,"
-                    "Address/AddressLine1,Address/AddressLine2,"
-                    "Address/City,Address/State,Address/PostalCode",
-            "$filter": query,
-            "$top": str(limit),
-        }
-        if query:
-            params["$filter"] = query
-        response = self.session.get(f'{self.base_uri}/Contact', params=params)
-        response.raise_for_status()
-        return response.json()
-
-
-
 #region SalesOrder
     def sales_order_create_receipt(self, order_data):
         self.logger.info(f'Creating Receipt for {order_data['OrderNbr']}')
@@ -86,13 +38,7 @@ class AcumaticaAPI:
             bp = 'here'
         bp = 'here'
 
-    def sales_order_get_shipment(self, order_data):        
-        shipment_data = {
-            'ShipmentNbr': None,
-            'CustomerID': None,
-            'Description': None,
-            'ExtRefNbr': None                    
-        }
+    def sales_order_get_shipment(self, order_data):
         self.logger.info(f'Checking for any shipments on {order_data['OrderNbr']}')
         try:
             response = self.session.get(f'{self.base_uri}/SalesOrder/{order_data['OrderType']}/{order_data['OrderNbr']}?$expand=Shipments')
@@ -103,27 +49,59 @@ class AcumaticaAPI:
         
         if order_info:
             self.logger.info(f'{order_data['OrderNbr']} parsed successfully. Status: {order_info['Status']['value']}, Shipments: {len(order_info['Shipments'])}')
+
             shipment = next((shipment for shipment in order_info['Shipments']
                                 if datetime.strptime(shipment['LastModifiedDateTime']['value'][:-6], '%Y-%m-%dT%H:%M:%S.%f') >= datetime.now() - timedelta(minutes=10)
                                 ), None)
             if shipment:
-                ShipmentNbr = shipment['ShipmentNbr']['value']
-                CustomerID = order_info['CustomerID'].get('value')
-                Description = order_info['Description'].get('value')
-                ExtRefNbr = order_info['ExternalRef'].get('value')
                 shipment_data = {
-                    'ShipmentNbr': ShipmentNbr,
-                    'CustomerID': CustomerID,
-                    'Description': Description,
-                    'ExtRefNbr': ExtRefNbr                    
+                    'ShipmentNbr': shipment['ShipmentNbr'].get('value'),
+                    'CustomerID': order_info['CustomerID'].get('value'),
+                    'Description': order_info['Description'].get('value'),
+                    'ExtRefNbr': order_info['ExternalRef'].get('value'),
+                    'OrderNbr': order_data['OrderNbr'],
+                    'OrderType': order_data['OrderType']
                 }
-                self.logger.info(f'{ShipmentNbr} found for {order_data['OrderNbr']}')
+                self.logger.info(f'{shipment['ShipmentNbr'].get('value')} found for {order_data['OrderNbr']}')
+                return shipment_data
             else:
                 self.logger.warning(f'No Shipment found for {order_data['OrderNbr']}')
+                
+        shipment_data = {
+            'ShipmentNbr': None,
+            'CustomerID': None,
+            'Description': None,
+            'ExtRefNbr': None,
+            'OrderNbr': order_data['OrderNbr'],
+            'OrderType': order_data['OrderType']
+        }
         return shipment_data
     
     
     def rc_sent_to_wh(self, OrderNbr, OrderType, CustomerID):
+        '''rc_sent_to_wh`(self, OrderNbr, OrderType, CustomerID)`
+        ===
+        
+        * Marks an *Order*'s **RC Ship to Warehouse** attribute to true. (AttributeRCSHP2WH)
+
+        * API Method: **PUT**
+        
+        Parameters
+        ---
+        <hr>
+
+            __OrderNbr__ (str): OrderNbr of Order to update (AR078365)
+            __OrderType__ (str): OrderType of Order to update (RC)
+            __CustomerID__ (str): CustomerID or AcctCD of Customer on Order (C0090306, C0067451)
+        
+        Returns
+        ---
+        <hr>
+
+            __self.status_description__ (str): Details of interaction with Acumatica API
+            __body__ (dict): Dictionary of what was sent to Acumatica API
+
+        '''
         body = {
             "CustomerID": { "value": f"{CustomerID}" },
             "OrderType": {"value": f"{OrderType}"},
@@ -146,28 +124,39 @@ class AcumaticaAPI:
         return self.status_description, body
     #endregion SalesOrder
 
+
+
+
     #region Shipment
 
-
-
-
-    def add_package(self, order_data):
+    def shipment_details(self, shipment_data: dict):
         try:
+            response = self.session.get()
             bp = 'here'
         except Exception as e:
-            self.logger.error(f'Error adding package to {order_data['OrderNbr']}')
+            self.logger.error(f'Error adding package to {shipment_data['ShipmentNbr']} ({shipment_data['OrderNbr']})')
+
 
     def sent_to_wh(self, ShipmentNbr, CustomerID):
         '''sent_to_wh`(self, ShipmentNbr, CustomerID)`
         ===
-        Marks a Shipment's Ship to Warehouse attribute to true. (AttributeSHP2WH)
+        * Marks a *Shipment*'s **Ship to Warehouse** attribute to true. (AttributeSHP2WH)
 
-        :param:   
+        * API Method: **PUT**
+
+        Parameters
+        ---
+        <hr>
 
             __ShipmentNbr__ (str): ShipmentNbr of Shipment to update
-            
-            __CustomerID__ (str): CustomerID or AcctCD of Customer on Shipment
-            
+            __CustomerID__ (str): CustomerID or AcctCD of Customer on Shipment (C0090306, C0067451)
+        
+        Returns
+        ---
+        <hr>
+
+            __self.status_description__ (str): Details of interaction with Acumatica API
+            __body__ (dict): Dictionary of what was sent to Acumatica API
 
         '''
         body = {
@@ -186,14 +175,13 @@ class AcumaticaAPI:
             self.parse_response(response, {'type': 'Shipment', 'attribute': 'AttributeSHP2WH'})
         except Exception as e:
             self.status_description = 'FAILURE'
-            bp = 'handle this'
         return self.status_description, body
 
     #endregion Shipment
 
 
 
-
+#region Utility
     def parse_response(self, response: requests.Response, entity_type: dict):
         status_code = response.status_code
         if status_code == 200:
@@ -218,9 +206,97 @@ class AcumaticaAPI:
         else:
             self.status_description = 'FAILURE'
             bp = 'here'
-        
+#endregion Utility
 
+
+#region Customer/Contact
+    def customers(self, query=None, limit=100):
+        '''customers`(self, query=None, limit=100)`
+        ===
+        * Gets Customer details
+
+        * API Method: **GET**
+
+        Parameters
+        ---
+        <hr>
+
+            __query__ (str | None): Query to filter response (default = None)
+            __limit__ (int): Number of results to limit to (default = 100)
+        
+        Returns
+        ---
+        <hr>
+
+            __response.json()__ (dict): Parsed Dictionary of response from API
+        '''
+        params = {
+            "$expand": "MainContact,MainContact/Address",
+            "$select": "CustomerID,CustomerName,CustomerClass,MainContact/Email,"
+                       "MainContact/Phone1,MainContact/Address/AddressLine1,"
+                       "MainContact/Address/AddressLine2,MainContact/Address/City,"
+                       "MainContact/Address/State,MainContact/Address/PostalCode,"
+                       "CreatedDateTime,LastModifiedDateTime",
+            "$top": str(limit),
+        }
+        if query:
+            params["$filter"] = query
+        response = self.session.get(f'{self.base_uri}/Customer', params=params)
+        response.raise_for_status()
+        return response.json()
+
+    def contact(self, query=None, limit=100):
+        '''contact`(self, query=None, limit=100)`
+        ===
+        * Gets Customer Contact details
+
+        * API Method: **GET**
+
+        Parameters
+        ---
+        <hr>
+
+            __query__ (str | None): Query to filter response (default = None)
+            __limit__ (int): Number of results to limit to (default = 100)
+        
+        Returns
+        ---
+        <hr>
+
+            __response.json()__ (dict): Parsed Dictionary of response from API
+        '''
+        params = {
+            "$expand": "Address",
+            "$select": "ContactID,FirstName,LastName,Email,Phone1,Phone2,"
+                    "JobTitle,Status,BusinessAccount,"
+                    "Address/AddressLine1,Address/AddressLine2,"
+                    "Address/City,Address/State,Address/PostalCode",
+            "$filter": query,
+            "$top": str(limit),
+        }
+        if query:
+            params["$filter"] = query
+        response = self.session.get(f'{self.base_uri}/Contact', params=params)
+        response.raise_for_status()
+        return response.json()
+    #endregion Customer/Contact
+
+
+#region Authentication/Logout
+    def _auth(self):
+        auth_url = 'https://erp.journeyhl.com/entity/auth/login'
+        body = {
+            "name": self.username,
+            "password": self.password,
+            "company": self.company
+        }
+        try:
+            response = self.session.post(url=auth_url, json=body)
+            response.raise_for_status()
+        except Exception as e:
+            self._logout()
 
     def _logout(self):
         self.session.post('https://erp.journeyhl.com/entity/auth/logout')
         self.logger.info('Logged out of Acumatica API session')
+#endregion Authentication/Logout
