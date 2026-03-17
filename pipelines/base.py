@@ -21,7 +21,7 @@ class Pipeline(ABC):
     def __init__(self, pipeline_name):
         self.pipeline_name = pipeline_name
         self.centralstore: SQLConnector[CentralStoreQueries] = SQLConnector(self, 'db_CentralStore')
-        # self.acudb: SQLConnector[AcumaticaDbQueries] = SQLConnector(self, 'AcumaticaDb')
+        self.acudb: SQLConnector[AcumaticaDbQueries] = SQLConnector(self, 'AcumaticaDb')
         self.acu_api = AcumaticaAPI(self)
         self.logger = logging.getLogger(pipeline_name)
 

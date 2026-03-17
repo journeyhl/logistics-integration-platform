@@ -34,6 +34,7 @@ class CentralStoreQueries(Queries):
 class AcumaticaDbQueries(Queries):
     SendReturns: Query
     SendShipments: Query
+    OpenRCsNoReceipt: Query
 
 
 _QUERY_CLASSES: dict[str, type[Queries]] = {

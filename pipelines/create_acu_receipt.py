@@ -12,15 +12,21 @@ class CreateAcuReceipt(Pipeline):
         
 
     def extract(self):
-        data_extract = self.centralstore.query_db(self.centralstore.queries.ReturnsPendingReciept.query)
-        bp = 'here'
+        central_extract = self.centralstore.query_db(self.centralstore.queries.ReturnsPendingReciept.query)
+        acu_extract = self.acudb.query_db(self.acudb.queries.OpenRCsNoReceipt.query)
+        data_extract = {
+            'central_extract': central_extract,
+            'acu_extract': acu_extract
+        }
         return data_extract
 
-    def transform(self, data_extract: pl.DataFrame):
-        data_transformed = data_extract.sql('select distinct RMANumber, CustomerRef from self')
-
+    def transform(self, data_extract: dict[str, pl.DataFrame]):
+        central_transformed = data_extract['central_extract'].sql('select distinct RMANumber from self').to_series().to_list()
+        central_shipments = "', '".join(order for order in central_transformed)
+        test = f"select * from self where ReturnNbr in('{central_shipments})"
+        acu_transformed = data_extract['acu_extract'].sql(f"select * from self where ReturnNbr in('{central_shipments}')")
         bp = 'here'
-        return data_transformed
+        return acu_transformed
     
     def load(self, data_transformed):
         data_loaded = data_transformed
