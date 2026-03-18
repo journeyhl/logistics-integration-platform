@@ -35,7 +35,7 @@ Upserts results to **RMA_Statuses**
         return data_transformed
     
     def load(self, data_transformed):
-        if data_extract == {'message': 'Bad Request', 'status': 400}:
+        if data_transformed == {'message': 'Bad Request', 'status': 400}:
             return data_transformed
         data_loaded = self.centralstore.checked_upsert('rmi_RMAStatus', data_transformed)
         return data_transformed
