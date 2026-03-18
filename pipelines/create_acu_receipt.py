@@ -6,11 +6,13 @@ if __name__ == '__main__':
 from pipelines import Pipeline
 import polars as pl
 from transform.create_acu_receipt import Transform
+from load.shipment_api import Load
 
 class CreateAcuReceipt(Pipeline):
     def __init__(self):
         super().__init__('create_receipts')
         self.transformer = Transform(self)
+        self.loader = Load(self)
         
 
     def extract(self):
@@ -29,16 +31,7 @@ class CreateAcuReceipt(Pipeline):
     def load(self, data_transformed):
 
         data_loaded = []
-        for order in data_transformed:
-            shipment_data = self.acu_api.sales_order_get_shipment(order)
-            if shipment_data['ShipmentNbr']:
-                receipt_response = self.acu_api.shipment_details(shipment_data)
-                self.acu_api.add_package(receipt_response)
-                bp = 'Add Package'
-            else:
-                self.acu_api.sales_order_create_receipt(order)
-                receipt_response = self.acu_api.shipment_details(shipment_data)
-                self.acu_api.add_package(shipment_data)
+        self.loader.load(data_transformed)
         return data_loaded
     
     def log_results(self, data_loaded):

@@ -33,7 +33,7 @@ class AcumaticaAPI:
         }
         try:
             response = self.session.post(f'{self.base_uri}/SalesOrder/SalesOrderCreateReceipt', json=body)
-            self.logger.info(response.status_code)
+            self.logger.info(f'{response.status_code} {response.reason}')
         except Exception as e:
             bp = 'here'
 
@@ -151,6 +151,7 @@ class AcumaticaAPI:
 
             __response.json()__ (dict): Parsed Dictionary of response from API
         '''
+        self.logger.info(f'Retrieving Shipment Details from Acu API for {shipment_data['ShipmentNbr']}')
         try:
             response = self.session.get(f'{self.base_uri}/Shipment/{shipment_data['ShipmentNbr']}?$expand=Details/Allocations,Packages')
             response_details = self.parse_shipment_details(shipment_data, response)
@@ -162,13 +163,16 @@ class AcumaticaAPI:
         bp = 'here'
 
     def add_package(self, shipment_data):
+        self.logger.info(f'Adding package to {shipment_data['ShipmentNbr']}')
+        now = datetime.now().strftime('%m/%d/%Y %H:%M:%S')
+        descr = f'Package added via API @ {now}'
         body = {
             "ShipmentNbr": { "value": f"{shipment_data['ShipmentNbr']}" },
             "Packages": [
                 {
                 "BoxID": { "value": "DEFAULT BOX" },
                 "TrackingNbr": { "value": f"{shipment_data['ExtRefNbr']}" },
-                "Description": { "value": "Package via API" },
+                "Description": { "value": f"{descr}" },
                 "Weight": { "value": 0 },
                 "UOM": { "value": "LBS" },
                 
@@ -184,16 +188,57 @@ class AcumaticaAPI:
             }
             for line in shipment_data['details']
         ]
+        shipment_data = self.get_package_details(shipment_data, body)
+        return shipment_data
+
+
+    def get_package_details(self, shipment_data, body=None):
+        verb = 'added to'
+        if body == None:
+            verb = 'retrieved from'
+            body = {
+                "ShipmentNbr": { "value": f"{shipment_data['ShipmentNbr']}" },
+            }
         response = self.session.put(url=f'{self.base_uri}/Shipment?$expand=Packages/PackageContents', json=body)
         json_response = response.json()
+        if response.ok:            
+            self.logger.info(f'Package {verb} {shipment_data['ShipmentNbr']}!')
+            shipment_data = {**shipment_data, 'Packages': json_response['Packages'], 'package_count': json_response['PackageCount']['value']}
         if not response.ok:
-            self.logger.error(f'add_package failed ({response.status_code}): {json_response['error']}')
-        return json_response
+            self.logger.error(f'get_package_details failed ({response.status_code}): {json_response['error']}')
+        return shipment_data
 
     def confirm_shipment(self, shipment_data):
+        self.logger.info(f'Confirming Shipment {shipment_data['ShipmentNbr']}')
+        body = {
+            "entity": {
+                "Type": {
+                    "value": "Shipment"
+                },
+                "ShipmentNbr": {
+                    "value": f"{shipment_data['ShipmentNbr']}"
+                }
+            }
+        }
+        response = self.session.post(url=f'{self.base_uri}/Shipment/ConfirmShipment', json=body)
+        self.logger.info(f'{response.status_code} {response.reason}')
         bp = 'here'
 
-
+    def update_reason_code(self, shipment_data, line_data):
+        self.logger.info(f'Updating ReasonCode on line {line_data['LineNbr']} of {shipment_data['ShipmentNbr']} from {line_data['ReasonCode']} to RETURN')
+        body = {
+            "ShipmentNbr": { "value": f"{shipment_data['ShipmentNbr']}" },
+            "Details": [
+                {
+                "LineNbr":    { "value": line_data['LineNbr'] },
+                "ReasonCode": { "value": "RETURN" }
+                }
+            ]
+        }
+        response = self.session.put(url=f'{self.base_uri}/Shipment', json=body)
+        if response.ok:
+            line_data['ReasonCode'] = 'RETURN'
+        return line_data
 
     def sent_to_wh(self, ShipmentNbr, CustomerID):
         '''sent_to_wh`(self, ShipmentNbr, CustomerID)`
@@ -255,11 +300,14 @@ class AcumaticaAPI:
             'LineNbr': line['LineNbr']['value'],
             'InventoryCD': line['InventoryID']['value'],
             'Qty': line['ShippedQty']['value'],
-            'SplitLineNbr': line['Allocations'][0]['SplitLineNbr']['value']
+            'SplitLineNbr': line['Allocations'][0]['SplitLineNbr']['value'],
+            'ReasonCode': line['ReasonCode']['value'],
+            'id': line['id']
         } for line in response['Details']]
 
         shipment_details = {
             **shipment_data,
+            'Status': response['Status']['value'],
             'package_count': package_count,
             'line_count': line_count,
             'details': details

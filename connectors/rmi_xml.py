@@ -86,8 +86,8 @@ class RMIXMLConnector:
         <CustomerRef>{shipment[0]['OrderNbr']}</CustomerRef>
         <Customer>
           <ShipTo>
-            <CompanyName>{shipment[0]['CompanyName'][:25]}</CompanyName>
-            <Contact>{shipment[0]['ShipToName'][:25]}</Contact>
+            <CompanyName>{shipment[0]['CompanyName'][:25].replace('&', '&amp;')}</CompanyName>
+            <Contact>{shipment[0]['ShipToName'][:25].replace('&', '&amp;')}</Contact>
             <ContactEmail>{shipment[0]['ShipToEmailContact']}</ContactEmail>
             <Address1>{shipment[0]['ShipToAddress1']}</Address1>
             <Address2>{shipment[0]['ShipToAddress2']}</Address2>
