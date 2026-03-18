@@ -4,6 +4,12 @@ from transform.rmi_send import Transform
 import polars as pl
 import json
 class SendReturns(Pipeline):
+    '''SendShipments
+===
+
+Queries *AcumaticaDb* for any **Open RC Orders** from RMI that have **NOT** been sent to the warehouse
+
+Sends Return Order payload to RMI and upserts *RMI_send_log*'''
     def __init__(self):
         super().__init__('rmi-send-returns')
         self.transformer = Transform(self)

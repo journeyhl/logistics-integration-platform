@@ -3,6 +3,13 @@ from connectors import RMIAPIConnector, SQLConnector
 from transform.rmi_receipt_pull import Transform
 
 class GetReceiptsFromRMI(Pipeline):
+    '''GetReceiptsFromRMI
+===
+
+Hits RMI's *Receipts* endpoint
+
+Upserts results to **rmi_Receipts**
+'''
     def __init__(self):
         super().__init__('rmi_receipts')
         self.rmi = RMIAPIConnector(self)

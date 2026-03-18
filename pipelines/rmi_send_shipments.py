@@ -4,6 +4,12 @@ from transform.rmi_send import Transform
 import polars as pl
 import json
 class SendShipments(Pipeline):
+    '''SendShipments
+===
+
+Queries *AcumaticaDb* for any **Open Shipments** for RMI that have **NOT** been sent to the warehouse
+
+Sends Shipment payload to RMI and upserts *RMI_send_log*'''
     def __init__(self):
         super().__init__('rmi-send-shipments')
         self.url = 'https://erp.journeyhl.com/ODATA/JHL/JHL RMI Shipment API'

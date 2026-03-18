@@ -8,6 +8,16 @@ from connectors import RMIAPIConnector
 from transform.rmi_receipt_pull import Transform
 
 class GetStatusFromRMI(Pipeline):
+    '''GetStatusFromRMI
+===
+From CentralStore: 
+ * Gets all recently pulled Closed Shipments and Receipts, 
+ * Gets all recently sent Shipments & Returns
+
+For each row, hits RMI's rma endpoint to determine the status on their end.
+
+Upserts results to **RMA_Statuses**
+    '''
     def __init__(self):
         super().__init__('rmi_status')
         self.rmi = RMIAPIConnector(self)
@@ -28,8 +38,9 @@ class GetStatusFromRMI(Pipeline):
         if data_extract == {'message': 'Bad Request', 'status': 400}:
             return data_transformed
         data_loaded = self.centralstore.checked_upsert('rmi_RMAStatus', data_transformed)
-        return data_loaded
+        return data_transformed
     
+        
     def log_results(self, data_loaded):
         pass
     
@@ -45,6 +56,7 @@ if __name__ == '__main__':
         data_extract = test.extract(RMANumber)
         data_transformed = test.transform(data_extract)
         data_loaded = test.load(data_transformed)
+        
         bp = 'here'
 
     

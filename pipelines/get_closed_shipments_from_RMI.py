@@ -6,6 +6,13 @@ from transform.rmi_receipt_pull import Transform
 
 
 class GetClosedShipmentsFromRMI(Pipeline):
+    '''
+===
+
+Hits RMI's *ClosedShipmentsV1* endpoint
+
+Upserts to **rmi_ClosedShipments**
+    '''
     def __init__(self):
         super().__init__('rmi_shipments')
         self.rmi = RMIAPIConnector(self)

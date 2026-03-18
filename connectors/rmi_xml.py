@@ -182,8 +182,8 @@ class RMIXMLConnector:
         <CustomerRef>{return_order[0]['OriginalOrderNbr']}</CustomerRef>
         <Customer>
           <ShipTo>
-            <CompanyName>{return_order[0]['CompanyName']}</CompanyName>
-            <Contact>{return_order[0]['ShipToName']}</Contact>
+            <CompanyName>{return_order[0]['CompanyName'].replace('&', '&amp;')}</CompanyName>
+            <Contact>{return_order[0]['ShipToName'].replace('&', '&amp;')}</Contact>
             <ContactEmail>{return_order[0]['ShipToEmailContact']}</ContactEmail>
             <Address1>{return_order[0]['ShipToAddress1']}</Address1>
             <Address2>{return_order[0]['ShipToAddress2']}</Address2>
