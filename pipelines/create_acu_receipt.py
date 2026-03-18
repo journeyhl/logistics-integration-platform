@@ -32,10 +32,13 @@ class CreateAcuReceipt(Pipeline):
         for order in data_transformed:
             shipment_data = self.acu_api.sales_order_get_shipment(order)
             if shipment_data['ShipmentNbr']:
-                self.acu_api.shipment_details(shipment_data)
+                receipt_response = self.acu_api.shipment_details(shipment_data)
+                self.acu_api.add_package(receipt_response)
                 bp = 'Add Package'
             else:
-                data_loaded.append(self.acu_api.sales_order_create_receipt(order))
+                self.acu_api.sales_order_create_receipt(order)
+                receipt_response = self.acu_api.shipment_details(shipment_data)
+                self.acu_api.add_package(shipment_data)
         return data_loaded
     
     def log_results(self, data_loaded):

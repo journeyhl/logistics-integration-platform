@@ -33,10 +33,9 @@ class AcumaticaAPI:
         }
         try:
             response = self.session.post(f'{self.base_uri}/SalesOrder/SalesOrderCreateReceipt', json=body)
-            bp = 'here'
+            self.logger.info(response.status_code)
         except Exception as e:
             bp = 'here'
-        bp = 'here'
 
     def sales_order_get_shipment(self, order_data):
         self.logger.info(f'Checking for any shipments on {order_data['OrderNbr']}')
@@ -153,16 +152,48 @@ class AcumaticaAPI:
             __response.json()__ (dict): Parsed Dictionary of response from API
         '''
         try:
-            response = self.session.get(f'{self.base_uri}/Shipment/{shipment_data['ShipmentNbr']}?$expand=Details,Packages')
+            response = self.session.get(f'{self.base_uri}/Shipment/{shipment_data['ShipmentNbr']}?$expand=Details/Allocations,Packages')
             response_details = self.parse_shipment_details(shipment_data, response)
             # if response_details['package_count'] == 0:
-            bp = 'here'
+            return response_details
         except Exception as e:
             self.logger.error(f'Error getting packages for {shipment_data['ShipmentNbr']} ({shipment_data['OrderNbr']})')
+            return {}
         bp = 'here'
 
     def add_package(self, shipment_data):
+        body = {
+            "ShipmentNbr": { "value": f"{shipment_data['ShipmentNbr']}" },
+            "Packages": [
+                {
+                "BoxID": { "value": "DEFAULT BOX" },
+                "TrackingNbr": { "value": f"{shipment_data['ExtRefNbr']}" },
+                "Description": { "value": "Package via API" },
+                "Weight": { "value": 0 },
+                "UOM": { "value": "LBS" },
+                
+                }
+            ]
+        }
+        body['Packages'][0]['PackageContents'] = [
+            {
+                "InventoryID": { "value": line['InventoryCD'] },
+                "Quantity": { "value": line['Qty'] },
+                "UOM": { "value": "EA" },
+                "ShipmentSplitLineNbr": { "value": line['SplitLineNbr'] }
+            }
+            for line in shipment_data['details']
+        ]
+        response = self.session.put(url=f'{self.base_uri}/Shipment?$expand=Packages/PackageContents', json=body)
+        json_response = response.json()
+        if not response.ok:
+            self.logger.error(f'add_package failed ({response.status_code}): {json_response['error']}')
+        return json_response
+
+    def confirm_shipment(self, shipment_data):
         bp = 'here'
+
+
 
     def sent_to_wh(self, ShipmentNbr, CustomerID):
         '''sent_to_wh`(self, ShipmentNbr, CustomerID)`
@@ -223,7 +254,8 @@ class AcumaticaAPI:
         details = [{
             'LineNbr': line['LineNbr']['value'],
             'InventoryCD': line['InventoryID']['value'],
-            'LineNbr': line['LineNbr']['value'],
+            'Qty': line['ShippedQty']['value'],
+            'SplitLineNbr': line['Allocations'][0]['SplitLineNbr']['value']
         } for line in response['Details']]
 
         shipment_details = {

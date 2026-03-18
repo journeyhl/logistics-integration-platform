@@ -112,10 +112,11 @@ class RMIXMLConnector:
               self.get_rmi_msg(rmi_response)
               bp ='here'
           else:
-              self.rmi_response_str = 'CRITICAL ERROR: No response from RMI!'
+              self.rmi_response_str = f'{shipment[0]['RMANumber']} - CRITICAL ERROR: No response from RMI!'
               self.logger.error(self.rmi_response_str)
+              print(send_str)
           if 'error' in self.rmi_response_str.lower():
-              acu_response = 'RMI Error, did not attempt SendToWH in Acu'
+              acu_response = f'{shipment[0]['RMANumber']} - RMI Error, did not attempt SendToWH in Acu'
               self.logger.warning(acu_response)
               acu_payload = ''
           else:              
@@ -162,9 +163,11 @@ class RMIXMLConnector:
             self.rmi_response_info = {'Result': 'false', 'Message': 'Error parsing response'}
             self.rmi_response_str = f'{status_code} ERROR: {self.rmi_response_info['Message']}'
             self.logger.error(self.rmi_response_str)
-#send immediately
-#
+
+
     def post_3(self, return_order):
+        line_str = f'1 line' if len(return_order) == 1 else f'{len(return_order)} lines'
+        self.logger.info(f'Preparing {return_order[0]['ReturnNbr']} - {line_str}')
         row_text = self._format_3_lines(return_order)
 
         send_str = f'''<?xml version="1.0" encoding="utf-8"?>
