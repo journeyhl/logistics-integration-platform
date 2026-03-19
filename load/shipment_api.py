@@ -35,7 +35,7 @@ class Load:
         bp = 'here'
     
     def check_reason_code(self, receipt_response, line):
-        if line['ReasonCode'] == 'PHONE':
+        if line['ReasonCode'] != 'RETURN':
             line = self.acu_api.update_reason_code(receipt_response, line)
         return line
     
@@ -73,13 +73,10 @@ class Load:
                 details_item_comparison[item] = {
                     'Qty': int(qty + details_item_comparison[item]['Qty'])
                 }
-                bp = 'here'
             else:
                 details_item_comparison[item] = {
                     'Qty': qty
                 }
-                bp = 'here'
-            bp = 'here'
         
         package_item_comparison = {}
         for package in receipt_response['Packages']:
@@ -92,12 +89,10 @@ class Load:
                     package_item_comparison[item] = {
                         'Qty': int(qty + package_item_comparison[item]['Qty'])
                     }
-                    bp = 'here'
                 else:
                     package_item_comparison[item] = {
                         'Qty': qty
                     }
-                    bp = 'here'
         
         bp = 'here'
         ready = details_item_comparison == package_item_comparison
