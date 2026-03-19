@@ -177,7 +177,10 @@ class AcumaticaAPI:
         ---
         <hr>
 
-            __shipment_data__ (dict): Dictionary containing details of Shipment
+        __shipment_data__ (dict): Dictionary containing details of Shipment
+        - Required
+
+            - **ShipmentNbr**
         
         Returns
         ---
@@ -206,7 +209,15 @@ class AcumaticaAPI:
     -------------
     <hr>
 
-        __shipment_data__ (dict): Shipment data. Must include Line details
+    __shipment_data__ (dict): Shipment data. Must include Line details
+    - Required
+
+     - **ShipmentNbr**
+     - **ExtRefNbr**
+     - **details**
+     - **details.InventoryCD**
+     - **details.Qty**
+     - **details.SplitLineNbr**
 
 
     Returns
@@ -265,6 +276,8 @@ class AcumaticaAPI:
 
         __shipment_data__ (dict): shipment_data with Package data
 
+         - Required: **ShipmentNbr**
+
     '''
         verb = 'added to'
         if body == None:
@@ -281,7 +294,23 @@ class AcumaticaAPI:
             self.logger.error(f'get_package_details failed ({response.status_code}): {json_response['error']}')
         return shipment_data
 
-    def confirm_shipment(self, shipment_data):
+    def confirm_shipment(self, shipment_data: dict):
+        '''confirm_shipment`(self, shipment_data)`
+    ===
+    Given a Shipment in Open status, confirms it.
+
+
+    Parameters
+    -------------
+    <hr>
+
+        __shipment_data__ (dict): Dictionary of Shipment data.
+
+         - Required: **ShipmentNbr**
+
+
+
+    '''
         self.logger.info(f'Confirming Shipment {shipment_data['ShipmentNbr']}')
         body = {
             "entity": {
