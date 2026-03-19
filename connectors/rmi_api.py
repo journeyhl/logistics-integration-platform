@@ -21,7 +21,6 @@ class RMIAPIConnector():
 
         self.username = RMI['username']
         self.password = RMI['password']
-        self.token_test = '0%8SAB9b1QCQ3R2g'
 
         self._auth()
         pass
