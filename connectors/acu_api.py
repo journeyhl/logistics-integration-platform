@@ -22,7 +22,21 @@ class AcumaticaAPI:
         self._auth()
 
 #region SalesOrder
-    def sales_order_create_receipt(self, order_data):
+    def sales_order_create_receipt(self, order_data: dict):
+        '''sales_order_create_receipt`(self, order_data)`
+    ===
+    Creates Receipt for Open SalesOrder
+
+    For **RC Orders only**
+
+
+    Parameters
+    -------------
+    <hr>
+
+        __order_data__ (dict): Dictionary of Order data. Must contain OrderType, OrderNbr, and AcctCD
+
+    '''
         self.logger.info(f'Creating Receipt for {order_data['OrderNbr']}')
         body = {
             "entity":{
@@ -37,7 +51,27 @@ class AcumaticaAPI:
         except Exception as e:
             bp = 'here'
 
+
     def sales_order_get_shipment(self, order_data):
+        '''sales_order_get_shipment`(self, order_data)`
+    ===
+    Returns Shipment details for a given *Sales Order*
+
+
+    Parameters
+    -------------
+    <hr>
+
+        __order_data__ (dict): Dictionary of Order data. Must contain OrderType and OrderNbr
+
+
+    Returns
+    -------------
+    <hr>
+
+        __shipment_data__ (dict): Formatted dict of Shipment data for order. If no shipment, Shipment data is None
+
+    '''
         self.logger.info(f'Checking for any shipments on {order_data['OrderNbr']}')
         try:
             response = self.session.get(f'{self.base_uri}/SalesOrder/{order_data['OrderType']}/{order_data['OrderNbr']}?$expand=Shipments')
@@ -135,7 +169,7 @@ class AcumaticaAPI:
     def shipment_details(self, shipment_data: dict):
         '''shipment_details`(self, shipment_data)`
         ===
-        * Gets Customer details
+        * Gets Shipment details for a given *Shipment*
 
         * API Method: **GET**
 
@@ -162,7 +196,26 @@ class AcumaticaAPI:
             return {}
         bp = 'here'
 
-    def add_package(self, shipment_data):
+    def add_package(self, shipment_data: dict):
+        '''add_package`(self, shipment_data)`
+    ===
+    Given a Shipment, creates and packs a package
+
+
+    Parameters
+    -------------
+    <hr>
+
+        __shipment_data__ (dict): Shipment data. Must include Line details
+
+
+    Returns
+    -------------
+    <hr>
+
+        __shipment_data__ (dict): Shipment data with package details
+
+    '''
         self.logger.info(f'Adding package to {shipment_data['ShipmentNbr']}')
         now = datetime.now().strftime('%m/%d/%Y %H:%M:%S')
         descr = f'Package added via API @ {now}'
@@ -193,6 +246,26 @@ class AcumaticaAPI:
 
 
     def get_package_details(self, shipment_data, body=None):
+        '''get_package_details`(self, order_data)`
+    ===
+    Given a Shipment, returns Package details
+
+
+    Parameters
+    -------------
+    <hr>
+
+        __shipment_data__ (dict): Dictionary of Shipment data
+        __body__ (dict): JSON payload sent to API
+
+
+    Returns
+    -------------
+    <hr>
+
+        __shipment_data__ (dict): shipment_data with Package data
+
+    '''
         verb = 'added to'
         if body == None:
             verb = 'retrieved from'
@@ -224,7 +297,28 @@ class AcumaticaAPI:
         self.logger.info(f'{response.status_code} {response.reason}')
         bp = 'here'
 
-    def update_reason_code(self, shipment_data, line_data):
+    def update_reason_code(self, shipment_data: dict, line_data: dict):
+        
+        '''update_reason_code`(self, shipment_data, line_data)`
+    ===
+    Updates Reason Code on the line of a Shipment to *RETURN*
+
+
+    Parameters
+    -------------
+    <hr>
+
+        __shipment_data__ (dict): Shipment data
+        __line_data__ (dict): For each line on Shipment, line_data is that line's data dict
+
+
+    Returns
+    -------------
+    <hr>
+
+        __line_data__ (dict): Line data with updated Reason Code
+
+    '''
         self.logger.info(f'Updating ReasonCode on line {line_data['LineNbr']} of {shipment_data['ShipmentNbr']} from {line_data['ReasonCode']} to RETURN')
         body = {
             "ShipmentNbr": { "value": f"{shipment_data['ShipmentNbr']}" },
