@@ -17,5 +17,5 @@ select distinct a.RMANumber, s.LastChecked, s.RMAStatus, s.DFStatus
 from AllItems a
 left join rmi_RMAStatus s on a.RMANumber = s.RMANumber
 where (s.RMAStatus not in('CLOSED', '') or s.RMAStatus is null)
-or (s.LastChecked >= getdate()-2 and RMAStatus != 'OPEN')
+or (s.LastChecked >= dateadd(hour, -6, getdate()) and RMAStatus != 'OPEN')
 order by s.LastChecked desc
