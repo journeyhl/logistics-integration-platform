@@ -15,7 +15,7 @@ class Transform:
         for order in acu_transformed.iter_rows(named=True):
             match = next((
                 rmi_order for rmi_order in central_transformed.iter_rows(named=True)
-                    if order['ReturnNbr'] == rmi_order['RMANumber'].replace('-1', '')
+                    if order['ReturnNbr'] == rmi_order['RMANumber'].replace('-1', '').replace('-2', '').replace('-3', '')
                     ), None)
             if match != None:
                 order_formatted = {

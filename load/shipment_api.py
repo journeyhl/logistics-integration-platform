@@ -31,7 +31,8 @@ class Load:
                 for line in receipt_response['details']:
                     line = self.check_reason_code(receipt_response, line)
                 receipt_response = self.acu_api.add_package(receipt_response)
-                self.acu_api.confirm_shipment(receipt_response)
+                self.check_if_ready_for_confirm(receipt_response)
+                # self.acu_api.confirm_shipment(receipt_response)
         bp = 'here'
     
     def check_reason_code(self, receipt_response, line):
@@ -99,6 +100,7 @@ class Load:
         if ready:
             self.logger.info('Check 3 passed!')
             self.acu_api.confirm_shipment(receipt_response)
+            return
         else:
             self.logger.error('Check 2 Failed!')
             return

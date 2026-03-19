@@ -22,7 +22,6 @@ for RMANumber in rmi_statuses.data:
     data_transformed = rmi_statuses.transform(data_extract)
     data_loaded = rmi_statuses.load(data_transformed)
 
-
 bp = 'here'
 acu_receipt_creation = CreateAcuReceipt()
 acu_receipt_creation_result = acu_receipt_creation.run()
