@@ -6,7 +6,7 @@ from pipelines import Pipeline, SendShipments, SendReturns, GetReceiptsFromRMI, 
 
 rmi_shipments = SendShipments()
 shipments_result = rmi_shipments.run()
- 
+
 
 rmi_returns = SendReturns()
 returns_result = rmi_returns.run()
@@ -21,7 +21,8 @@ rmi_receipts_result = rmi_receipts.run()
 rmi_statuses = GetStatusFromRMI()
 for RMANumber in rmi_statuses.data:
     rmi_statuses.logger.info(RMANumber)
-    data_extract = rmi_statuses.extract(RMANumber)
+    rmi_statuses._re_init(RMANumber)
+    data_extract = rmi_statuses.extract()
     data_transformed = rmi_statuses.transform(data_extract)
     data_loaded = rmi_statuses.load(data_transformed)
 

@@ -1,1 +1,11 @@
 .venv
+.git
+.github
+.vscode
+__pycache__
+.env
+*.pyc
+.gitignore
+.gitattributes
+scripts
+.degraded
