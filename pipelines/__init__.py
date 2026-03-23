@@ -5,3 +5,4 @@ from .get_receipts_from_RMI import GetReceiptsFromRMI
 from .get_closed_shipments_from_RMI import GetClosedShipmentsFromRMI
 from .get_status_from_RMI import GetStatusFromRMI
 from .create_acu_receipt import CreateAcuReceipt
+from .stage_rmi_status_retrieval import StageRMIStatusRetrieval

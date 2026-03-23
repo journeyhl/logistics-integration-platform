@@ -3,7 +3,7 @@ from pipelines import Pipeline, SendShipments, SendReturns, GetReceiptsFromRMI, 
 
 rmi_shipments = SendShipments()
 shipments_result = rmi_shipments.run()
-
+ 
 
 rmi_returns = SendReturns()
 returns_result = rmi_returns.run()

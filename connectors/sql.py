@@ -85,7 +85,7 @@ class SQLConnector(Generic[QT]):
         )
     
 
-    def query_db(self, query: str):        
+    def query_db(self, query: str):
         data_extract = pl.read_database(query, self.engine)
         self.logger.info(f'Extracted {data_extract.height} rows')
         return data_extract

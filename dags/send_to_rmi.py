@@ -13,10 +13,23 @@ from dataclasses import asdict
 )
 
 
-def rmi_pipeline():    
+def rmi_send_shipment_return_pipeline():    
     @task
-    def send_to_rmi(shipment):
+    def send_shipment():
         from pipelines import SendShipments
-        rmi_pipeline = SendShipments()
-        completed_rmi_pipeline = rmi_pipeline.load(shipment)
+        rmi_shipment_pipeline = SendShipments()
+        completed_rmi_shipment_pipeline = rmi_shipment_pipeline.run()
+        rmi_shipments = completed_rmi_shipment_pipeline['loaded']
         
+    shipments = send_shipment()
+
+    @task
+    def send_return():
+        from pipelines import SendReturns
+        rmi_return_pipeline = SendReturns()
+        completed_rmi_return_pipeline = rmi_return_pipeline.run()
+        rmi_returns = completed_rmi_return_pipeline['loaded']
+    
+    returns = send_return()
+
+rmi_send_shipment_return_pipeline()
