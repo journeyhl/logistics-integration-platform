@@ -8,7 +8,7 @@ app = af.FunctionApp()
     arg_name = 'timer',
     run_on_startup = False    
 )
-def rmi_send_shipment_return_pipeline():
+def rmi_send_shipment_return_pipeline(timer: af.TimerRequest):
     from pipelines import SendShipments, SendReturns
     shipment_pipeline = SendShipments()
     shipment_pipeline.run()
@@ -22,7 +22,7 @@ def rmi_send_shipment_return_pipeline():
     arg_name = 'timer',
     run_on_startup = False
 )
-def rmi_data_retrieval_pipeline():
+def rmi_data_retrieval_pipeline(timer: af.TimerRequest):
     from pipelines import GetClosedShipmentsFromRMI, GetReceiptsFromRMI, GetStatusFromRMI, StageRMIStatusRetrieval
     closed_shipment_pipeline = GetClosedShipmentsFromRMI()
     closed_shipment_pipeline.run()
@@ -45,7 +45,7 @@ def rmi_data_retrieval_pipeline():
     arg_name = 'timer',
     run_on_startup = False
 )
-def create_acu_receipts():
+def create_acu_receipts(timer: af.TimerRequest):
     from pipelines import CreateAcuReceipt
     create_receipt_pipeline = CreateAcuReceipt()
     create_receipt_pipeline.run()
