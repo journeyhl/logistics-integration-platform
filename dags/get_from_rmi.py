@@ -16,6 +16,7 @@ def rmi_data_retrieval_pipeline():
         rmi_closed_shipments_pipeline = GetClosedShipmentsFromRMI()
         completed_rmi_closed_shipments_pipeline = rmi_closed_shipments_pipeline.run()
         closed_shipments = completed_rmi_closed_shipments_pipeline['loaded']
+        return closed_shipments
     
 
     @task
@@ -24,6 +25,7 @@ def rmi_data_retrieval_pipeline():
         rmi_receipts_pipeline = GetReceiptsFromRMI()
         completed_rmi_receipts_pipeline = rmi_receipts_pipeline.run()
         receipts = completed_rmi_receipts_pipeline['loaded']
+        return receipts
     
 
     @task
@@ -31,7 +33,8 @@ def rmi_data_retrieval_pipeline():
         from pipelines import StageRMIStatusRetrieval
         stage_status_pipeline = StageRMIStatusRetrieval()
         completed_stage_status_pipeline = stage_status_pipeline.run()
-        items_to_check = completed_stage_status_pipeline['loaded']
+        rma_numbers_to_check = completed_stage_status_pipeline['loaded']
+        return rma_numbers_to_check
 
     from pipelines import GetStatusFromRMI
     status_retrieval_pipeline = GetStatusFromRMI()
@@ -40,13 +43,13 @@ def rmi_data_retrieval_pipeline():
         status_retrieval_pipeline._re_init(rma_number)
         completed_status_retrival_pipeline = status_retrieval_pipeline.run()
         status_retrieved = completed_status_retrival_pipeline['loaded']
+        return status_retrieved
 
 
     get_closed_shipments()
     get_receipts()
 
-    rma_numbers_to_check = rmi_data_retrieval_pipeline()
-
+    rma_numbers_to_check = stage_status_retrieval()
     retrieve_status.expand(rma_number = rma_numbers_to_check)
 
 

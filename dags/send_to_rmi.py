@@ -20,16 +20,17 @@ def rmi_send_shipment_return_pipeline():
         rmi_shipment_pipeline = SendShipments()
         completed_rmi_shipment_pipeline = rmi_shipment_pipeline.run()
         rmi_shipments = completed_rmi_shipment_pipeline['loaded']
+        return rmi_shipments
         
-    shipments = send_shipment()
-
     @task
     def send_return():
         from pipelines import SendReturns
         rmi_return_pipeline = SendReturns()
         completed_rmi_return_pipeline = rmi_return_pipeline.run()
         rmi_returns = completed_rmi_return_pipeline['loaded']
+        return rmi_returns
     
+    shipments = send_shipment()
     returns = send_return()
 
 rmi_send_shipment_return_pipeline()
