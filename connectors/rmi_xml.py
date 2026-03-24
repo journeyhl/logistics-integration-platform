@@ -11,6 +11,7 @@ class RMIXMLConnector:
     def __init__(self, pipeline):
         self.pipeline = pipeline
         self.logger = logging.getLogger(f'{pipeline.pipeline_name}.rmi_xml')
+        self.session = self.session.Session()
         self.login()
         self.send_url = 'https://jhl.returnsmanagement.com/webserviceV2/rma/rmaservice.asmx'
         self.send_headers = {
@@ -35,7 +36,7 @@ class RMIXMLConnector:
     </Login>
   </soap12:Body>
 </soap12:Envelope>'''
-        response = requests.post(login_url, data=login_body, headers=login_headers)
+        response = self.session.post(login_url, data=login_body, headers=login_headers)
         try:
             xml_response = xmltodict.parse(response.content)
             login_result = xml_response['soap:Envelope']['soap:Body']['LoginResponse']['LoginResult']
@@ -109,7 +110,7 @@ class RMIXMLConnector:
         # print(send_str)
         acu_response, acu_payload = None, None
         try:
-          rmi_response = requests.post(self.send_url, data=send_str, headers=self.send_headers)
+          rmi_response = self.session.post(self.send_url, data=send_str, headers=self.send_headers)
           if rmi_response:
               self.get_rmi_msg(rmi_response)
               bp ='here'
@@ -209,7 +210,7 @@ class RMIXMLConnector:
         result = ''
         acu_response, acu_payload = None, None
         try:
-          rmi_response = requests.post(self.send_url, data=send_str, headers=self.send_headers)
+          rmi_response = self.session.post(self.send_url, data=send_str, headers=self.send_headers)
           if rmi_response:
               self.get_rmi_msg(rmi_response)
               bp ='here'
