@@ -3,9 +3,13 @@
 .github
 .vscode
 __pycache__
+**/__pycache__
 .env
 *.pyc
+**/*.pyc
 .gitignore
 .gitattributes
 scripts
 .degraded
+/dags
+/.degraded
