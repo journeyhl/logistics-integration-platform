@@ -5,7 +5,6 @@ from pathlib import Path
 import polars as pl
 import pandas as pd
 import logging
-import pyodbc
 from dataclasses import dataclass
 from typing import Generic, TypeVar
 
@@ -59,7 +58,7 @@ class SQLConnector(Generic[QT]):
         self.database_name = database_name
         self.config = DATABASES[database_name]
         self.engine = self._create_engine()
-        self.pyodbc_connection = pyodbc.connect(self._get_pyodbc_connection())
+        self.raw_connection = self.engine.raw_connection()
         self.queries = _QUERY_CLASSES.get(database_name, Queries)(database_name)  # type: ignore[assignment]
         pass
 
@@ -67,22 +66,10 @@ class SQLConnector(Generic[QT]):
     def _create_engine(self):
         password = quote_plus(str(self.config['password']))
         connection_string = (
-            f"mssql+pyodbc://{self.config['username']}:{password}"
+            f"mssql+pymssql://{self.config['username']}:{password}"
             f"@{self.config['server']}/{self.config['database']}"
-            f"?driver=ODBC+Driver+17+for+SQL+Server"
         )
-        fast_executemany=True   # switches pyodbc from row-by-row to ODBC batch
-        # mode — critical for large inserts (2M+ rows)
-        return create_engine(connection_string, fast_executemany=True)
-    
-    def _get_pyodbc_connection(self) -> str:
-        return (
-            f"DRIVER={{ODBC Driver 17 for SQL Server}};"
-            f"SERVER={self.config['server']};"
-            f"DATABASE={self.config['database']};"
-            f"UID={self.config['username']};"
-            f"PWD={self.config['password']}"
-        )
+        return create_engine(connection_string)
     
 
     def query_db(self, query: str):
@@ -116,22 +103,21 @@ class SQLConnector(Generic[QT]):
 if not exists(
 select 1 
 from {table_name}
-where {' = ? and '.join(sql_table['keys'])} = ?
+where {' = %s and '.join(sql_table['keys'])} = %s
 )
 begin
 insert into {table_name}({', '.join(sql_table['columns'])})
-values({', '.join(['?'] * len(sql_table['columns']))})
+values({', '.join(['%s'] * len(sql_table['columns']))})
 end
 else
 begin
-update {table_name} set {' = ?, '.join(col for col in sql_table['update_columns'])} = ?
-where {' = ? and '.join(sql_table['keys'])} = ?
+update {table_name} set {' = %s, '.join(col for col in sql_table['update_columns'])} = %s
+where {' = %s and '.join(sql_table['keys'])} = %s
 end
 '''
         try:
             params = [self._dict_to_params(data_dict, sql_table['keys'] + sql_table['columns'] + sql_table['update_columns'] + sql_table['keys']) for data_dict in data]
-            cursor = self.pyodbc_connection.cursor()
-            cursor.fast_executemany = True
+            cursor = self.raw_connection.cursor()
             cursor.executemany(upsert_string, params)
             self.logger.info(f'{table_name} ╍ Upserted {len(data)} rows')
             cursor.commit()

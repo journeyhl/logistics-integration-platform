@@ -1,4 +1,3 @@
-import pyodbc
 import requests
 import xmltodict
 import logging
