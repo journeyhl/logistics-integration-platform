@@ -4,12 +4,12 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from pipelines import Pipeline, SendShipments, SendReturns, GetReceiptsFromRMI, GetClosedShipmentsFromRMI, GetStatusFromRMI, CreateAcuReceipt
 
  
-# rmi_shipments = SendShipments()
-# shipments_result = rmi_shipments.run()
+rmi_shipments = SendShipments()
+shipments_result = rmi_shipments.run()
 
 
-# rmi_returns = SendReturns()
-# returns_result = rmi_returns.run()
+rmi_returns = SendReturns()
+returns_result = rmi_returns.run()
 
 
 rmi_closed_shipments = GetClosedShipmentsFromRMI()
