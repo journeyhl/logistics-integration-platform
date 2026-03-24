@@ -58,7 +58,7 @@ class Pipeline(ABC):
 
 
     def run(self):
-        self.run_timestamp = datetime.now()
+        self.run_timestamp = datetime.now(ZoneInfo('America/New_York'))
         self.logger.info(f'Starting {self.pipeline_name}')
 
         self.logger.info('Extracting...')

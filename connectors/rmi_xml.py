@@ -3,6 +3,7 @@ from config.settings import RMI
 import json
 import xmltodict
 from datetime import datetime
+from zoneinfo import ZoneInfo
 import logging
 
 class RMIXMLConnector:
@@ -129,7 +130,7 @@ class RMIXMLConnector:
               'acu_response': acu_response,
               'acu_payload': acu_payload,
               'shipment_data': shipment,
-              'timestamp': datetime.now()
+              'timestamp': datetime.now(ZoneInfo('America/New_York'))
           }
           
         except Exception as e:
@@ -141,7 +142,7 @@ class RMIXMLConnector:
               'acu_response': acu_response,
               'acu_payload': acu_payload,
               'shipment_data': shipment,
-              'timestamp': datetime.now()
+              'timestamp': datetime.now(ZoneInfo('America/New_York'))
           }
           bp = 'here'
         self.results.append(info)
@@ -228,7 +229,7 @@ class RMIXMLConnector:
               'acu_response': acu_response,
               'acu_payload': acu_payload,
               'shipment_data': return_order,
-              'timestamp': datetime.now()
+              'timestamp': datetime.now(ZoneInfo('America/New_York'))
           }
           
         except Exception as e:
@@ -240,7 +241,7 @@ class RMIXMLConnector:
               'acu_response': acu_response,
               'acu_payload': acu_payload,
               'shipment_data': return_order,
-              'timestamp': datetime.now()
+              'timestamp': datetime.now(ZoneInfo('America/New_York'))
           }
           bp = 'here'
         self.results.append(info)

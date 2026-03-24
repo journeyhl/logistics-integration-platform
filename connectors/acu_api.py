@@ -3,6 +3,7 @@ import requests
 import logging
 import json
 from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 class AcumaticaAPI:
     def __init__(self, pipeline):
         if type(pipeline) == str:            
@@ -84,7 +85,7 @@ class AcumaticaAPI:
             self.logger.info(f'{order_data['OrderNbr']} parsed successfully. Status: {order_info['Status']['value']}, Shipments: {len(order_info['Shipments'])}')
             if len(order_info['Shipments']) > 1:
                 shipment = next((shipment for shipment in order_info['Shipments']
-                                    if datetime.strptime(shipment['LastModifiedDateTime']['value'][:-6], '%Y-%m-%dT%H:%M:%S.%f') >= datetime.now() - timedelta(minutes=10)
+                                    if datetime.strptime(shipment['LastModifiedDateTime']['value'][:-6], '%Y-%m-%dT%H:%M:%S.%f') >= datetime.now(ZoneInfo('America/New_York')) - timedelta(minutes=10)
                                     ), None)
             elif len(order_info['Shipments']) != 0:
                 shipment = order_info['Shipments'][0]
@@ -228,7 +229,7 @@ class AcumaticaAPI:
 
     '''
         self.logger.info(f'Adding package to {shipment_data['ShipmentNbr']}')
-        now = datetime.now().strftime('%m/%d/%Y %H:%M:%S')
+        now = datetime.now(ZoneInfo('America/New_York')).strftime('%m/%d/%Y %H:%M:%S')
         descr = f'Package added via API @ {now}'
         body = {
             "ShipmentNbr": { "value": f"{shipment_data['ShipmentNbr']}" },

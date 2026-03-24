@@ -3,6 +3,7 @@ import requests
 import logging
 import json
 from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 
 class RMIAPIConnector():
 
@@ -49,7 +50,7 @@ class RMIAPIConnector():
         url = f'{self.uri}api/ClosedShipmentsV1'
         from_date = datetime.today() - timedelta(days=21)
         from_date = from_date.date().strftime('%Y-%m-%dT%H:%M:%SZ')
-        to_date = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
+        to_date = datetime.now(ZoneInfo('America/New_York')).strftime('%Y-%m-%dT%H:%M:%SZ')
         headers = {
             **self.headers, 
             "Accept": "application/json",
@@ -79,7 +80,7 @@ class RMIAPIConnector():
         url = f'{self.uri}api/Receipts'
         from_date = datetime.today() - timedelta(days=21)
         from_date = from_date.date().strftime('%Y-%m-%dT%H:%M:%SZ')
-        to_date = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
+        to_date = datetime.now(ZoneInfo('America/New_York')).strftime('%Y-%m-%dT%H:%M:%SZ')
         headers = {
             **self.headers, 
             "Accept": "application/json",
@@ -109,7 +110,7 @@ class RMIAPIConnector():
         url = f'{self.uri}api/RMA'
         from_date = datetime.today() - timedelta(days=180)
         from_date = from_date.date().strftime('%Y-%m-%dT%H:%M:%SZ')
-        to_date = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
+        to_date = datetime.now(ZoneInfo('America/New_York')).strftime('%Y-%m-%dT%H:%M:%SZ')
         headers = {
             **self.headers, 
             "Accept": "application/json",

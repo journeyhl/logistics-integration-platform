@@ -1,5 +1,6 @@
 from datetime import datetime
 import logging
+from zoneinfo import ZoneInfo
 
 class Transform:
     def __init__(self, pipeline):
@@ -80,7 +81,7 @@ class Transform:
                     'RMATypeName': item['rmaTypeDescription'],
                     'CreateDate': datetime.strptime(item['rmaCreateDate'], '%Y-%m-%dT%H:%M:%SZ'),
                     'RMILastModifiedDate': datetime.strptime(item['rmaLastModifiedDate'], '%Y-%m-%dT%H:%M:%SZ'),
-                    'LastChecked': datetime.now()
+                    'LastChecked': datetime.now(ZoneInfo('America/New_York'))
                 }
                 table_rows.append(row)
 
