@@ -4,7 +4,7 @@ app = af.FunctionApp()
 
 #Send Shipments and Returns to RMI every hour at the top of the hour. 4am-11pm
 @app.timer_trigger(
-    schedule = '/*5 4-23/1 * * *',
+    schedule = '*/5 4-23/1 * * *',
     arg_name = 'timer',
     run_on_startup = False    
 )
