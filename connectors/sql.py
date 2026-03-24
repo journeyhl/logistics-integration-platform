@@ -120,7 +120,7 @@ end
             cursor = self.raw_connection.cursor()
             cursor.executemany(upsert_string, params)
             self.logger.info(f'{table_name} ╍ Upserted {len(data)} rows')
-            cursor.commit()
+            self.raw_connection.commit()
         except Exception as e:
             self.logger.error({
                 'Table': table_name,
