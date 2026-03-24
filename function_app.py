@@ -31,8 +31,8 @@ def rmi_data_retrieval_pipeline(timer: af.TimerRequest):
     receipt_pipeline.run()
 
     rma_status_staging_pipeline = StageRMIStatusRetrieval()
-    rma_status_staging_pipeline.run()
-    rma_numbers = rma_status_staging_pipeline['loaded']    
+    rmi_statuses = rma_status_staging_pipeline.run()
+    rma_numbers = rmi_statuses['loaded']    
     status_retrieval_pipeline = GetStatusFromRMI()
     for rma_number in rma_numbers:
         status_retrieval_pipeline._re_init(rma_number = rma_number)
@@ -42,7 +42,7 @@ def rmi_data_retrieval_pipeline(timer: af.TimerRequest):
 
 #Create Receipts in Acumatica at half past every hour. 8am - 8pm
 @app.timer_trigger(
-    schedule = '30 8-20 * * *', 
+    schedule = '0 8-20 * * *', 
     arg_name = 'timer',
     run_on_startup = False
 )

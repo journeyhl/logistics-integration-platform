@@ -3,7 +3,6 @@ from urllib.parse import quote_plus
 from sqlalchemy import create_engine, text
 from pathlib import Path
 import polars as pl
-import pandas as pd
 import logging
 from dataclasses import dataclass
 from typing import Generic, TypeVar

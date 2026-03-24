@@ -1,24 +1,28 @@
 import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from pipelines import Pipeline, SendShipments, SendReturns, GetReceiptsFromRMI, GetClosedShipmentsFromRMI, GetStatusFromRMI, CreateAcuReceipt
+from pipelines import Pipeline, SendShipments, SendReturns, GetReceiptsFromRMI, GetClosedShipmentsFromRMI, GetStatusFromRMI, CreateAcuReceipt, StageRMIStatusRetrieval
 
  
-rmi_shipments = SendShipments()
-shipments_result = rmi_shipments.run()
+# rmi_shipments = SendShipments()
+# shipments_result = rmi_shipments.run()
 
 
-rmi_returns = SendReturns()
-returns_result = rmi_returns.run()
+# rmi_returns = SendReturns()
+# returns_result = rmi_returns.run()
 
 
-rmi_closed_shipments = GetClosedShipmentsFromRMI()
-rmi_closed_shipments_result = rmi_closed_shipments.run()
+# rmi_closed_shipments = GetClosedShipmentsFromRMI()
+# rmi_closed_shipments_result = rmi_closed_shipments.run()
 
-rmi_receipts = GetReceiptsFromRMI()
-rmi_receipts_result = rmi_receipts.run()
+# rmi_receipts = GetReceiptsFromRMI()
+# rmi_receipts_result = rmi_receipts.run()
 
+rma_status_staging_pipeline = StageRMIStatusRetrieval()
+rmi_status = rma_status_staging_pipeline.run()
 rmi_statuses = GetStatusFromRMI()
+rmi_statuses.run()
+test = 1
 for RMANumber in rmi_statuses.data:
     rmi_statuses.logger.info(RMANumber)
     rmi_statuses._re_init(RMANumber)

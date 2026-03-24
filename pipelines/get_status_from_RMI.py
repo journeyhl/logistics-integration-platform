@@ -21,7 +21,7 @@ Upserts results to **RMA_Statuses**
     def __init__(self):
         super().__init__('rmi_status')
         self.rmi = RMIAPIConnector(self)
-        self.data = self.centralstore.query_db(self.centralstore.queries.StatusCheckRMI.query).to_series().to_list()
+        # self.data = self.centralstore.query_db(self.centralstore.queries.StatusCheckRMI.query).to_series().to_list()
         self.transformer = Transform(self)
 
     def extract(self):  # type: ignore[override]
