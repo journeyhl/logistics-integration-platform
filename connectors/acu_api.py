@@ -157,8 +157,14 @@ class AcumaticaAPI:
             response = self.session.put(f'{self.base_uri}/SalesOrder', json=body)
             self.parse_response(response, {'type': 'Order', 'attribute': 'AttributeRCSHP2WH'})
         except Exception as e:
-            self.status_description = 'FAILURE'
-            bp = 'here'
+            try:                    
+                self._logout()
+                self._auth()
+                response = self.session.put(f'{self.base_uri}/SalesOrder', json=body)
+                self.parse_response(response, {'type': 'Order', 'attribute': 'AttributeRCSHP2WH'})
+            except Exception as e:
+                self.status_description = 'FAILURE'
+                bp = 'here'
         return self.status_description, body
     #endregion SalesOrder
 
@@ -401,7 +407,14 @@ class AcumaticaAPI:
             response = self.session.put(f'{self.base_uri}/Shipment', json=body)
             self.parse_response(response, {'type': 'Shipment', 'attribute': 'AttributeSHP2WH'})
         except Exception as e:
-            self.status_description = 'FAILURE'
+            try:                    
+                self._logout()
+                self._auth()
+                response = self.session.put(f'{self.base_uri}/Shipment', json=body)
+                self.parse_response(response, {'type': 'Shipment', 'attribute': 'AttributeSHP2WH'})
+            except Exception as e:
+                self.status_description = 'FAILURE'
+                bp = 'here'
         return self.status_description, body
 
     #endregion Shipment
