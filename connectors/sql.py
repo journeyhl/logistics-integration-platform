@@ -69,7 +69,7 @@ class SQLConnector(Generic[QT]):
             f"mssql+pymssql://{self.config['username']}:{password}"
             f"@{self.config['server']}/{self.config['database']}"
         )
-        return create_engine(connection_string)
+        return create_engine(connection_string, connect_args={"tds_version": "7.3", "login_timeout": 30})
     
 
     def query_db(self, query: str):

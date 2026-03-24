@@ -12,11 +12,11 @@ from pipelines import Pipeline, SendShipments, SendReturns, GetReceiptsFromRMI, 
 # returns_result = rmi_returns.run()
 
 
-# rmi_closed_shipments = GetClosedShipmentsFromRMI()
-# rmi_closed_shipments_result = rmi_closed_shipments.run()
+rmi_closed_shipments = GetClosedShipmentsFromRMI()
+rmi_closed_shipments_result = rmi_closed_shipments.run()
 
-# rmi_receipts = GetReceiptsFromRMI()
-# rmi_receipts_result = rmi_receipts.run()
+rmi_receipts = GetReceiptsFromRMI()
+rmi_receipts_result = rmi_receipts.run()
 
 rmi_statuses = GetStatusFromRMI()
 for RMANumber in rmi_statuses.data:
