@@ -54,6 +54,7 @@ where s.CompanyID = 2
 and isi.SiteCD = 'RMI'
 and s.Status = 'N'
 and s.OrderType = 'RC'
+and s.OrderNbr != 'AR078849'
 --and s.OrderDate > '20260301'
 and (k.ValueNumeric is null or k.ValueNumeric != 1)
 order by s.OrderDate desc, ReturnNbr, LineNumber
