@@ -11,7 +11,7 @@ class RMIXMLConnector:
     def __init__(self, pipeline):
         self.pipeline = pipeline
         self.logger = logging.getLogger(f'{pipeline.pipeline_name}.rmi_xml')
-        self.session = self.session.Session()
+        self.session = requests.Session()
         self.login()
         self.send_url = 'https://jhl.returnsmanagement.com/webserviceV2/rma/rmaservice.asmx'
         self.send_headers = {
