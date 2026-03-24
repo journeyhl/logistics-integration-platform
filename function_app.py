@@ -2,9 +2,9 @@ import azure.functions as af
 
 app = af.FunctionApp()
 
-#Send Shipments and Returns to RMI every hour at the top of the hour. 4am-11pm
+#Send Shipments and Returns to RMI every half hour. 4am-11pm
 @app.timer_trigger(
-    schedule = '*/5 4-23/1 * * *',
+    schedule = '*/30 4-23/1 * * *',
     arg_name = 'timer',
     run_on_startup = False    
 )
@@ -40,9 +40,9 @@ def rmi_data_retrieval_pipeline(timer: af.TimerRequest):
 
 
 
-#Create Receipts in Acumatica at half past every hour. 8am - 8pm
+#Create Receipts in Acumatica at 50 past every hour. 8am - 8pm
 @app.timer_trigger(
-    schedule = '0 8-20 * * *', 
+    schedule = '50 8-20 * * *', 
     arg_name = 'timer',
     run_on_startup = False
 )
