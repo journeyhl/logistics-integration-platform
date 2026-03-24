@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from datetime import datetime
+from zoneinfo import ZoneInfo
 import logging
 import polars as pl
 from connectors import SQLConnector, AcumaticaAPI
