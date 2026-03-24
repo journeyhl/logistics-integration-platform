@@ -4,6 +4,7 @@ import json
 import xmltodict
 from datetime import datetime
 from zoneinfo import ZoneInfo
+import time
 import logging
 
 class RMIXMLConnector:
@@ -146,6 +147,8 @@ class RMIXMLConnector:
           }
           bp = 'here'
         self.results.append(info)
+        self.logger.info('Sleeping 3 seconds')
+        time.sleep(3)
         return info
 
 
