@@ -90,7 +90,7 @@ class SQLConnector(Generic[QT]):
         '''
         df_data_loaded.write_database(table_name=table_name, 
                                       connection=self.engine,
-                                      if_table_exists='append',                                      
+                                      if_table_exists='append',
                                       )
         bp = 'here'
 

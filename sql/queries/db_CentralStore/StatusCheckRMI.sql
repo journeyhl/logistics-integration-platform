@@ -7,7 +7,7 @@ select distinct RMANumber
 from rmi_Receipts
 union
 select distinct KeyValue
-from rmi_send_log
+from _util.rmi_send_log
 where KeyValue != 'AR078849'
 )
 , AllItems as(

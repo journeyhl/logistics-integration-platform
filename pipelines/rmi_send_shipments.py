@@ -9,7 +9,7 @@ class SendShipments(Pipeline):
 
 Queries *AcumaticaDb* for any **Open Shipments** for RMI that have **NOT** been sent to the warehouse
 
-Sends Shipment payload to RMI and upserts *RMI_send_log*'''
+Sends Shipment payload to RMI and upserts *_util.rmi_send_log*'''
     def __init__(self):
         super().__init__('rmi-send-shipments')
         self.url = 'https://erp.journeyhl.com/ODATA/JHL/JHL RMI Shipment API'
@@ -40,5 +40,5 @@ Sends Shipment payload to RMI and upserts *RMI_send_log*'''
             df_loaded = df_loaded.with_columns(pl.lit('Shipment').alias('Type'))
             df_loaded = df_loaded.rename({'key': 'KeyValue', 'lines': 'Lines', 'rmi_response': 'RMI_Response', 'rmi_payload': 'RMI_Payload', 'acu_response': 'ACU_Response', 'timestamp': 'Timestamp'})
             df_loaded = df_loaded.select(['Type', 'KeyValue', 'Lines', 'RMI_Response', 'RMI_Payload', 'ACU_Response', 'Timestamp'])
-            self.centralstore.insert_df(df_loaded, 'rmi_send_log')
+            self.centralstore.insert_df(df_loaded, '_util.rmi_send_log')
         pass
