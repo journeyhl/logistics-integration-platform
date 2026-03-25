@@ -2,7 +2,7 @@ from pipelines import Pipeline
 import polars as pl
 from connectors import AcumaticaAPI
 import json
-
+import time
 class ShipmentsReadyToConfirm(Pipeline):
     def __init__(self):
         super().__init__('shipment_confirmations')
@@ -20,12 +20,14 @@ class ShipmentsReadyToConfirm(Pipeline):
     
     def load(self, data_transformed):
         for shipment in data_transformed:
+            self.logger.info(f'Sleeping 5 seconds')
+            time.sleep(5)
             self.acu_api.confirm_shipment(shipment)
         return self.acu_api.data_log
     
     def log_results(self, data_loaded):
         self.acu_api._logout()
-        
+
         self.logger.info(f'Logging acu_api interactions...')
         for entry in data_loaded:
             entry['Payload'] = json.dumps(entry['Payload'])
