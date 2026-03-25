@@ -19,6 +19,7 @@ class AcumaticaAPI:
         self.username = ACUMATICA_API['username']
         self.password = ACUMATICA_API['password']
         self.company = 'JHL'
+        self.data_log = []
         self.session = requests.Session()
         self._auth()
 
@@ -48,9 +49,19 @@ class AcumaticaAPI:
         }
         try:
             response = self.session.post(f'{self.base_uri}/SalesOrder/SalesOrderCreateReceipt', json=body)
-            self.logger.info(f'{response.status_code} {response.reason}')
+            response_str = f'{response.status_code} {response.reason}'
+            
+            self.logger.info(response_str)
         except Exception as e:
             bp = 'here'
+        self.data_log.append({
+            'Entity': 'SalesOrder',
+            'KeyValue': order_data['OrderNbr'],
+            'Operation': f'POST - Create Receipt',
+            'Payload': body,
+            'Response': response_str,
+            'Timestamp': datetime.now(ZoneInfo('America/New_York'))
+        })
 
 
     def sales_order_get_shipment(self, order_data):
@@ -165,6 +176,14 @@ class AcumaticaAPI:
             except Exception as e:
                 self.status_description = 'FAILURE'
                 bp = 'here'
+        self.data_log.append({
+            'Entity': 'SalesOrder',
+            'KeyValue': OrderNbr,
+            'Operation': 'PUT - Mark RC Order as Sent To WH',
+            'Payload': body,
+            'Response': self.status_description,
+            'Timestamp': datetime.now(ZoneInfo('America/New_York'))
+        })
         return self.status_description, body
     #endregion SalesOrder
 
@@ -299,6 +318,14 @@ class AcumaticaAPI:
             shipment_data = {**shipment_data, 'Packages': json_response['Packages'], 'package_count': json_response['PackageCount']['value']}
         if not response.ok:
             self.logger.error(f'get_package_details failed ({response.status_code}): {json_response['error']}')
+        self.data_log.append({
+            'Entity': 'Shipment',
+            'KeyValue': shipment_data['ShipmentNbr'],
+            'Operation': f'PUT: Package {verb} {shipment_data['ShipmentNbr']}!',
+            'Payload': body,
+            'Response': f'{response.status_code} {response.text}',
+            'Timestamp': datetime.now(ZoneInfo('America/New_York'))
+        })
         return shipment_data
 
     def confirm_shipment(self, shipment_data: dict):
@@ -330,8 +357,18 @@ class AcumaticaAPI:
             }
         }
         response = self.session.post(url=f'{self.base_uri}/Shipment/ConfirmShipment', json=body)
+        response_str = f'{response.status_code} {response.reason}'
         self.logger.info(f'{response.status_code} {response.reason}')
         bp = 'here'
+        self.data_log.append({
+            'Entity': 'Shipment',
+            'KeyValue': shipment_data['ShipmentNbr'],
+            'Operation': 'POST - Confirm Shipment',
+            'Payload': body,
+            'Response': response_str,
+            'Timestamp': datetime.now(ZoneInfo('America/New_York'))
+        })
+
 
     def update_reason_code(self, shipment_data: dict, line_data: dict):
         
@@ -368,6 +405,14 @@ class AcumaticaAPI:
         response = self.session.put(url=f'{self.base_uri}/Shipment', json=body)
         if response.ok:
             line_data['ReasonCode'] = 'RETURN'
+        self.data_log.append({
+            'Entity': 'Shipment',
+            'KeyValue': shipment_data['ShipmentNbr'],
+            'Operation': 'PUT - Update ReasonCode on Shipment Line',
+            'Payload': body,
+            'Response': f'{response.status_code} {response.text}',
+            'Timestamp': datetime.now(ZoneInfo('America/New_York'))
+        })
         return line_data
 
     def sent_to_wh(self, ShipmentNbr, CustomerID):
@@ -415,6 +460,14 @@ class AcumaticaAPI:
             except Exception as e:
                 self.status_description = 'FAILURE'
                 bp = 'here'
+        self.data_log.append({
+            'Entity': 'Shipment',
+            'KeyValue': ShipmentNbr,
+            'Operation': 'PUT - Mark Shipment as Sent to WH',
+            'Payload': body,
+            'Response': self.status_description,
+            'Timestamp': datetime.now(ZoneInfo('America/New_York'))
+        })
         return self.status_description, body
 
     #endregion Shipment

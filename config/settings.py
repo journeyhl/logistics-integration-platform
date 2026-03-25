@@ -121,5 +121,25 @@ TABLES = {
             'RMILastModifiedDate',
             'LastChecked'
         ]
+    }, 
+    '_util.acu_api_log':{
+        'keys': [
+            'Entity',
+            'KeyValue',
+            'Operation',
+            'Timestamp'
+        ],
+        'columns': [
+            'Entity',
+            'KeyValue',
+            'Operation',
+            'Payload',
+            'Response',
+            'Timestamp'
+        ],
+        'update_columns':[
+            'Payload',
+            'Response',
+        ]
     },
 }

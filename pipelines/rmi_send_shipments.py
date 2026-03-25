@@ -41,4 +41,5 @@ Sends Shipment payload to RMI and upserts *_util.rmi_send_log*'''
             df_loaded = df_loaded.rename({'key': 'KeyValue', 'lines': 'Lines', 'rmi_response': 'RMI_Response', 'rmi_payload': 'RMI_Payload', 'acu_response': 'ACU_Response', 'timestamp': 'Timestamp'})
             df_loaded = df_loaded.select(['Type', 'KeyValue', 'Lines', 'RMI_Response', 'RMI_Payload', 'ACU_Response', 'Timestamp'])
             self.centralstore.insert_df(df_loaded, '_util.rmi_send_log')
+        self.acu_api._logout()
         pass

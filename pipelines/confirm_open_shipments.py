@@ -1,9 +1,12 @@
 from pipelines import Pipeline
 import polars as pl
+from connectors import AcumaticaAPI
+import json
 
 class ShipmentsReadyToConfirm(Pipeline):
     def __init__(self):
         super().__init__('shipment_confirmations')
+        self.acu_api = AcumaticaAPI(self)
 
 
     def extract(self):
@@ -16,10 +19,13 @@ class ShipmentsReadyToConfirm(Pipeline):
         return data_transformed
     
     def load(self, data_transformed):
-        data_loaded = []
         for shipment in data_transformed:
-            data_loaded.append(self.acu_api.confirm_shipment(shipment))
-        return data_loaded
+            self.acu_api.confirm_shipment(shipment)
+        return self.acu_api.data_log
     
-    def log_results(self):
+    def log_results(self, data_loaded):
+        for entry in data_loaded:
+            entry['Payload'] = json.dumps(entry['Payload'])
+        self.centralstore.checked_upsert('_util.acu_api_log', data_loaded)
+        self.acu_api._logout()
         pass

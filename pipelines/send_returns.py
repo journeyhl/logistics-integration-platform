@@ -1,5 +1,5 @@
 from pipelines import Pipeline
-from connectors import SQLConnector, RMIXMLConnector
+from connectors import SQLConnector, RMIXMLConnector, AcumaticaAPI
 from transform.rmi_send import Transform
 import polars as pl
 import json
@@ -14,6 +14,7 @@ Sends Return Order payload to RMI and upserts *_util.rmi_send_log*'''
         super().__init__('rmi-send-returns')
         self.transformer = Transform(self)
         self.rmi = RMIXMLConnector(self)
+        self.acu_api = AcumaticaAPI(self)
 
 
     def extract(self):
@@ -38,4 +39,5 @@ Sends Return Order payload to RMI and upserts *_util.rmi_send_log*'''
             self.centralstore.insert_df(df_loaded, '_util.rmi_send_log')
         else:
             self.logger.warning('Nothing was logged!')
+        self.acu_api._logout()
         pass

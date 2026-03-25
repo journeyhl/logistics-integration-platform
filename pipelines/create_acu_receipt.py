@@ -7,7 +7,7 @@ from pipelines import Pipeline
 import polars as pl
 from transform.create_acu_receipt import Transform
 from load.shipment_api import Load
-
+from connectors import AcumaticaAPI
 class CreateAcuReceipt(Pipeline):
     '''CreateAcuReceipt
 ===
@@ -33,6 +33,7 @@ Matches Orders across datasets to find any Acumatica Orders that are ready to be
         super().__init__('create_receipts')
         self.transformer = Transform(self)
         self.loader = Load(self)
+        self.acu_api = AcumaticaAPI(self)
         
 
     def extract(self):
@@ -52,9 +53,11 @@ Matches Orders across datasets to find any Acumatica Orders that are ready to be
 
         data_loaded = []
         self.loader.load(data_transformed)
-        return data_loaded
+        return self.acu_api.data_log
     
     def log_results(self, data_loaded):
+        self.centralstore.insert_df(pl.DataFrame(data_loaded), '_util.acu_api_log')
+        self.acu_api._logout()
         return data_loaded
 
 
