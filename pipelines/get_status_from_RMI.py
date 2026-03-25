@@ -48,17 +48,17 @@ Upserts results to **RMA_Statuses**
     
 
 
-if __name__ == '__main__':
-    test = GetStatusFromRMI()
-    extracted = []
-    transformed = []
-    loaded = []
-    for RMANumber in test.data:
-        test.logger.info(RMANumber)
-        data_extract = test.extract(RMANumber)
-        data_transformed = test.transform(data_extract)
-        data_loaded = test.load(data_transformed)
+# if __name__ == '__main__':
+#     test = GetStatusFromRMI()
+#     extracted = []
+#     transformed = []
+#     loaded = []
+#     for RMANumber in test.data:
+#         test.logger.info(RMANumber)
+#         data_extract = test.extract(RMANumber)
+#         data_transformed = test.transform(data_extract)
+#         data_loaded = test.load(data_transformed)
         
-        bp = 'here'
+#         bp = 'here'
 
     
