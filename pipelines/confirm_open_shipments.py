@@ -24,8 +24,10 @@ class ShipmentsReadyToConfirm(Pipeline):
         return self.acu_api.data_log
     
     def log_results(self, data_loaded):
+        self.acu_api._logout()
+        
+        self.logger.info(f'Logging acu_api interactions...')
         for entry in data_loaded:
             entry['Payload'] = json.dumps(entry['Payload'])
         self.centralstore.checked_upsert('_util.acu_api_log', data_loaded)
-        self.acu_api._logout()
         pass

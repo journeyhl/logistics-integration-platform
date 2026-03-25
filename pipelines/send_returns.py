@@ -40,4 +40,10 @@ Sends Return Order payload to RMI and upserts *_util.rmi_send_log*'''
         else:
             self.logger.warning('Nothing was logged!')
         self.acu_api._logout()
+
+        self.logger.info(f'Logging acu_api interactions...')
+        for entry in self.acu_api.data_log:
+            entry['Payload'] = json.dumps(entry['Payload'])
+        self.centralstore.checked_upsert('_util.acu_api_log', self.acu_api.data_log)
+        
         pass
