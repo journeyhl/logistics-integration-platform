@@ -61,4 +61,4 @@ def create_acu_receipts(timer: af.TimerRequest):
 def confirm_acu_shipments(timer: af.TimerRequest):
     from pipelines import ShipmentsReadyToConfirm
     confirm_packed_shipments = ShipmentsReadyToConfirm()
-    ShipmentsReadyToConfirm.run()
+    confirm_packed_shipments.run()
