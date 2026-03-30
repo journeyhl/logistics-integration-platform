@@ -1,7 +1,13 @@
 import logging
 import time
+from __future__ import annotations
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from pipelines.create_acu_receipt import CreateAcuReceipt
+
+
 class Load:
-    def __init__(self, pipeline):
+    def __init__(self, pipeline: CreateAcuReceipt):
         self.pipeline = pipeline
         self.logger = logging.getLogger(f'{pipeline.pipeline_name}.transform')
 
