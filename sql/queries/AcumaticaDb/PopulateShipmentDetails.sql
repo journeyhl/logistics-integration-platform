@@ -27,7 +27,7 @@ inner join InventoryItem i on s.CompanyID = i.CompanyID and sl.InventoryID = i.I
 inner join INSite si on s.CompanyID = si.CompanyID and s.SiteID = si.SiteID
 left join SOShipLineSplitPackage splp on s.CompanyID = splp.CompanyID and s.ShipmentNbr = splp.ShipmentNbr
         and spl.SplitLineNbr = splp.ShipmentSplitLineNbr and splp.ShipmentLineNbr = sl.LineNbr
-left join SOPackageDetail p on s.CompanyID = p.CompanyID and s.ShipmentNbr = p.ShipmentNbr
+left join SOPackageDetail p on s.CompanyID = p.CompanyID and s.ShipmentNbr = p.ShipmentNbr and splp.PackageLineNbr = p.LineNbr
 inner join BAccount b on s.CompanyID = b.CompanyID and s.CustomerID = b.BAccountID
 where s.CompanyID = 2 
 and left(SiteCD, 7) = 'REDSTAG'
