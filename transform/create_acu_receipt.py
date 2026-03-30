@@ -22,10 +22,10 @@ class Transform:
                     'OrderType': order['OrderType'],
                     'OrderNbr': order['ReturnNbr'],
                     'AcctCD': order['AcctCD'],
-                    'AcuInventoryCD': order['InventoryCD'],
-                    'AcuQty': order['Qty'],
-                    'RMIInventoryCD': match['InventoryCD'],
-                    'RMIQty': match['Qty'] 
+                    'InventoryCD': order['InventoryCD'],
+                    'OrderQty': order['Qty'],
+                    'InventoryCD_3pl': match['InventoryCD'],
+                    'Qty_3pl': match['Qty'] 
                 }
                 data_transformed.append(order_formatted)
         self.logger.info(f'Matched {len(data_transformed)} rows')

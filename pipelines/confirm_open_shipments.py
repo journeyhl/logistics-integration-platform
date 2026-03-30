@@ -20,8 +20,8 @@ class ShipmentsReadyToConfirm(Pipeline):
     
     def load(self, data_transformed):
         for shipment in data_transformed:
-            self.logger.info(f'Sleeping 5 seconds')
-            time.sleep(5)
+            self.logger.info(f'Sleeping 3 seconds')
+            time.sleep(3)
             self.acu_api.confirm_shipment(shipment)
         return self.acu_api.data_log
     

@@ -270,7 +270,7 @@ class AcumaticaAPI:
     - Required
 
      - **ShipmentNbr**
-     - **ExtRefNbr**
+     - **ExtRefNbr** or **TrackingNbr**
      - **details**
      - **details.InventoryCD**
      - **details.Qty**
@@ -287,12 +287,13 @@ class AcumaticaAPI:
         self.logger.info(f'Adding package to {shipment_data['ShipmentNbr']}')
         now = datetime.now(ZoneInfo('America/New_York')).strftime('%m/%d/%Y %H:%M:%S')
         descr = f'Package added via API @ {now}'
+        tracking_nbr = shipment_data['ExtRefNbr'] if shipment_data.get('ExtRefNbr') else shipment_data['TrackingNbr']
         body = {
             "ShipmentNbr": { "value": f"{shipment_data['ShipmentNbr']}" },
             "Packages": [
                 {
                 "BoxID": { "value": "DEFAULT BOX" },
-                "TrackingNbr": { "value": f"{shipment_data['ExtRefNbr']}" },
+                "TrackingNbr": { "value": f"{tracking_nbr}" },
                 "Description": { "value": f"{descr}" },
                 "Weight": { "value": 0 },
                 "UOM": { "value": "LBS" },
@@ -312,6 +313,15 @@ class AcumaticaAPI:
         shipment_data = self.get_package_details(shipment_data, body)
         return shipment_data
 
+
+    def add_package_v2(self, shipment_data: dict):
+        '''
+
+        Revised version of add_package. Used in redStag
+        '''
+        self.logger.info(f'Adding package to {shipment_data['ShipmentNbr']}')
+        shipment_data = self.get_package_details(shipment_data, shipment_data['PackagePayload'])
+        bp = 'here'
 
     def get_package_details(self, shipment_data, body=None):
         '''get_package_details`(self, order_data)`
@@ -347,14 +357,19 @@ class AcumaticaAPI:
         if response.ok:            
             self.logger.info(f'Package {verb} {shipment_data['ShipmentNbr']}!')
             shipment_data = {**shipment_data, 'Packages': json_response['Packages'], 'package_count': json_response['PackageCount']['value']}
+            response_str = f'{response.status_code} {response.reason}. {shipment_data['ShipmentNbr']} now has {json_response['PackageCount']['value']} packages.'
+            self.logger.info(response_str)
         if not response.ok:
             self.logger.error(f'get_package_details failed ({response.status_code}): {json_response['error']}')
+            response_str = f'{response.status_code} {json_response['error']}'
+            self.logger.warning(response_str)
+
         self.data_log.append({
             'Entity': 'Shipment',
             'KeyValue': shipment_data['ShipmentNbr'],
             'Operation': f'PUT: Package {verb} {shipment_data['ShipmentNbr']}!',
             'Payload': body,
-            'Response': f'{response.status_code}',
+            'Response': response_str,
             'Timestamp': datetime.now(ZoneInfo('America/New_York'))
         })
         return shipment_data
@@ -436,12 +451,13 @@ class AcumaticaAPI:
         response = self.session.put(url=f'{self.base_uri}/Shipment', json=body)
         if response.ok:
             line_data['ReasonCode'] = 'RETURN'
+        response_str = f'{response.status_code} {response.reason}'
         self.data_log.append({
             'Entity': 'Shipment',
             'KeyValue': shipment_data['ShipmentNbr'],
             'Operation': 'PUT - Update ReasonCode on Shipment Line',
             'Payload': body,
-            'Response': f'{response.status_code}',
+            'Response': response_str,
             'Timestamp': datetime.now(ZoneInfo('America/New_York'))
         })
         return line_data

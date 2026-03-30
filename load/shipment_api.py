@@ -2,16 +2,31 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from pipelines.create_acu_receipt import CreateAcuReceipt
+    from pipelines.populate_shipment_details import PopulateShipmentDetails
 import logging
 import time
 
 class Load:
-    def __init__(self, pipeline: CreateAcuReceipt):
+    def __init__(self, pipeline: CreateAcuReceipt | PopulateShipmentDetails):
         self.pipeline = pipeline
         self.logger = logging.getLogger(f'{pipeline.pipeline_name}.transform')
 
+    def load_shipments(self, data_transformed):
+        data_loaded = []
+        for shipment, data in data_transformed.items():
+            shipment_data = self.pipeline.acu_api.shipment_details(data)
+            if (shipment_data['package_count'] == 0
+            or shipment_data['package_count'] != shipment_data['line_count']
+            or len(shipment_data['PackageLines']) != shipment_data['package_count']
+            or len(shipment_data['PackageLines']) != shipment_data['line_count']
+            ):
+                shipment_data = self.pipeline.acu_api.add_package_v2(shipment_data)
+            else:
+                shipment_data = self.pipeline.acu_api.get_package_details(shipment_data)
+            bp = 'here'
 
-    def load(self, data_transformed):        
+
+    def load_receipts(self, data_transformed):        
         data_loaded = []
         for order in data_transformed:
             shipment_data = self.pipeline.acu_api.sales_order_get_shipment(order)

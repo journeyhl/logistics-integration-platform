@@ -36,6 +36,7 @@ class AcumaticaDbQueries(Queries):
     SendShipments: Query
     OpenRCsNoReceipt: Query
     ShipmentsReadyToConfirm: Query
+    PopulateShipmentDetails: Query
 
 
 _QUERY_CLASSES: dict[str, type[Queries]] = {

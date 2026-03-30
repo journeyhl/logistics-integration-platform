@@ -21,8 +21,27 @@ acuRsShipments as(
     inner join acu.rsPackageItems pi on p.PackageID = pi.PackageID and p.TrackerID = pi.TrackerID
 )
 
-select *, 
-case when rsQty = (select sum(ShipQty) from acu.rsFulfill ff where r.ShipmentNbr = ff.ShipmentNbr and r.InventoryCD = ff.InventoryCD) 
+select r.ShipmentNbr
+     , r.InventoryCD
+     , r.ShipLineNbr
+     , r.SplitLineNbr
+     , r.InventoryID
+     , r.ShipQty
+     , r.OrderQty
+     , r.rsQty
+     , r.TrackingNbr
+     , r.rsStatus
+     , r.acuStatus
+     , r.ffStatus
+     , r.acuLastModifiedDateTime
+     , r.AcuPackageStatus
+     , r.ShipmentID
+     , r.num
+     , r.PackageNum
+     , s.CourierCode
+     , s.Carrier
+     , s.CourierName
+     , case when rsQty = (select sum(ShipQty) from acu.rsFulfill ff where r.ShipmentNbr = ff.ShipmentNbr and r.InventoryCD = ff.InventoryCD) 
  and 1 = (select distinct 1 from acu.rsFulfill f where r.ShipmentNbr = f.ShipmentNbr and (f.rsStatus is null or r.rsStatus != f.rsStatus) and ffStatus is null)
 		then 'Partially Complete' 
 	 when rsQty = (select sum(ShipQty) from acu.rsFulfill ff where r.ShipmentNbr = ff.ShipmentNbr and r.InventoryCD = ff.InventoryCD) 
@@ -30,11 +49,8 @@ case when rsQty = (select sum(ShipQty) from acu.rsFulfill ff where r.ShipmentNbr
 	 else 'Not' 
 end Complete,
 (select ItemsOnPackage from PackageLines l where l.ShipmentNbr= r.ShipmentNbr and l.TrackingNbr = r.TrackingNbr) ItemsOnPackage
-, r.AcuPackageStatus
 , (select max(PackageNum) from RowOrder r1 where r.ShipmentNbr = r1.ShipmentNbr) MaxPackageNum
-, s.CourierCode
-, s.CourierName
-, s.Carrier
+
 
 from RowOrder r
 inner join acuRsShipments s on r.ShipmentNbr = s.ShipmentNbr and r.ShipmentID = s.ShipmentID and r.InventoryCD = s.InventoryCD and r.TrackingNbr = s.TrackingNumber

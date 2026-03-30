@@ -53,7 +53,7 @@ Matches Orders across datasets to find any Acumatica Orders that are ready to be
     
     def load(self, data_transformed):
 
-        self.loader.load(data_transformed)
+        self.loader.load_receipts(data_transformed)
         return self.acu_api.data_log
     
     def log_results(self, data_loaded):
