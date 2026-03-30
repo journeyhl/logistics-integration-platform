@@ -354,7 +354,7 @@ class AcumaticaAPI:
             'KeyValue': shipment_data['ShipmentNbr'],
             'Operation': f'PUT: Package {verb} {shipment_data['ShipmentNbr']}!',
             'Payload': body,
-            'Response': f'{response.status_code} {response.text}',
+            'Response': f'{response.status_code}',
             'Timestamp': datetime.now(ZoneInfo('America/New_York'))
         })
         return shipment_data
@@ -441,7 +441,7 @@ class AcumaticaAPI:
             'KeyValue': shipment_data['ShipmentNbr'],
             'Operation': 'PUT - Update ReasonCode on Shipment Line',
             'Payload': body,
-            'Response': f'{response.status_code} {response.text}',
+            'Response': f'{response.status_code}',
             'Timestamp': datetime.now(ZoneInfo('America/New_York'))
         })
         return line_data
