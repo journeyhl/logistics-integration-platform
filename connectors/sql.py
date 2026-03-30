@@ -28,6 +28,7 @@ class CentralStoreQueries(Queries):
     ReturnsPendingReciept: Query
     StatusCheckRMI: Query
     AuditFulfillment: Query
+    PopulateShipmentDetails: Query
 
 
 class AcumaticaDbQueries(Queries):

@@ -1,10 +1,9 @@
-import logging
-import time
 from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from pipelines.create_acu_receipt import CreateAcuReceipt
-
+import logging
+import time
 
 class Load:
     def __init__(self, pipeline: CreateAcuReceipt):
