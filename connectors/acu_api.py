@@ -223,8 +223,39 @@ class AcumaticaAPI:
         except Exception as e:
             self.logger.error(f'Error getting packages for {shipment_data['ShipmentNbr']} ({shipment_data['OrderNbr']})')
             return {}
-        bp = 'here'
 
+    def shipment_details_attr(self, shipment_data: dict):
+        '''shipment_details`(self, shipment_data)`
+        ===
+        * Gets Shipment details for a given *Shipment*, along with whether or not it was Sent to WH
+
+        * API Method: **GET**
+
+        Parameters
+        ---
+        <hr>
+
+        __shipment_data__ (dict): Dictionary containing details of Shipment
+        - Required
+
+            - **ShipmentNbr**
+        
+        Returns
+        ---
+        <hr>
+
+            __response.json()__ (dict): Parsed Dictionary of response from API
+        '''
+        self.logger.info(f'Retrieving Shipment Details from Acu API for {shipment_data['ShipmentNbr']}')
+        try:
+            response = self.session.get(f'{self.base_uri}/Shipment/{shipment_data['ShipmentNbr']}?$custom=Document.AttributeSHP2WH&$expand=Details/Allocations,Packages')
+            response_details = self.parse_shipment_details(shipment_data, response)
+            # if response_details['package_count'] == 0:
+            return response_details
+        except Exception as e:
+            self.logger.error(f'Error getting packages for {shipment_data['ShipmentNbr']} ({shipment_data['OrderNbr']})')
+            return {}
+        
     def add_package(self, shipment_data: dict):
         '''add_package`(self, shipment_data)`
     ===
