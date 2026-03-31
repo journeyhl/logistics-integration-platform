@@ -2,7 +2,7 @@ import requests
 import xmltodict
 import logging
 
-class ODATAConnector:
+class AcuOData:
     def __init__(self, pipeline):
         self.pipeline = pipeline
         self.logger = logging.getLogger(f'{pipeline.pipeline_name}.odata')
@@ -19,6 +19,6 @@ class ODATAConnector:
   
 if __name__ == '__main__':
 
-    odata = ODATAConnector('pipeline')
+    odata = AcuOData('pipeline')
     odata.get_data('https://erp.journeyhl.com/ODATA/JHL/JHL RMI Shipment API')
     bp = 'here'

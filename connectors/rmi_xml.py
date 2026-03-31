@@ -7,7 +7,7 @@ from zoneinfo import ZoneInfo
 import time
 import logging
 
-class RMIXMLConnector:
+class RMIXML:
     def __init__(self, pipeline):
         self.pipeline = pipeline
         self.logger = logging.getLogger(f'{pipeline.pipeline_name}.rmi_xml')

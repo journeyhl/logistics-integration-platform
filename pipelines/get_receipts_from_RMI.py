@@ -1,5 +1,5 @@
 from pipelines import Pipeline
-from connectors import RMIAPIConnector, SQLConnector
+from connectors import RMIAPI, SQLConnector
 from transform.rmi_receipt_pull import Transform
 
 class GetReceiptsFromRMI(Pipeline):
@@ -11,8 +11,8 @@ Hits RMI's *Receipts* endpoint
 Upserts results to **rmi_Receipts**
 '''
     def __init__(self):
-        super().__init__('rmi_receipts')
-        self.rmi = RMIAPIConnector(self)
+        super().__init__('rmi-receipts')
+        self.rmi = RMIAPI(self)
         self.transformer = Transform(self)
 
 

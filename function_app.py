@@ -9,11 +9,11 @@ app = af.FunctionApp()
     run_on_startup = False    
 )
 def rmi_send_shipment_return_pipeline(timer: af.TimerRequest):
-    from pipelines import SendShipments, SendReturns
-    shipment_pipeline = SendShipments()
+    from pipelines import SendRMIShipments, SendRMIReturns
+    shipment_pipeline = SendRMIShipments()
     shipment_pipeline.run()
 
-    return_pipeline = SendReturns()
+    return_pipeline = SendRMIReturns()
     return_pipeline.run()
 
 #Retrieve data from RMI api every hour, 5 minutes past. 4am-11pm

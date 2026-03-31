@@ -1,7 +1,7 @@
 import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from pipelines import Pipeline, SendShipments, SendReturns, GetReceiptsFromRMI, GetClosedShipmentsFromRMI, GetStatusFromRMI, CreateAcuReceipt, StageRMIStatusRetrieval
+from pipelines import Pipeline, SendRMIShipments, SendRMIReturns, GetReceiptsFromRMI, GetClosedShipmentsFromRMI, GetStatusFromRMI, CreateAcuReceipt, StageRMIStatusRetrieval
 
  
 # rmi_shipments = SendShipments()

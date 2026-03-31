@@ -52,7 +52,7 @@ class CentralStoreQueries(Queries):
 
 
 class AcumaticaDbQueries(Queries):
-    SendReturns: Query
+    SendRMIReturns: Query
     '''Pulls all **RC** Sales Orders that are in **Open** status and have a *AttributeRCSHP2WH* value that is **null** or **not equal to 1**
 
     Where
@@ -69,14 +69,11 @@ class AcumaticaDbQueries(Queries):
         - Warehouse is RMI
 
      **(AttributeRCSHP2WH** != *1* *or* **AttributeRCSHP2WH** *is null***)** 
-        - RC Order has not been sent to Warehouse
-     
+        - RC Order has not been sent to Warehouse'''
 
 
-    '''
-    SendShipments: Query
-    '''
-    Pulls Shipments that are ready to be sent to RMI as type Ws
+    SendRMIShipments: Query
+    '''Pulls Shipments that are ready to be sent to RMI as type Ws
 
     Where
     ---
@@ -92,12 +89,31 @@ class AcumaticaDbQueries(Queries):
         - Not sent to Warehouse
 
      **SiteCD** = *'RMI'*
-        - Warehouse is RMI
+        - Warehouse is RMI'''
 
-    '''
+    SendRedStagShipments: Query
+    '''Pulls Shipments that are ready to be sent to RedStag
+
+    Where
+    ---
+    <hr>
+
+     **OrigOrderType** != **'RC'** 
+        - Original OrderType != RC
+
+     **Status not in('C', 'L', 'F', 'I')** 
+        - Completed, Cancelled, Confirmed, Invoiced
+
+     **AttributeSHP2WH** = **0**
+        - Not sent to Warehouse
+
+     **SiteCD** = *'RedStag'*
+        - Warehouse is RMI'''
+
+
+
     OpenRCsNoReceipt: Query
-    '''
-    Pulls all Open RC Orders that have been sent to RMI and do not have a Shipment(Receipt)
+    '''Pulls all Open RC Orders that have been sent to RMI and do not have a Shipment(Receipt)
 
     Where
     ---
@@ -116,12 +132,11 @@ class AcumaticaDbQueries(Queries):
         - Warehouse is RMI
         
      **ShipmentNbr** *is null*
-        - Order does not have a Shipment found when joining on SOLine -> SOShipLine
-    
-    '''
+        - Order does not have a Shipment found when joining on SOLine -> SOShipLine'''
+
+
     ShipmentsReadyToConfirm: Query
-    '''
-    Pulls all *Open* Shipments that have a Tracking Number and are ready to be confirmed
+    '''Pulls all *Open* Shipments that have a Tracking Number and are ready to be confirmed
     
     Where
     ---
@@ -134,11 +149,11 @@ class AcumaticaDbQueries(Queries):
         - Status is Open
         
      **left(SiteCD, 7)** = *'REDSTAG'*
-        - Warehouse is REDSTAGSWT or REDSTAGSLC
-    '''
+        - Warehouse is REDSTAGSWT or REDSTAGSLC'''
+
+
     PackShipment: Query
-    '''
-    Query from adf that populates acu.rsFulfill
+    '''Query from adf that populates acu.rsFulfill
 
     
     Where
@@ -149,8 +164,8 @@ class AcumaticaDbQueries(Queries):
         - TrackingNumber was NOT able to be joined to Shipment line
 
      **Status = 'N'** 
-        - Status is Open
-    '''
+        - Status is Open'''
+
 
 
 _QUERY_CLASSES: dict[str, type[Queries]] = {

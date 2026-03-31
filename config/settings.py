@@ -24,6 +24,11 @@ RMI = {
     'password': os.getenv('RMI_PASSWORD')
 }
 
+REDSTAG = {
+    'username': os.getenv('REDSTAG_USERNAME'),
+    'password': os.getenv('REDSTAG_PASSWORD')
+}
+
 ACUMATICA_API = {
     'username': os.getenv('ACUMATICA_API_USERNAME'),
     'password': os.getenv('ACUMATICA_API_PASSWORD')

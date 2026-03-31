@@ -5,7 +5,7 @@ import polars as pl
 
 class StageRMIStatusRetrieval(Pipeline):
     def __init__(self):
-        super().__init__('rmi_status_staging')
+        super().__init__('rmi-status-staging')
 
     
     def extract(self):

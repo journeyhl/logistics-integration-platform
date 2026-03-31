@@ -5,7 +5,7 @@ from transform.audit_fulfillment import Transform
 
 class AuditFulfillment(Pipeline):
     def __init__(self):
-        super().__init__('audit_fulfillment')
+        super().__init__('audit-fulfillment')
         self.acu_api = AcumaticaAPI(self)
         self.transformer = Transform(self)
 

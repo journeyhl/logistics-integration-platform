@@ -1,9 +1,9 @@
 from pipelines import Pipeline
-from connectors import SQLConnector, RMIXMLConnector, AcumaticaAPI
+from connectors import SQLConnector, RMIXML, AcumaticaAPI
 from transform.rmi_send import Transform
 import polars as pl
 import json
-class SendReturns(Pipeline):
+class SendRMIReturns(Pipeline):
     '''SendShipments
 ===
 
@@ -13,12 +13,12 @@ Sends Return Order payload to RMI and upserts *_util.rmi_send_log*'''
     def __init__(self):
         super().__init__('rmi-send-returns')
         self.transformer = Transform(self)
-        self.rmi = RMIXMLConnector(self)
+        self.rmi = RMIXML(self)
         self.acu_api = AcumaticaAPI(self)
 
 
     def extract(self):
-        data_extract = self.acudb.query_db(self.acudb.queries.SendReturns.query)
+        data_extract = self.acudb.query_db(self.acudb.queries.SendRMIReturns.query)
         return data_extract
     
     def transform(self, data_extract):

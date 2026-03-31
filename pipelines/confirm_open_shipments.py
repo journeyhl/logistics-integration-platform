@@ -5,7 +5,7 @@ import json
 import time
 class ShipmentsReadyToConfirm(Pipeline):
     def __init__(self):
-        super().__init__('shipment_confirmations')
+        super().__init__('shipment-confirmations')
         self.acu_api = AcumaticaAPI(self)
 
 

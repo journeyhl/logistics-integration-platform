@@ -715,6 +715,7 @@ class AcumaticaAPI:
         try:
             response = self.session.post(url=auth_url, json=body)
             response.raise_for_status()
+            self.logger.info('Acumatica API is online. Logged into Acumatica and authenticated successfully')
         except Exception as e:
             self._logout()
 

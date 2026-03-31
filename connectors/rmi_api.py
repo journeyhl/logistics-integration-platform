@@ -1,19 +1,18 @@
-
 import requests
 import logging
 import json
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
+from config.settings import RMI
 
-class RMIAPIConnector():
+class RMIAPI():
 
     def __init__(self, pipeline):
-        self.pipeline = pipeline
-        try:
-            self.logger = logging.getLogger(f'{pipeline.pipeline_name}.acu_api')
-        except Exception as e:
-            self.logger = logging.getLogger()
-        self.uri = 'https://api.backtracksrl.com/'
+        if type(pipeline) == str:
+            self.logger = logging.getLogger(f'{pipeline}.rmi_api')
+        else:
+            self.logger = logging.getLogger(f'{pipeline.pipeline_name}.rmi_api')
+        self.base_uri = 'https://api.backtracksrl.com/'
         self.auth_type = 'Token'
         self.headers = {
             'Content-Type': 'application/json', 
@@ -22,19 +21,25 @@ class RMIAPIConnector():
 
         self.username = RMI['username']
         self.password = RMI['password']
-
+        self.session = requests.Session()
         self._auth()
         pass
 
     def _auth(self):
-        auth_url = f'{self.uri}Auth/Login'
+        '''`_auth`(self)
+        ===
+        <hr>
+        
+        Logins into RMI's API. If response, gets a token and sets **self.token** 
+        '''
+        auth_url = f'{self.base_uri}Auth/Login'
         body = {
             "name": self.username,
             "password": self.password 
         }
 
         try:
-            response = requests.post(
+            response = self.session.post(
                 url = auth_url,
                 headers = self.headers,
                 json=body
@@ -42,12 +47,14 @@ class RMIAPIConnector():
             j_response = json.loads(response.text)
             self.token = j_response['token']
             bp = 'here'
+            self.logger.info('RMI API is online. Logged into RMI and authenticated successfully')
         except Exception as e:
-            bp = 'here'
+            self.logger.critical(f'Could not login to RMI API!')
+            raise
 
 
     def closed_shipments(self):
-        url = f'{self.uri}api/ClosedShipmentsV1'
+        url = f'{self.base_uri}api/ClosedShipmentsV1'
         from_date = datetime.today() - timedelta(days=21)
         from_date = from_date.date().strftime('%Y-%m-%dT%H:%M:%SZ')
         to_date = datetime.now(ZoneInfo('America/New_York')).strftime('%Y-%m-%dT%H:%M:%SZ')
@@ -64,7 +71,7 @@ class RMIAPIConnector():
             "toDate": to_date
         }
         try:
-            response = requests.post(
+            response = self.session.post(
                 url = url,
                 headers = headers,
                 json = body
@@ -77,7 +84,7 @@ class RMIAPIConnector():
 
 
     def get_receipts(self):
-        url = f'{self.uri}api/Receipts'
+        url = f'{self.base_uri}api/Receipts'
         from_date = datetime.today() - timedelta(days=21)
         from_date = from_date.date().strftime('%Y-%m-%dT%H:%M:%SZ')
         to_date = datetime.now(ZoneInfo('America/New_York')).strftime('%Y-%m-%dT%H:%M:%SZ')
@@ -94,7 +101,7 @@ class RMIAPIConnector():
             "toDate": to_date
         }
         try:
-            response = requests.post(
+            response = self.session.post(
                 url = url,
                 headers = headers,
                 json = body
@@ -107,7 +114,7 @@ class RMIAPIConnector():
 
 
     def get_rma(self, rma_number):
-        url = f'{self.uri}api/RMA'
+        url = f'{self.base_uri}api/RMA'
         from_date = datetime.today() - timedelta(days=180)
         from_date = from_date.date().strftime('%Y-%m-%dT%H:%M:%SZ')
         to_date = datetime.now(ZoneInfo('America/New_York')).strftime('%Y-%m-%dT%H:%M:%SZ')
@@ -124,7 +131,7 @@ class RMIAPIConnector():
             "toDate": to_date
         }
         try:
-            response = requests.post(
+            response = self.session.post(
                 url = url,
                 headers = headers,
                 json = body,
@@ -138,14 +145,3 @@ class RMIAPIConnector():
         except Exception as e:
             bp = 'here'
 
-if __name__ == '__main__':
-    import sys
-    from pathlib import Path
-    sys.path.append(str(Path(__file__).resolve().parent.parent))
-    from config.settings import RMI
-    rmi = RMIAPIConnector('woohoo')
-    # test1 = rmi.get_rma()
-    test = rmi.closed_shipments()
-    bp = 'here'
-else:    
-    from config.settings import RMI

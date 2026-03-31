@@ -1,9 +1,9 @@
 from pipelines import Pipeline
-from connectors import ODATAConnector, SQLConnector, RMIXMLConnector, AcumaticaAPI
+from connectors import AcuOData, SQLConnector, RMIXML, AcumaticaAPI
 from transform.rmi_send import Transform
 import polars as pl
 import json
-class SendShipments(Pipeline):
+class SendRMIShipments(Pipeline):
     '''SendShipments
 ===
 
@@ -13,9 +13,9 @@ Sends Shipment payload to RMI and upserts *_util.rmi_send_log*'''
     def __init__(self):
         super().__init__('rmi-send-shipments')
         self.url = 'https://erp.journeyhl.com/ODATA/JHL/JHL RMI Shipment API'
-        self.odata_source = ODATAConnector(self)
+        self.odata_source = AcuOData(self)
         self.transformer = Transform(self)
-        self.rmi = RMIXMLConnector(self)
+        self.rmi = RMIXML(self)
         self.acu_api = AcumaticaAPI(self)
         
         

@@ -32,7 +32,7 @@ Matches Orders across datasets to find any Acumatica Orders that are ready to be
 
     '''
     def __init__(self):
-        super().__init__('create_receipts')
+        super().__init__('create-receipts')
         self.acu_api = AcumaticaAPI(self)
         self.transformer = Transform(self)
         self.loader = Load(self)

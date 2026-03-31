@@ -1,6 +1,6 @@
 from .base import Pipeline
-from .rmi_send_shipments import SendShipments
-from .send_returns import SendReturns
+from .rmi_send_shipments import SendRMIShipments
+from .rmi_send_returns import SendRMIReturns
 from .get_receipts_from_RMI import GetReceiptsFromRMI
 from .get_closed_shipments_from_RMI import GetClosedShipmentsFromRMI
 from .get_status_from_RMI import GetStatusFromRMI
@@ -9,3 +9,4 @@ from .stage_rmi_status_retrieval import StageRMIStatusRetrieval
 from .confirm_open_shipments import ShipmentsReadyToConfirm
 from .audit_fulfillment import AuditFulfillment
 from .pack_shipments import PackShipments
+from .redstag_send_shipments import SendRedStagShipments

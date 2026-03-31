@@ -4,7 +4,7 @@ if __name__ == '__main__':
     sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from pipelines import Pipeline
-from connectors import RMIAPIConnector
+from connectors import RMIAPI
 from transform.rmi_receipt_pull import Transform
 
 class GetStatusFromRMI(Pipeline):
@@ -19,8 +19,8 @@ For each row, hits RMI's rma endpoint to determine the status on their end.
 Upserts results to **RMA_Statuses**
     '''
     def __init__(self):
-        super().__init__('rmi_status')
-        self.rmi = RMIAPIConnector(self)
+        super().__init__('rmi-status')
+        self.rmi = RMIAPI(self)
         # self.data = self.centralstore.query_db(self.centralstore.queries.StatusCheckRMI.query).to_series().to_list()
         self.transformer = Transform(self)
 

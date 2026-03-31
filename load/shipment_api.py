@@ -3,11 +3,19 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from pipelines.create_acu_receipt import CreateAcuReceipt
     from pipelines.pack_shipments import PackShipments
+    from pipelines.redstag_send_shipments import SendRedStagShipments
 import logging
 import time
 
 class Load:
-    def __init__(self, pipeline: CreateAcuReceipt | PackShipments):
+    '''Load
+    ===
+    <hr>
+
+    Class for smart handling of Acumatica API interactions 
+    
+    '''
+    def __init__(self, pipeline: CreateAcuReceipt | PackShipments | SendRedStagShipments):
         self.pipeline = pipeline
         self.logger = logging.getLogger(f'{pipeline.pipeline_name}.transform')
 
