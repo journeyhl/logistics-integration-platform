@@ -28,7 +28,8 @@ class CentralStoreQueries(Queries):
     ReturnsPendingReciept: Query
     StatusCheckRMI: Query
     AuditFulfillment: Query
-    PopulateShipmentDetails: Query
+    PackShipment: Query
+    RedStagEvents: Query
 
 
 class AcumaticaDbQueries(Queries):
@@ -36,7 +37,7 @@ class AcumaticaDbQueries(Queries):
     SendShipments: Query
     OpenRCsNoReceipt: Query
     ShipmentsReadyToConfirm: Query
-    PopulateShipmentDetails: Query
+    PackShipment: Query
 
 
 _QUERY_CLASSES: dict[str, type[Queries]] = {
