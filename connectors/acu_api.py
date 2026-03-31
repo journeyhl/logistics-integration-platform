@@ -266,7 +266,8 @@ class AcumaticaAPI:
     -------------
     <hr>
 
-    __shipment_data__ (dict): Shipment data. Must include Line details
+    **shipment_data** (*dict*): Shipment data. Must include Line details
+
     - Required
 
      - **ShipmentNbr**
@@ -315,9 +316,24 @@ class AcumaticaAPI:
 
 
     def add_package_v2(self, shipment_data: dict):
-        '''
+        '''`add_package_v2`(self, shipment_data):
+    ===
+    Revised version of add_package. Used in RedStag.
 
-        Revised version of add_package. Used in redStag
+    Instead of formatting the package within function like `add_package`, format it beforehand and pass the completed payload inside *shipment_data*
+    
+
+    Parameters
+    -------------
+    <hr>
+
+        __shipment_data__ (dict): Dictionary of Shipment data
+
+        - Required: **ShipmentNbr**, **PackagePayload**
+        
+
+
+
         '''
         self.logger.info(f'Adding package to {shipment_data['ShipmentNbr']}')
         shipment_data = self.get_package_details(shipment_data, shipment_data['PackagePayload'])
@@ -416,8 +432,7 @@ class AcumaticaAPI:
         })
 
 
-    def update_reason_code(self, shipment_data: dict, line_data: dict):
-        
+    def update_reason_code(self, shipment_data: dict, line_data: dict):        
         '''update_reason_code`(self, shipment_data, line_data)`
     ===
     Updates Reason Code on the line of a Shipment to *RETURN*
@@ -522,7 +537,44 @@ class AcumaticaAPI:
 
 
 #region Utility
-    def parse_shipment_details(self, shipment_data, response):
+    def parse_shipment_details(self, shipment_data: dict, response: requests.Response):
+        '''`parse_shipment_details`(self, shipment_data, response)
+        ===
+        Given the Acumatica API's *response*, convert to JSON and combine with shipment_data.
+
+        API response contains the detailed information regarding the shipment, including line details
+
+
+        Parameters
+        ---
+        <hr>
+
+         **shipment_data** (*dict*): Dictionary containing details of Shipment
+
+         **response** (*requests.Response*): Response from Acumatica API (Shipment endpoint)
+
+        Returns
+        ---
+        <hr>
+
+         **shipment_details** (*dict*): **shipment_data**, but with added *Status*, *package_count*, *line_count* and *details* values
+        
+         - **shipment_details['*Status*']**
+
+            - Status of Shipment in Acumatica   
+            
+         - **shipment_details['*package_count*']**
+
+            - How many packages are currently on the Shipment
+            
+         - **shipment_details['*line_count*']**
+
+            - How many lines are currently on the shipment
+            
+         - **shipment_details['*details*']**
+        
+            - LineNbr, InventoryCD, Qty, SplitLineNbr, ReasonCode and id *for each line* on Shipment
+        '''
         try:
             response = response.json()
         except Exception as e:

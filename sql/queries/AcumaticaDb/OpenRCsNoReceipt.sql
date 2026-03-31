@@ -26,6 +26,7 @@ select s.OrderNbr ReturnNbr
 	 , sa.State ShipToState
 	 , sa.PostalCode ShipToZip
 	 , sa.CountryID ShipToCountry
+	 , shl.ShipmentNbr
 from SOOrder s
 inner join SOLine sl on s.CompanyID = sl.CompanyID and s.OrderType = sl.OrderType and s.OrderNbr = sl.OrderNbr
 inner join SOContact sc on s.CompanyID = sc.CompanyID and s.ShipContactID = sc.ContactID and s.CustomerID = sc.CustomerID
@@ -36,10 +37,12 @@ inner join INItemClass ic on s.CompanyID = ic.CompanyID and i.ItemClassID = ic.I
 inner join INSite isi on s.CompanyID = isi.CompanyID and sl.SiteID = isi.SiteID
 left join SOOrderKvExt k on s.CompanyID = k.CompanyID and s.NoteID = k.RecordID and k.FieldName = 'AttributeRCSHP2WH'
 left join JJStatusLookup j on s.Status = j.CStatus and j.Tbl = 'SOOrder'
+left join SOShipLine shl on shl.OrigOrderNbr = s.OrderNbr and shl.OrigLineNbr = sl.LineNbr and sl.InventoryID = shl.InventoryID
 where s.CompanyID = 2
 and isi.SiteCD = 'RMI'
 and s.Status in('N')
 and s.OrderType = 'RC'
 --and s.OrderDate > '20260301'
 and k.ValueNumeric = 1
+and shl.ShipmentNbr is null
 order by s.OrderDate desc, ReturnNbr, LineNumber

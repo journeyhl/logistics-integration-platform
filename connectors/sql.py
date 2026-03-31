@@ -26,18 +26,131 @@ class Queries:
 
 class CentralStoreQueries(Queries):
     ReturnsPendingReciept: Query
+    '''Checks **rmi_RMAStatus** for any *Closed* **or** *Receipted* **Returns**
+    '''
     StatusCheckRMI: Query
+    '''Pulls each distinct RMANumber from **rmi_ClosedShipments**, **rmi_Receipts**, and **_util.rmi_send_log**
+
+    Looks for:
+     - *null* **RMAStatuses** or any rows with a **RMAStatus** not equal to '*CLOSED*' or *blank*
+    OR
+     - **LastChecked** value *within the last two days* and **RMAStatus** not equal to '*OPEN*'
+    '''
     AuditFulfillment: Query
+    '''No query yet
+    '''
     PackShipment: Query
+    '''This query originally drove the RedStag Confirmations celigo flow. 
+
+    Pulls shipments from CentralStore using the **acu.rs_** tables to determine which should be shipped
+    '''
     RedStagEvents: Query
+    '''More robust version of PackShipment, also a redundancy. 
+    
+    Uses the **json.RedStagEvents** table to get all rows where **json_value(*jsonData, '$.topic')*** = '***shipment:packed***'
+    '''
 
 
 class AcumaticaDbQueries(Queries):
     SendReturns: Query
+    '''Pulls all **RC** Sales Orders that are in **Open** status and have a *AttributeRCSHP2WH* value that is **null** or **not equal to 1**
+
+    Where
+    ---
+    <hr>
+    
+     **OrderType** = *'RC'* 
+        - OrderType is Return
+
+     **Status** = *'N'*
+        - Status is Open
+
+     **SiteCD** = *'RMI'*
+        - Warehouse is RMI
+
+     **(AttributeRCSHP2WH** != *1* *or* **AttributeRCSHP2WH** *is null***)** 
+        - RC Order has not been sent to Warehouse
+     
+
+
+    '''
     SendShipments: Query
+    '''
+    Pulls Shipments that are ready to be sent to RMI as type Ws
+
+    Where
+    ---
+    <hr>
+
+     **OrigOrderType** != **'RC'** 
+        - Original OrderType != RC
+
+     **Status not in('C', 'L', 'F', 'I')** 
+        - Completed, Cancelled, Confirmed, Invoiced
+
+     **AttributeSHP2WH** = **0**
+        - Not sent to Warehouse
+
+     **SiteCD** = *'RMI'*
+        - Warehouse is RMI
+
+    '''
     OpenRCsNoReceipt: Query
+    '''
+    Pulls all Open RC Orders that have been sent to RMI and do not have a Shipment(Receipt)
+
+    Where
+    ---
+    <hr>
+
+     **OrderType** != **'RC'** 
+        - OrderType != RC
+
+     **Status in('N')** 
+        - Status is Open
+
+     **AttributeSHP2WH** = **1**
+        - Order has been sent to the warehouse
+
+     **SiteCD** = *'RMI'*
+        - Warehouse is RMI
+        
+     **ShipmentNbr** *is null*
+        - Order does not have a Shipment found when joining on SOLine -> SOShipLine
+    
+    '''
     ShipmentsReadyToConfirm: Query
+    '''
+    Pulls all *Open* Shipments that have a Tracking Number and are ready to be confirmed
+    
+    Where
+    ---
+    <hr>
+
+     **TrackNumber is not null** 
+        - TrackingNumber was able to be joined to Shipment line
+
+     **Status = 'N'** 
+        - Status is Open
+        
+     **left(SiteCD, 7)** = *'REDSTAG'*
+        - Warehouse is REDSTAGSWT or REDSTAGSLC
+    '''
     PackShipment: Query
+    '''
+    Query from adf that populates acu.rsFulfill
+
+    
+    Where
+    ---
+    <hr>
+
+     **TrackNumber is null** 
+        - TrackingNumber was NOT able to be joined to Shipment line
+
+     **Status = 'N'** 
+        - Status is Open
+    '''
 
 
 _QUERY_CLASSES: dict[str, type[Queries]] = {
