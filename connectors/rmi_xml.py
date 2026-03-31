@@ -217,7 +217,7 @@ class RMIXMLConnector:
           else:
               self.rmi_response_str = 'CRITICAL ERROR: No response from RMI!'
               self.logger.error(self.rmi_response_str)
-          if 'error' in self.rmi_response_str.lower():
+          if 'error' in self.rmi_response_str.lower() and 'already exists' not in self.rmi_response_str.lower():
               acu_response = 'RMI Error, did not attempt RCSendToWH in Acu'
               self.logger.warning(acu_response)
               acu_payload = ''

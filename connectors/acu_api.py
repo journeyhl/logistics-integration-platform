@@ -568,10 +568,10 @@ class AcumaticaAPI:
                 self.status_description = f'{self.acu_response[f'{entity_type['type']}Nbr']} is {self.acu_response['Status']}! SentToWH = {is_sent}'
                 self.logger.error(self.status_description)
             elif is_sent:
-                self.status_description = f'{self.acu_response[f'{entity_type['type']}Nbr']} has been sent!' 
+                self.status_description = f'{self.acu_response[f'{entity_type['type']}Nbr']} has been marked as sent in Acumatica!' 
                 self.logger.info(self.status_description)
             else:
-                self.status_description = f'{self.acu_response[f'{entity_type['type']}Nbr']} was not sent and is in Open status!'
+                self.status_description = f'{self.acu_response[f'{entity_type['type']}Nbr']} was not marked as sent and is in Open status!'
                 self.logger.error(self.status_description)
         else:
             self.status_description = 'FAILURE'

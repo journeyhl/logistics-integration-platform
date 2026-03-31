@@ -1,6 +1,6 @@
 from pipelines import Pipeline
 from connectors import AcumaticaAPI
-from transform.populate_shipment_details import Transform
+from transform.pack_shipment import Transform
 from load.shipment_api import Load
 import json
 
@@ -15,11 +15,12 @@ class PackShipment(Pipeline):
 
     def extract(self):
         central_extract = self.centralstore.query_db(self.centralstore.queries.PackShipment.query)
-        central_extract_v2 = self.centralstore.query_db(self.centralstore.queries.RedStagEvents.query)
-        # acu_extract = self.acudb.query_db(self.acudb.queries.PopulateShipmentDetails.query)
+        redstag_event_extract = self.centralstore.query_db(self.centralstore.queries.RedStagEvents.query)
+        acu_extract = self.acudb.query_db(self.acudb.queries.PackShipment.query)
         data_extract = {
             'central_extract': central_extract,
-            # 'acu_extract': acu_extract
+            'redstag_event_extract': redstag_event_extract,
+            'acu_extract': acu_extract
         }
         return data_extract
 

@@ -2,12 +2,12 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from pipelines.create_acu_receipt import CreateAcuReceipt
-    from pipelines.populate_shipment_details import PopulateShipmentDetails
+    from pipelines.pack_shipment import PackShipment
 import logging
 import time
 
 class Load:
-    def __init__(self, pipeline: CreateAcuReceipt | PopulateShipmentDetails):
+    def __init__(self, pipeline: CreateAcuReceipt | PackShipment):
         self.pipeline = pipeline
         self.logger = logging.getLogger(f'{pipeline.pipeline_name}.transform')
 
