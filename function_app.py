@@ -62,3 +62,14 @@ def confirm_acu_shipments(timer: af.TimerRequest):
     from pipelines import ShipmentsReadyToConfirm
     confirm_packed_shipments = ShipmentsReadyToConfirm()
     confirm_packed_shipments.run()
+
+
+@app.timer_trigger(
+    schedule = '*/15 4-23 * * *',
+    arg_name = 'timer',
+    run_on_startup = False
+)
+def pack_shipments(timer: af.TimerRequest):
+    from pipelines import PackShipments
+    pack_shipments = PackShipments()
+    pack_shipments.run()

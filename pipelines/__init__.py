@@ -8,4 +8,4 @@ from .create_acu_receipt import CreateAcuReceipt
 from .stage_rmi_status_retrieval import StageRMIStatusRetrieval
 from .confirm_open_shipments import ShipmentsReadyToConfirm
 from .audit_fulfillment import AuditFulfillment
-from .pack_shipment import PackShipment
+from .pack_shipments import PackShipments

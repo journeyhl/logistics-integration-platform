@@ -4,9 +4,9 @@ from transform.pack_shipment import Transform
 from load.shipment_api import Load
 import json
 
-class PackShipment(Pipeline):
+class PackShipments(Pipeline):
     def __init__(self):
-        super().__init__('pack_shipment')
+        super().__init__('pack_shipments')
         self.acu_api = AcumaticaAPI(self)
         self.transformer = Transform(self)
         self.loader = Load(self)
