@@ -123,7 +123,7 @@ class RMIXML:
               self.logger.warning(acu_response)
               acu_payload = ''
           else:              
-              acu_response, acu_payload = self.pipeline.acu_api.sent_to_wh(shipment[0]['RMANumber'], shipment[0]['CustomerID'])
+              acu_response, acu_payload = self.pipeline.acu_api.send_to_wh(shipment[0]['RMANumber'], shipment[0]['CustomerID'])
           info = {
               'key': shipment[0]['RMANumber'],
               'lines': len(shipment),
@@ -222,7 +222,7 @@ class RMIXML:
               self.logger.warning(acu_response)
               acu_payload = ''
           else:
-              acu_response, acu_payload = self.pipeline.acu_api.rc_sent_to_wh(return_order[0]['ReturnNbr'],
+              acu_response, acu_payload = self.pipeline.acu_api.rc_send_to_wh(return_order[0]['ReturnNbr'],
                                                                           return_order[0]['OrderType'], 
                                                                           return_order[0]['CustomerID'])
           info = {

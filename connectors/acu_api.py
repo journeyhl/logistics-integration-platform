@@ -127,8 +127,8 @@ class AcumaticaAPI:
         return shipment_data
     
     
-    def rc_sent_to_wh(self, OrderNbr, OrderType, CustomerID):
-        '''rc_sent_to_wh`(self, OrderNbr, OrderType, CustomerID)`
+    def rc_send_to_wh(self, OrderNbr, OrderType, CustomerID):
+        '''`rc_send_to_wh`(self, OrderNbr, OrderType, CustomerID)
         ===
         
         * Marks an *Order*'s **RC Ship to Warehouse** attribute to true. (AttributeRCSHP2WH)
@@ -477,8 +477,8 @@ class AcumaticaAPI:
         })
         return line_data
 
-    def sent_to_wh(self, ShipmentNbr, CustomerID):
-        '''sent_to_wh`(self, ShipmentNbr, CustomerID)`
+    def send_to_wh(self, ShipmentNbr, CustomerID):
+        '''send_to_wh`(self, ShipmentNbr, CustomerID)`
         ===
         * Marks a *Shipment*'s **Ship to Warehouse** attribute to true. (AttributeSHP2WH)
 
@@ -532,6 +532,65 @@ class AcumaticaAPI:
         })
         return self.status_description, body
 
+
+    def send_to_wh_v2(self, ShipmentNbr: str, CustomerID: str, attribute_payload: dict = {}):
+        '''`sent_to_wh_v2`(self, ShipmentNbr: *str*, CustomerID: *str*, attribute_payload: *dict*)
+        ===
+        * Marks a *Shipment*'s **Ship to Warehouse** attribute to true. (AttributeSHP2WH)
+
+        * Receives a dynamic payload for additional attribute values to populate
+
+        * API Method: **PUT**
+
+        Parameters
+        ---
+        <hr>
+
+            __ShipmentNbr__ (*str*): ShipmentNbr of Shipment to update
+            __CustomerID__ (*str*): CustomerID or AcctCD of Customer on Shipment (C0090306, C0067451)
+            __attribute_payload__ (*dict*): Additional Attribute values to populate on Shipment
+        
+        Returns
+        ---
+        <hr>
+
+            __self.status_description__ (str): Details of interaction with Acumatica API
+            __body__ (dict): Dictionary of what was sent to Acumatica API
+
+        '''
+        body = {
+            "CustomerID": { "value": f"{CustomerID}" },
+            "ShipmentNbr": { "value": f"{ShipmentNbr}" },
+            "custom": {
+                "Document": {
+                    "AttributeSHP2WH": {
+                        "value": True
+                    },
+                    **attribute_payload
+                }
+            } 
+        }
+        try:
+            response = self.session.put(f'{self.base_uri}/Shipment', json=body)
+            self.parse_response(response, {'type': 'Shipment', 'attribute': 'AttributeSHP2WH'})
+        except Exception as e:
+            try:                    
+                self._logout()
+                self._auth()
+                response = self.session.put(f'{self.base_uri}/Shipment', json=body)
+                self.parse_response(response, {'type': 'Shipment', 'attribute': 'AttributeSHP2WH'})
+            except Exception as e:
+                self.status_description = 'FAILURE'
+                bp = 'here'
+        self.data_log.append({
+            'Entity': 'Shipment',
+            'KeyValue': ShipmentNbr,
+            'Operation': 'PUT - Mark Shipment as Sent to WH',
+            'Payload': body,
+            'Response': self.status_description,
+            'Timestamp': datetime.now(ZoneInfo('America/New_York'))
+        })
+        return self.status_description, body
     #endregion Shipment
 
 
@@ -576,15 +635,15 @@ class AcumaticaAPI:
             - LineNbr, InventoryCD, Qty, SplitLineNbr, ReasonCode and id *for each line* on Shipment
         '''
         try:
-            response = response.json()
+            json_response = response.json()
         except Exception as e:
             self.logger.error(f'Could not parse response!')
             return {
                 'data': response,
                 'status': 'Error'
             }
-        package_count = response['PackageCount']['value']
-        line_count = len(response['Details'])
+        package_count = json_response['PackageCount']['value']
+        line_count = len(json_response['Details'])
         details = [{
             'LineNbr': line['LineNbr']['value'],
             'InventoryCD': line['InventoryID']['value'],
@@ -592,16 +651,16 @@ class AcumaticaAPI:
             'SplitLineNbr': line['Allocations'][0]['SplitLineNbr']['value'],
             'ReasonCode': line['ReasonCode']['value'],
             'id': line['id']
-        } for line in response['Details']]
+        } for line in json_response['Details']]
 
         shipment_details = {
             **shipment_data,
-            'Status': response['Status']['value'],
+            'Status': json_response['Status']['value'],
             'package_count': package_count,
             'line_count': line_count,
             'details': details
         }
-        self.logger.info(f'{response['ShipmentNbr']['value']} - Packages: {package_count}. Lines: {line_count}')
+        self.logger.info(f'{json_response['ShipmentNbr']['value']} - Packages: {package_count}. Lines: {line_count}')
         return shipment_details
 
     def parse_response(self, response: requests.Response, entity_type: dict):

@@ -8,6 +8,10 @@ from pipelines import SendRedStagShipments
 redstag = SendRedStagShipments()
 redstag.run()
 
+bp = 'here'
+
+
+
 payload_target = [    
     "order.search",
     [
@@ -23,5 +27,3 @@ payload_target = [
     ]
 ]
 
-json_response = redstag.target_api(payload_target, '078828: order.search')
-bp = 'here'

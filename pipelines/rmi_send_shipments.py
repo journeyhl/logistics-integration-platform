@@ -21,7 +21,7 @@ Sends Shipment payload to RMI and upserts *_util.rmi_send_log*'''
         
     
     def extract(self):
-        data_extract = self.acudb.query_db(self.acudb.queries.SendShipments.query)
+        data_extract = self.acudb.query_db(self.acudb.queries.SendRMIShipments.query)
         return data_extract
     
     def transform(self, data_extract):

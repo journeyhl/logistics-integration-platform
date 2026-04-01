@@ -1,7 +1,7 @@
 from pipelines import Pipeline
 from connectors import RedStagAPI, AcumaticaAPI
 from transform.redstag_send import Transform
-from load.shipment_api import Load
+from load.load_redstag_send import Load
 import json
 
 class SendRedStagShipments(Pipeline):
@@ -23,7 +23,7 @@ class SendRedStagShipments(Pipeline):
 
     def load(self, data_transformed):
         if data_transformed:
-            self.loader.load_shipments(data_transformed)
+            self.loader.send_shipments(data_transformed)
         else:
             self.logger.info(f'No Shipments to load')
         return self.acu_api.data_log
