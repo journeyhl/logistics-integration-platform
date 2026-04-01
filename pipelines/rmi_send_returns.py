@@ -4,7 +4,7 @@ from transform.rmi_send import Transform
 import polars as pl
 import json
 class SendRMIReturns(Pipeline):
-    '''SendShipments
+    '''SendRMIReturns
 ===
 
 Queries *AcumaticaDb* for any **Open RC Orders** from RMI that have **NOT** been sent to the warehouse

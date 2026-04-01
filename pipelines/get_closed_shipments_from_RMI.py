@@ -6,7 +6,7 @@ from transform.rmi_receipt_pull import Transform
 
 
 class GetClosedShipmentsFromRMI(Pipeline):
-    '''
+    '''GetClosedShipmentsFromRMI
 ===
 
 Hits RMI's *ClosedShipmentsV1* endpoint
