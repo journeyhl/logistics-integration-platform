@@ -95,6 +95,47 @@ class Transform:
         '''
         return item == item_payload[iterator]['shipVia']
 
+    def _determine_shipvia(self, shipment: dict, item_payload: list):
+        '''`_determine_shipvia`(self, shipment: **dict**, item_payload: **list**)
+        ---
+        <hr>
+
+        Following a call to `self._check_shipvia()`, this function determintes what the parent ShipVia value should be
+
+        :param shipment: dict containing Shipment information
+        :type shipment: dict
+        :param item_payload: list of dicts containing Item information. 1 dict per item
+        :type item_payload: list
+        :return item_payload: Edited item_payload, shipVia replaced if needed
+        :rtype: *list*
+        :return ship_via: ShipVia value to be used in **order_create_payload**
+        :rtype: *str*
+        '''
+        if len(item_payload) == 1:
+            ship_via = shipment['rsShipVia']
+            line_str = 'line'
+        else:
+            self.logger.info(f'Determining ShipVia value...')
+            line_str = 'lines'
+            for i, item in enumerate(item_payload[1:]):
+                for j in range(i+1):
+                    same_shipvia = self._check_shipvia(j, item, item_payload)
+                    if not same_shipvia and item['shipVia'] == 'cheapest_ALL':
+                        ship_via = item_payload[j]['shipVia']
+                    elif not same_shipvia:
+                        ship_via = item['shipVia']
+                    else:
+                        ship_via = shipment['rsShipVia']
+                    bp = 'here'
+
+        self.logger.info(f'{shipment['ShipmentNbr']} has {len(item_payload)} {line_str}. ShipVia: {ship_via}')
+        for item in item_payload:
+            if item['shipVia'] != ship_via:
+                item['shipVia'] = ship_via
+        return item_payload, ship_via
+    
+
+
     def transform_order_create_payload(self, shipment: dict, data_extract: pl.DataFrame):
         '''`transform_order_create_payload`(self, shipment: **dict**, data_extract: **pl.DataFrame**)
         ---
@@ -102,7 +143,6 @@ class Transform:
 
         Transforms **shipment** to format needed for posting an **Order** *(Shipment in Acumatica)* to RedStag via API
 
-        This function acts as the driver for the order_create transform and the payload itself is transformed in **transform_order_create_payload**
         
 
         Parameters
@@ -133,27 +173,7 @@ class Transform:
                 for shipment_line in data_extract.iter_rows(named=True)
             if shipment['ShipmentNbr'] == shipment_line['ShipmentNbr']
         ]
-        if len(item_payload) == 1:
-            ship_via = shipment['rsShipVia']
-            line_str = 'line'
-        else:
-            self.logger.info(f'Determining ShipVia value...')
-            line_str = 'lines'
-            for i, item in enumerate(item_payload[1:]):
-                for j in range(i+1):
-                    same_shipvia = self._check_shipvia(j, item, item_payload)
-                    if not same_shipvia and item['shipVia'] == 'cheapest_ALL':
-                        ship_via = item_payload[j]['shipVia']
-                    elif not same_shipvia:
-                        ship_via = item['shipVia']
-                    else:
-                        ship_via = shipment['rsShipVia']
-                    bp = 'here'
-
-        self.logger.info(f'{shipment['ShipmentNbr']} has {len(item_payload)} {line_str}. ShipVia: {ship_via}')
-        for item in item_payload:
-            if item['shipVia'] != ship_via:
-                item['shipVia'] = ship_via
+        item_payload, ship_via = self._determine_shipvia(shipment=shipment, item_payload=item_payload)
         reference_numbers = {} if shipment['OrigOrderType'] != 'RT' else shipment['CustomerOrderNbr']
 
         self.order_create_payload = [            
@@ -181,8 +201,6 @@ class Transform:
                 }
             ]
         ]
-        
-        bp = 'here'
     
     def transform_acu_attribute_payload(self, data: dict) -> dict:
         

@@ -376,8 +376,8 @@ class AcumaticaAPI:
             response_str = f'{response.status_code} {response.reason}. {shipment_data['ShipmentNbr']} now has {json_response['PackageCount']['value']} packages.'
             self.logger.info(response_str)
         if not response.ok:
-            self.logger.error(f'get_package_details failed ({response.status_code}): {json_response['error']}')
-            response_str = f'{response.status_code} {json_response['error']}'
+            self.logger.error(f'get_package_details failed ({response.status_code}): {json_response.get('error')}')
+            response_str = f'{response.status_code} {json_response.get('error')}'
             self.logger.warning(response_str)
 
         self.data_log.append({

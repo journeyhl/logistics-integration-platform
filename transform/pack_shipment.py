@@ -74,6 +74,7 @@ class Transform:
     Groups shipment lines by **ShipmentNbr** and **TrackingNbr**
         '''
         shipments = {}
+        self.package_contents = {}
         for i, line in enumerate(data_transformed):
             if shipments.get(f'{line['ShipmentNbr']}') == None:
                 package_payload = self._format_package(line, data_transformed)
@@ -93,30 +94,31 @@ class Transform:
         '''
         now = datetime.now(ZoneInfo('America/New_York')).strftime('%m/%d/%Y %H:%M:%S')
         descr = f'Package added via API @ {now}'
+        packages = []
+        if self.package_contents.get((shipment_line_data['ShipmentNbr'], shipment_line_data['TrackingNbr_3pl'])) == None:
+            self.package_contents[(shipment_line_data['ShipmentNbr'], shipment_line_data['TrackingNbr_3pl'])] = [{
+                    "InventoryID": { "value": pkg_line_data['InventoryCD'] },
+                    "Quantity": { "value": pkg_line_data['Qty_3pl'] },
+                    "UOM": { "value": "EA" },
+                    "ShipmentSplitLineNbr": { "value": pkg_line_data['SplitLineNbr']}
+                }
+                for pkg_line_data in shipment_data if shipment_line_data['TrackingNbr_3pl'] == pkg_line_data['TrackingNbr_3pl'] and shipment_line_data['ShipmentNbr'] == pkg_line_data['ShipmentNbr']
+            ]
+
         package_payload = {
             "ShipmentNbr": { "value": f"{shipment_line_data['ShipmentNbr']}" },
             "Packages": [
                 {
                     "BoxID": { "value": "DEFAULT BOX" },
-                    "TrackingNbr": { "value": f"{line['TrackingNbr_3pl']}" },
+                    "TrackingNbr": { "value": f"{shipment_line_data['TrackingNbr_3pl']}" },
                     "Description": { "value": f"{descr}" },
                     "Weight": { "value": 0 },
                     "UOM": { "value": "LBS" },
-                    "PackageContents": [
-                        {
-                            "InventoryID": { "value": pkg_line_data['InventoryCD'] },
-                            "Quantity": { "value": pkg_line_data['Qty_3pl'] },
-                            "UOM": { "value": "EA" },
-                            "ShipmentSplitLineNbr": { "value": pkg_line_data['SplitLineNbr']}
-                        }
-                        for pkg_line_data in shipment_data
-                    if line['TrackingNbr_3pl'] == pkg_line_data['TrackingNbr_3pl']  
-                    ]
+                    "PackageContents": self.package_contents[(shipment_line_data['ShipmentNbr'], shipment_line_data['TrackingNbr_3pl'])]
                 }
-                for line in shipment_data
-            if shipment_line_data['ShipmentNbr'] == line['ShipmentNbr']
             ]
         }
+
         return package_payload
     
 
