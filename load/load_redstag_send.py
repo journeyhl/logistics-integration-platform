@@ -18,9 +18,37 @@ class Load:
         self.logger = logging.getLogger(f'{pipeline.pipeline_name}.transform')
 
     def send_shipments(self, data_transformed):
+        '''`send_shipments`(self, data_transformed)
+        ---
+        <hr>
+
+        Once we have the order_id (*rsOrderID*) from RedStag, we can mark the shipment as Sent to WH.
+
+
+        Parameters
+        ===
+        <hr>
+
+        :param **data_transformed**: Transformed dictionary of RedStag Shipments to send
+        :type **data_transformed**: _dict_
+        '''
+        data_transformed_copy = data_transformed
         data_loaded = []
         for shipment, data in data_transformed.items():
             self.logger.info(f'Sending {shipment} to RedStag')
-            self.create_response = self.pipeline.redstag.target_api(payload_target=data['order_create_payload'], operation=f'{shipment}, order.create')
-            shipment_data = self.pipeline.acu_api.shipment_details(data)
+            self.create_response = self.pipeline.redstag.target_api(payload_target=data['execution_payload'], operation=data['execution_operation'])
+            if self.create_response.get('results'):
+                self.create_response = self.create_response['results'][0]
+            
+            if self.create_response['status'] == 'unable_to_process':
+                self.logger.warning(f'{self.create_response['status']} {shipment}!')
+                bp = 'here'
+            if self.create_response['status'] == 'new' or self.create_response['status'] == 'unable_to_process':
+                self.logger.info(f'Shipment {shipment} created at RedStag successfully!')
+                data['data_3pl'] = self.create_response
+                data['attribute_payload'] = self.pipeline.transformer.transform_acu_attribute_payload(data)
+                self.pipeline.acu_api.send_to_wh_v2(shipment, data['CustomerID'], data['attribute_payload'])
             bp = 'here'
+
+        data_loaded = data_transformed
+        return data_loaded

@@ -571,8 +571,9 @@ class AcumaticaAPI:
             } 
         }
         try:
+            self.logger.info(f'Sending attribute_payload to Acumatica for Shipment {ShipmentNbr}')
             response = self.session.put(f'{self.base_uri}/Shipment', json=body)
-            self.parse_response(response, {'type': 'Shipment', 'attribute': 'AttributeSHP2WH'})
+            self.parse_response(response, {'type': 'Shipment', 'attribute': 'AttributeSHP2WH',})
         except Exception as e:
             try:                    
                 self._logout()
