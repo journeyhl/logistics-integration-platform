@@ -118,11 +118,11 @@ class RMIXML:
               self.rmi_response_str = f'{shipment[0]['RMANumber']} - CRITICAL ERROR: No response from RMI!'
               self.logger.error(self.rmi_response_str)
               print(send_str)
-          if 'error' in self.rmi_response_str.lower():
+          if 'error' in self.rmi_response_str.lower() and 'already exists' not in self.rmi_response_str.lower():
               acu_response = f'{shipment[0]['RMANumber']} - RMI Error, did not attempt SendToWH in Acu'
               self.logger.warning(acu_response)
               acu_payload = ''
-          else:              
+          else:
               acu_response, acu_payload = self.pipeline.acu_api.send_to_wh(shipment[0]['RMANumber'], shipment[0]['CustomerID'])
           info = {
               'key': shipment[0]['RMANumber'],
