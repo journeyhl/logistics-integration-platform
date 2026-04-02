@@ -1,17 +1,29 @@
 import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from connectors import RedStagAPI
-from pipelines import SendRedStagShipments
+from pipelines import SendRedStagShipments, RedStagInventory
 
 
-redstag = SendRedStagShipments()
-redstag.run()
+
+
+redstag_inventory = RedStagInventory()
+redstag_inventory.run()
+
+bp = 'here'
+
+send_redstag = SendRedStagShipments()
+send_redstag.run()
+
+
+
 
 bp = 'here'
 
 
 
+
+
+#region misc
 payload_target = [    
     "order.search",
     [
@@ -26,4 +38,6 @@ payload_target = [
         ]
     ]
 ]
+#endregion
+
 

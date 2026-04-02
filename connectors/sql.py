@@ -250,6 +250,7 @@ end
         try:
             params = [self._dict_to_params(data_dict, sql_table['keys'] + sql_table['columns'] + sql_table['update_columns'] + sql_table['keys']) for data_dict in data]
             cursor = self.raw_connection.cursor()
+            self.logger.info(f'Beginning upsert of {len(data)} rows to {table_name}...')
             cursor.executemany(upsert_string, params)
             self.logger.info(f'{table_name} ╍ Upserted {len(data)} rows')
             self.raw_connection.commit()

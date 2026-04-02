@@ -1,8 +1,7 @@
 import azure.functions as af
-
 app = af.FunctionApp()
 
-#Send Shipments and Returns to RMI every half hour. 4am-11pm
+#region RMI - Send Shipments & Returns
 @app.timer_trigger(
     schedule = '10/30 4-23/1 * * *',
     arg_name = 'timer',
@@ -41,35 +40,15 @@ def rmi_send_shipment_return_pipeline(timer: af.TimerRequest):
 
     return_pipeline = SendRMIReturns()
     return_pipeline.run()
-
-#Send Shipments and Returns to RMI every half hour. 4am-11pm
-@app.timer_trigger(
-    schedule = '5/30 4-23/1 * * *',
-    arg_name = 'timer',
-    run_on_startup = False
-)
-def redstag_send_shipment_return_pipeline(timer: af.TimerRequest):
-    '''`redstag_send_shipment_return_pipeline`
-    ---
-    <hr>
-
-    SendRedStagShipments
-    ===
-    
-    Sends Shipments to RedStag. If successful, marks as SentToWH in Acumatica along with any other attributes specified
-
-    <hr>
-
-    Schedule
-    ===
-     *Runs at :05 and :35 every hour from 4am-11pm*
-    '''
-    from pipelines import SendRedStagShipments
-    shipment_pipeline = SendRedStagShipments()
-    shipment_pipeline.run()
+#endregion RMI - Send Shipments & Returns
 
 
-#Retrieve data from RMI api every hour, 5 minutes past. 4am-11pm
+############################____________############################
+##--------------------------     JJ     ----------------------------
+############################‾‾‾‾‾‾‾‾‾‾‾‾############################
+
+
+#region RMI - Data Retrieval
 @app.timer_trigger(
     schedule = '25 4-23/1 * * *',
     arg_name = 'timer',
@@ -132,10 +111,15 @@ def rmi_data_retrieval_pipeline(timer: af.TimerRequest):
     for rma_number in rma_numbers:
         status_retrieval_pipeline._re_init(rma_number = rma_number)
         status_retrieval_pipeline.run()
+#endregion RMI Data Retrieval
 
 
+############################____________############################
+##--------------------------     JJ     ----------------------------
+############################‾‾‾‾‾‾‾‾‾‾‾‾############################
 
-#Create Receipts in Acumatica at 50 past every hour. 8am - 8pm
+
+#region RMI/Acu - Create Receipts
 @app.timer_trigger(
     schedule = '50 8-20 * * *',
     arg_name = 'timer',
@@ -177,25 +161,93 @@ def create_acu_receipts(timer: af.TimerRequest):
     create_receipt_pipeline = CreateAcuReceipt()
     create_receipt_pipeline.run()
 
+#endregion RMI/Acu - Create Receipts
 
 
+############################____________############################
+##--------------------------     JJ     ----------------------------
+############################‾‾‾‾‾‾‾‾‾‾‾‾############################
+
+
+#region Acu - Confirm Shipments
 @app.timer_trigger(
     schedule = '*/20 4-23 * * *',
     arg_name = 'timer',
     run_on_startup = False
 )
 def confirm_acu_shipments(timer: af.TimerRequest):
+    '''`confirm_acu_shipments`
+    ---
+    <hr>
+    
+    *1. Pulls all Open RedStag Shipments that have a Tracking Number and are ready to be confirmed*
+
+    *2. Formats payload for Shipment Confirmation via Acumatica API*
+
+    *3. Sends payload to confirm each Shipment*
+
+    
+    '''
     from pipelines import ShipmentsReadyToConfirm
     confirm_packed_shipments = ShipmentsReadyToConfirm()
     confirm_packed_shipments.run()
+#endregion Acu - Confirm Shipments
 
 
+############################____________############################
+##--------------------------     JJ     ----------------------------
+############################‾‾‾‾‾‾‾‾‾‾‾‾############################
+
+
+#region Acu - Pack Shipments
 @app.timer_trigger(
     schedule = '*/15 4-23 * * *',
     arg_name = 'timer',
     run_on_startup = False
 )
 def pack_shipments(timer: af.TimerRequest):
+    '''`pack_shipments`
+    ---
+    <hr>
+
+    *1. Queries CentralStore RedStag tables and json.RedStagEvents to find RedStag shipments ready to be packed and have tracking added.*
+
+    >>> central_extract = self.centralstore.query_db(self.centralstore.queries.PackShipment.query)
+    >>> redstag_event_extract = self.centralstore.query_db(self.centralstore.queries.RedStagEvents.query)
+
+    *2. Queries AcumaticaDb for Open Shipments that have been sent to Warehouse but don't have a Tracking Nbr*
+
+    >>> acu_extract = self.acudb.query_db(self.acudb.queries.PackShipment.query)
+    
+    *3. Matches results from Acumatica to one or both of the CentralStore extracts, then formats the Package payload to be sent to Acumatica's API*
+
+    *4. Sends each Shipments Package Payload to Acumatica API*
+    '''
     from pipelines import PackShipments
     pack_shipments = PackShipments()
     pack_shipments.run()
+#endregion Acu - Pack Shipments
+
+
+############################____________############################
+##--------------------------     JJ     ----------------------------
+############################‾‾‾‾‾‾‾‾‾‾‾‾############################
+
+#region RedStag - Retrieve Inventory
+@app.timer_trigger(
+    schedule = '10 4-23/2 * * *',
+    arg_name = 'timer',
+    run_on_startup = False
+)
+def redstag_inventory_retrieval(timer: af.TimerRequest):
+    '''`redstag_inventory_retrieval`
+    ---
+    <hr>
+    
+    Loads Detailed Inventory information from RedStag via API and Upserts to **RedStagInventorySummary** and **RedStagInventoryDetail**
+    
+    '''
+    from pipelines import RedStagInventory
+    redstag_inventory = RedStagInventory()
+    redstag_inventory.run()
+#endregion RedStag - Retrieve Inventory

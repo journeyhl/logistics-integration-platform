@@ -10,3 +10,4 @@ from .confirm_open_shipments import ShipmentsReadyToConfirm
 from .audit_fulfillment import AuditFulfillment
 from .pack_shipments import PackShipments
 from .redstag_send_shipments import SendRedStagShipments
+from .redstag_inventory import RedStagInventory

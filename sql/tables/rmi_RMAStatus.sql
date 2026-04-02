@@ -1,3 +1,9 @@
+if not exists(
+select * 
+from sys.tables t 
+where t.name = 'rmi_RMAStatus'
+)
+begin
 create table rmi_RMAStatus(
 RMANumber varchar(55),
 RMAID		int,
@@ -16,3 +22,4 @@ RMILastModifiedDate datetime,
 LastChecked datetime,
 Primary Key(RMANumber, RMAID, RMALineID, RMAType)
 )
+end

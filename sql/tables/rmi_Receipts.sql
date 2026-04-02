@@ -1,3 +1,9 @@
+if not exists(
+select * 
+from sys.tables t 
+where t.name = 'rmi_Receipts'
+)
+begin
 create table rmi_Receipts(
 RMANumber varchar(55),
 ReceiptDate datetime,
@@ -14,3 +20,4 @@ Price decimal(18,2),
 Cost decimal(18,2),
 Primary Key(RMANumber, ReceiptID, RMAID, RMALineID)
 )
+end

@@ -1,3 +1,9 @@
+if not exists(
+select * 
+from sys.tables t 
+where t.name = 'rmi_ClosedShipments'
+)
+begin
 create table rmi_ClosedShipments(
 RMANumber varchar(55),
 RMAID		int,
@@ -19,3 +25,4 @@ FreightCost decimal(18,2),
 OutboundShipMethod varchar(50),
 Primary Key(RMANumber, RMAID, RMALineID, RMAType)
 )
+end
