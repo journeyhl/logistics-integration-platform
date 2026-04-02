@@ -19,8 +19,25 @@ class Load:
         self.pipeline = pipeline
         self.logger = logging.getLogger(f'{pipeline.pipeline_name}.transform')
 
-    def load_shipments(self, data_transformed):
-        data_loaded = []
+    def load_shipments(self, data_transformed: dict):
+        '''`load_shipments`(self, data_transformed: *dict*)
+        ---
+        <hr>
+        
+        Iterates through **data_transformed** items and adds Package for each Shipment in Acumatica if it meets all conditions
+        
+        <hr>
+        
+        Parameters
+        ----------
+        
+        :param data_transformed: dict of Shipments to pack in Acumatica. Each entry's key is the *ShipmentNbr* and will contain **PackagePayload**
+        :type data_transformed: dict
+        
+        <hr>
+        
+        
+        '''
         for shipment, data in data_transformed.items():
             shipment_data = self.pipeline.acu_api.shipment_details(data)
             if (shipment_data['package_count'] == 0
@@ -34,7 +51,24 @@ class Load:
             bp = 'here'
 
 
-    def load_receipts(self, data_transformed):        
+
+    def load_receipts(self, data_transformed):
+        '''`load_receipts`(self, data_transformed)
+        ---
+        <hr>
+        
+        Used by CreateAcuReceipt, Iterates through each shipment needing a receipt, determines if it's ready to be created and acts accordingly
+        
+        <hr>
+        
+        Parameters
+        ----------
+        
+        :param data_transformed: _description_
+        :type data_transformed: _type_
+        
+        
+        '''
         data_loaded = []
         for order in data_transformed:
             shipment_data = self.pipeline.acu_api.sales_order_get_shipment(order)

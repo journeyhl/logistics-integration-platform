@@ -24,7 +24,9 @@ select s.ShipmentNbr
 	 , sa.State ShipToState
 	 , sa.PostalCode ShipToZip
 	 , sa.CountryID ShipToCountry
-	, case when s.ShipVia in ('GROUND', 'PSC150THRES', 'WHITEGLOVE399', 'WHITEGLOVE450', 'WHITEGLOVE499') and i.Descr like '%battery%' 
+	, case when i.InventoryCD in('01025','08371','01102','08824','08505','08305','08307','08369','08939','08835','08306') 
+				then 'cheapest_GROUND'
+			when s.ShipVia in ('GROUND', 'PSC150THRES', 'WHITEGLOVE399', 'WHITEGLOVE450', 'WHITEGLOVE499') and i.Descr like '%battery%' 
 	  			then 'cheapest_UPS'
 			when s.ShipVia in ('GROUND', 'PSC150THRES', 'WHITEGLOVE399', 'WHITEGLOVE450', 'WHITEGLOVE499')
 				then 'cheapest_ALL'

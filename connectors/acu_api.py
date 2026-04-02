@@ -26,17 +26,19 @@ class AcumaticaAPI:
 #region SalesOrder
     def sales_order_create_receipt(self, order_data: dict):
         '''sales_order_create_receipt`(self, order_data)`
-    ===
+    ---
+    <hr>
+
     Creates Receipt for Open SalesOrder
 
     For **RC Orders only**
 
+    <hr>
 
     Parameters
     -------------
-    <hr>
 
-        __order_data__ (dict): Dictionary of Order data. Must contain OrderType, OrderNbr, and AcctCD
+    :param (*dict*) `order_data`: Dictionary of Order data. Must contain OrderType, OrderNbr, and AcctCD
 
     '''
         self.logger.info(f'Creating Receipt for {order_data['OrderNbr']}')
@@ -65,21 +67,22 @@ class AcumaticaAPI:
 
 
     def sales_order_get_shipment(self, order_data):
-        '''sales_order_get_shipment`(self, order_data)`
-    ===
+        '''`sales_order_get_shipment`(self, order_data)
+    ---
+    <hr>
     Returns Shipment details for a given *Sales Order*
 
+    <hr>
 
     Parameters
     -------------
+
+    :param (*dict*) `order_data`: Dictionary of Order data. Must contain OrderType and OrderNbr
+
     <hr>
-
-        __order_data__ (dict): Dictionary of Order data. Must contain OrderType and OrderNbr
-
 
     Returns
     -------------
-    <hr>
 
         __shipment_data__ (dict): Formatted dict of Shipment data for order. If no shipment, Shipment data is None
 
@@ -129,23 +132,25 @@ class AcumaticaAPI:
     
     def rc_send_to_wh(self, OrderNbr, OrderType, CustomerID):
         '''`rc_send_to_wh`(self, OrderNbr, OrderType, CustomerID)
-        ===
+        ---
+        <hr>
         
         * Marks an *Order*'s **RC Ship to Warehouse** attribute to true. (AttributeRCSHP2WH)
 
         * API Method: **PUT**
         
+        <hr>
+        
         Parameters
         ---
+        :param (*str*) `OrderNbr`: OrderNbr of Order to update (AR078365)
+        :param (*str*) `OrderType`: OrderType of Order to update (RC)
+        :param (*str*) `CustomerID`: CustomerID or AcctCD of Customer on Order (C0090306, C0067451)
+        
         <hr>
 
-            __OrderNbr__ (str): OrderNbr of Order to update (AR078365)
-            __OrderType__ (str): OrderType of Order to update (RC)
-            __CustomerID__ (str): CustomerID or AcctCD of Customer on Order (C0090306, C0067451)
-        
         Returns
         ---
-        <hr>
 
             __self.status_description__ (str): Details of interaction with Acumatica API
             __body__ (dict): Dictionary of what was sent to Acumatica API
@@ -194,23 +199,25 @@ class AcumaticaAPI:
 
     def shipment_details(self, shipment_data: dict):
         '''shipment_details`(self, shipment_data)`
-        ===
+        ---
+        <hr>
+
         * Gets Shipment details for a given *Shipment*
 
         * API Method: **GET**
 
+        <hr>
+
         Parameters
         ---
+        :param (*dict*) shipment_data: Dictionary containing details of Shipment
+
+            - Required: **ShipmentNbr**
+        
         <hr>
 
-        __shipment_data__ (dict): Dictionary containing details of Shipment
-        - Required
-
-            - **ShipmentNbr**
-        
         Returns
         ---
-        <hr>
 
             __response.json()__ (dict): Parsed Dictionary of response from API
         '''
@@ -226,25 +233,30 @@ class AcumaticaAPI:
 
     def shipment_details_attr(self, shipment_data: dict):
         '''shipment_details`(self, shipment_data)`
-        ===
+        ---
+        <hr>
+
         * Gets Shipment details for a given *Shipment*, along with whether or not it was Sent to WH
 
         * API Method: **GET**
+        
+        <hr>
 
         Parameters
         ---
-        <hr>
 
-        __shipment_data__ (dict): Dictionary containing details of Shipment
+        :param (*dict*) `shipment_data`: Dictionary containing details of Shipment
+        :type shipment_data: dict
+        
         - Required
+            - **ShipmentNbr**, **OrderNbr**
 
-            - **ShipmentNbr**
+        <hr>
         
         Returns
         ---
-        <hr>
 
-            __response.json()__ (dict): Parsed Dictionary of response from API
+            `response.json()` (dict): Parsed Dictionary of response from API
         '''
         self.logger.info(f'Retrieving Shipment Details from Acu API for {shipment_data['ShipmentNbr']}')
         try:
@@ -257,34 +269,34 @@ class AcumaticaAPI:
             return {}
         
     def add_package(self, shipment_data: dict):
-        '''add_package`(self, shipment_data)`
-    ===
-    Given a Shipment, creates and packs a package
+        '''add_package`(self, shipment_data: *dict*)`
+        ---
+        <hr>
 
+        Given a Shipment, creates and packs a package
 
-    Parameters
-    -------------
-    <hr>
+        <hr>
 
-    **shipment_data** (*dict*): Shipment data. Must include Line details
+        Parameters
+        ---
+        :param (*dict*) `shipment_data`: Shipment data. Must include Line details
 
-    - Required
+        Required:
+        - **ShipmentNbr**
+        - **ExtRefNbr** or **TrackingNbr**
+        - **details**
+        - **details.InventoryCD**
+        - **details.Qty**
+        - **details.SplitLineNbr**
 
-     - **ShipmentNbr**
-     - **ExtRefNbr** or **TrackingNbr**
-     - **details**
-     - **details.InventoryCD**
-     - **details.Qty**
-     - **details.SplitLineNbr**
+        <hr>
 
+        Returns
+        -------------
 
-    Returns
-    -------------
-    <hr>
+            `shipment_data` (dict): Shipment data with package details
 
-        __shipment_data__ (dict): Shipment data with package details
-
-    '''
+        '''
         self.logger.info(f'Adding package to {shipment_data['ShipmentNbr']}')
         now = datetime.now(ZoneInfo('America/New_York')).strftime('%m/%d/%Y %H:%M:%S')
         descr = f'Package added via API @ {now}'
@@ -316,52 +328,51 @@ class AcumaticaAPI:
 
 
     def add_package_v2(self, shipment_data: dict):
-        '''`add_package_v2`(self, shipment_data):
-    ===
-    Revised version of add_package. Used in RedStag.
-
-    Instead of formatting the package within function like `add_package`, format it beforehand and pass the completed payload inside *shipment_data*
-    
-
-    Parameters
-    -------------
-    <hr>
-
-        __shipment_data__ (dict): Dictionary of Shipment data
-
-        - Required: **ShipmentNbr**, **PackagePayload**
+        '''`add_package_v2`(self, shipment_data: *dict*):
+        ---
+        <hr>
         
+        Revised version of add_package. Used in RedStag.
 
+        Instead of formatting the package within function like `add_package`, format it beforehand and pass the completed payload inside *shipment_data*
+        
+        <hr>
+        
+        Parameters
+        ----------
+        
+        :param `shipment_data`: Dictionary of Shipment data
+        :type shipment_data: dict
 
-
-        '''
+        - Required: **ShipmentNbr**, **PackagePayload**'''
+        
         self.logger.info(f'Adding package to {shipment_data['ShipmentNbr']}')
         shipment_data = self.get_package_details(shipment_data, shipment_data['PackagePayload'])
         bp = 'here'
 
     def get_package_details(self, shipment_data, body=None):
-        '''get_package_details`(self, order_data)`
-    ===
-    Given a Shipment, returns Package details
+        '''`get_package_details`(self, shipment_data)
+        ---
+        <hr>
+    
+        Given a Shipment, returns Package details
 
 
-    Parameters
-    -------------
-    <hr>
+        Parameters
+        -------------
+        <hr>
 
-        __shipment_data__ (dict): Dictionary of Shipment data
-        __body__ (dict): JSON payload sent to API
+            `shipment_data` (dict): Dictionary of Shipment data
+            `body` (dict): JSON payload sent to API
 
 
-    Returns
-    -------------
-    <hr>
+        Returns
+        -------------
+        <hr>
 
-        __shipment_data__ (dict): shipment_data with Package data
-
-         - Required: **ShipmentNbr**
-
-    '''
+        `shipment_data` (dict): shipment_data with Package data
+            - Required: **ShipmentNbr**
+            '''
         verb = 'added to'
         if body == None:
             verb = 'retrieved from'
@@ -391,22 +402,21 @@ class AcumaticaAPI:
         return shipment_data
 
     def confirm_shipment(self, shipment_data: dict):
-        '''confirm_shipment`(self, shipment_data)`
-    ===
-    Given a Shipment in Open status, confirms it.
+        '''`confirm_shipment`(self, shipment_data: *dict* )
+        ---
+        <hr>
+        
+        Confirms Shipment
+        <hr>
 
+        Parameters
+        -------------
 
-    Parameters
-    -------------
-    <hr>
-
-        __shipment_data__ (dict): Dictionary of Shipment data.
-
-         - Required: **ShipmentNbr**
-
-
-
-    '''
+        :param `shipment_data`: Dictionary of Shipment data.
+        :type shipment_data: dict
+        
+        - Required: **ShipmentNbr**
+        '''
         self.logger.info(f'Confirming Shipment {shipment_data['ShipmentNbr']}')
         body = {
             "entity": {
@@ -432,27 +442,29 @@ class AcumaticaAPI:
         })
 
 
-    def update_reason_code(self, shipment_data: dict, line_data: dict):        
-        '''update_reason_code`(self, shipment_data, line_data)`
-    ===
-    Updates Reason Code on the line of a Shipment to *RETURN*
-
-
-    Parameters
-    -------------
-    <hr>
-
-        __shipment_data__ (dict): Shipment data
-        __line_data__ (dict): For each line on Shipment, line_data is that line's data dict
-
-
-    Returns
-    -------------
-    <hr>
-
-        __line_data__ (dict): Line data with updated Reason Code
-
-    '''
+    def update_reason_code(self, shipment_data: dict, line_data: dict):    
+        '''`update_reason_code`(self, shipment_data: *dict*, line_data: *dict*)
+        ---
+        <hr>
+        
+        Updates Reason Code on the line of a Shipment to *RETURN*
+        
+        <hr>
+        
+        Parameters
+        ----------
+        
+        :param `shipment_data`: Shipment data
+        :type shipment_data: dict
+        :param `line_data`: For each line on Shipment, line_data is that line's data dict
+        :type line_data: dict
+        
+        <hr>
+        
+        Returns
+        ----------
+        
+        :return `line_data` (*dict*): Line data with updated Reason Code'''
         self.logger.info(f'Updating ReasonCode on line {line_data['LineNbr']} of {shipment_data['ShipmentNbr']} from {line_data['ReasonCode']} to RETURN')
         body = {
             "ShipmentNbr": { "value": f"{shipment_data['ShipmentNbr']}" },
@@ -478,27 +490,29 @@ class AcumaticaAPI:
         return line_data
 
     def send_to_wh(self, ShipmentNbr, CustomerID):
-        '''send_to_wh`(self, ShipmentNbr, CustomerID)`
-        ===
-        * Marks a *Shipment*'s **Ship to Warehouse** attribute to true. (AttributeSHP2WH)
-
-        * API Method: **PUT**
-
-        Parameters
+        '''`send_to_wh`(ShipmentNbr, CustomerID, )
         ---
         <hr>
-
-            __ShipmentNbr__ (str): ShipmentNbr of Shipment to update
-            __CustomerID__ (str): CustomerID or AcctCD of Customer on Shipment (C0090306, C0067451)
+        
+        _summary_
+        
+        <hr>
+        
+        Parameters
+        ---
+        
+        :param `ShipmentNbr`: _description_
+        :type ShipmentNbr: _type_
+        :param `CustomerID`: _description_
+        :type CustomerID: _type_
+        
+        <hr>
         
         Returns
         ---
-        <hr>
+        :return `self.status_description` (*str*): Details of interaction with Acumatica API
 
-            __self.status_description__ (str): Details of interaction with Acumatica API
-            __body__ (dict): Dictionary of what was sent to Acumatica API
-
-        '''
+        :return `body` (*dict*): Dictionary of what was sent to Acumatica API'''
         body = {
             "CustomerID": { "value": f"{CustomerID}" },
             "ShipmentNbr": { "value": f"{ShipmentNbr}" },
@@ -541,23 +555,25 @@ class AcumaticaAPI:
         * Receives a dynamic payload for additional attribute values to populate
 
         * API Method: **PUT**
+        
+        <hr>
 
         Parameters
         ---
+        :param `ShipmentNbr`: ShipmentNbr of Shipment to update
+        :type ShipmentNbr: str
+        :param `CustomerID`: CustomerID or AcctCD of Customer on Shipment (C0090306, C0067451)
+        :type CustomerID: str
+        :param `attribute_payload`: Additional Attribute values to populate on Shipment
+        :type attribute_payload: dict
+            
         <hr>
 
-            __ShipmentNbr__ (*str*): ShipmentNbr of Shipment to update
-            __CustomerID__ (*str*): CustomerID or AcctCD of Customer on Shipment (C0090306, C0067451)
-            __attribute_payload__ (*dict*): Additional Attribute values to populate on Shipment
-        
         Returns
         ---
-        <hr>
+        :return `self.status_description` (*str*): Details of interaction with Acumatica API
 
-            __self.status_description__ (str): Details of interaction with Acumatica API
-            __body__ (dict): Dictionary of what was sent to Acumatica API
-
-        '''
+        :return `body` (*dict*): Dictionary of what was sent to Acumatica API'''
         body = {
             "CustomerID": { "value": f"{CustomerID}" },
             "ShipmentNbr": { "value": f"{ShipmentNbr}" },
@@ -604,20 +620,22 @@ class AcumaticaAPI:
 
         API response contains the detailed information regarding the shipment, including line details
 
+        <hr>
 
         Parameters
         ---
+        :param `shipment_data`: Dictionary containing details of Shipment
+        :type shipment_data: dict
+        :param `response`: Response from Acumatica API (Shipment endpoint)
+        :type response: requests.Response
+
+         
         <hr>
-
-         **shipment_data** (*dict*): Dictionary containing details of Shipment
-
-         **response** (*requests.Response*): Response from Acumatica API (Shipment endpoint)
 
         Returns
         ---
-        <hr>
 
-         **shipment_details** (*dict*): **shipment_data**, but with added *Status*, *package_count*, *line_count* and *details* values
+         `shipment_details` (*dict*): **shipment_data**, but with added *Status*, *package_count*, *line_count* and *details* values
         
          - **shipment_details['*Status*']**
 

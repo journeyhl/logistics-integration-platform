@@ -15,6 +15,7 @@ class Transform:
     def __init__(self, pipeline: SendRedStagShipments):
         self.pipeline = pipeline
         self.logger = logging.getLogger(f'{pipeline.pipeline_name}.transform')
+        self.regulated_goods = ['01025','08371','01102','08824','08505','08305','08307','08369','08939','08835','08306',]
         pass
 
     
