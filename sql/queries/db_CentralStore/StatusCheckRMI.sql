@@ -8,7 +8,7 @@ from rmi_Receipts
 union
 select distinct KeyValue
 from _util.rmi_send_log
-where KeyValue != 'AR078849'
+where right(RMI_Response, 19) != 'Item does not exist'
 )
 , AllItems as(
 select distinct RMANumber
