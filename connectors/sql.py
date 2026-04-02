@@ -232,20 +232,20 @@ class SQLConnector(Generic[QT]):
     
 
     def insert_df(self, df_data_loaded: pl.DataFrame, table_name: str):
-        '''_summary_
+        '''`insert_df`(self, df_data_loaded: *pl.DataFrame*, table_name: *str*)
 
-        _extended_summary_
+        Given a polars dataframe and the name of a table, insert the contents of the DataFrame to that table
 
-        :param df_data_loaded: _description_
+        :param df_data_loaded: Data to be loaded into SQL db
         :type df_data_loaded: pl.DataFrame
-        :param table_name: _description_
+        :param table_name: The name of the table in which the contents of *df_data_loaded* will be inserted
         :type table_name: str
         '''
         df_data_loaded.write_database(table_name=table_name, 
                                       connection=self.engine,
                                       if_table_exists='append',
                                       )
-        bp = 'here'
+        self.logger.info(f'Wrote {df_data_loaded.height} rows to {table_name}')
 
 
     
@@ -318,6 +318,19 @@ end
 
     
     def _dict_to_params(self, d: dict, keys: list) -> tuple:
+        '''_dict_to_params
+        ---
+        <hr>
+        
+        Utility function used by **checked_upsert** to format table keys, columns and update_columns with their respective values to parameters
+
+        <hr>
+
+        Parameters
+        -------------
+
+            __d__ (*dict*): dict containing the data to be inserted to database
+            __keys__ (*list*): list containing the names of keys, columns and update_columns of table receiving insert'''
         return tuple(d[k.replace('[', '').replace(']', '')] for k in keys)
     
 
@@ -350,3 +363,21 @@ end
         data = pl.read_database(query.query, self.engine)
         self.logger.info(f'{data.height} rows returned')
         return data
+    
+    def raw_execute(self, query: str):
+        '''`raw_execute`(self, query)
+        ===
+        Given an Insert, Update or Delete command, will return number of rows affected
+
+        Parameters
+        ---
+        <hr>
+
+        - **query** (*str*): Query to be executed in Database as plain text
+
+        '''
+        cursor = self.raw_connection.cursor()
+        self.logger.info(f'Executing query with raw_execute')
+        db_msg = cursor.execute(query)
+        self.raw_connection.commit()
+        return db_msg.rowcount
