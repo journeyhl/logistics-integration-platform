@@ -10,7 +10,7 @@ class ShipmentsReadyToConfirm(Pipeline):
 
 
     def extract(self):
-        data_extract = self.acudb.query_db(self.acudb.queries.ShipmentsReadyToConfirm.query)
+        data_extract = self.acudb.query_to_dataframe(self.acudb.queries.ShipmentsReadyToConfirm)
         return data_extract
     
     def transform(self, data_extract: pl.DataFrame):

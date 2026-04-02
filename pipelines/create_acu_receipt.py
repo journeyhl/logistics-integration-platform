@@ -39,8 +39,8 @@ Matches Orders across datasets to find any Acumatica Orders that are ready to be
         
 
     def extract(self):
-        central_extract = self.centralstore.query_db(self.centralstore.queries.ReturnsPendingReciept.query)
-        acu_extract = self.acudb.query_db(self.acudb.queries.OpenRCsNoReceipt.query)
+        central_extract = self.centralstore.query_to_dataframe(query=self.centralstore.queries.ReturnsPendingReciept)
+        acu_extract = self.acudb.query_to_dataframe(query=self.acudb.queries.OpenRCsNoReceipt)
         data_extract = {
             'central_extract': central_extract,
             'acu_extract': acu_extract

@@ -10,7 +10,7 @@ class StageRMIStatusRetrieval(Pipeline):
     
     def extract(self):
         self.logger.info(f'Running StatusCheckRMI.sql in CentralStore')
-        data_extract = self.centralstore.query_db(self.centralstore.queries.StatusCheckRMI.query)
+        data_extract = self.centralstore.query_to_dataframe(self.centralstore.queries.StatusCheckRMI)
         return data_extract
     
     def transform(self, data_extract):

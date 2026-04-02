@@ -18,7 +18,7 @@ Sends Return Order payload to RMI and upserts *_util.rmi_send_log*'''
 
 
     def extract(self):
-        data_extract = self.acudb.query_db(self.acudb.queries.SendRMIReturns.query)
+        data_extract = self.acudb.query_to_dataframe(query=self.acudb.queries.SendRMIReturns)
         return data_extract
     
     def transform(self, data_extract):

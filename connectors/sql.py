@@ -205,6 +205,27 @@ class SQLConnector(Generic[QT]):
     
 
     def query_db(self, query: str):
+        '''`query_db`(self, query: *str*)
+        ---
+        <hr>
+            
+        Given a string of SQL text, execute and return a polars DataFrame.
+
+        <hr>
+
+        Parameters
+        -------------
+
+        :param (*str*) `query`: SQL query to execute
+        :type query: *str*
+
+        <hr>
+
+        Returns
+        -------------
+
+        :return `data_extract` (*pl.DataFrame*): polars DataFrame with results of query
+        '''
         data_extract = pl.read_database(query, self.engine)
         self.logger.info(f'Extracted {data_extract.height} rows')
         return data_extract
@@ -228,7 +249,39 @@ class SQLConnector(Generic[QT]):
 
 
     
-    def checked_upsert(self, table_name: str, data: list):        
+    def checked_upsert(self, table_name: str, data: list):
+        '''`checked_upsert`(self, table_name: *str*, data: *list*)
+        ---
+        <hr>
+        
+        Given a table name and a list of rows to insert, performs an upsert to database.
+
+
+        :param *str* table_name: The name of the table to update
+
+        :param *list* data: list of dictionaries that correspond to the values in config/settings.py
+
+            * Each dictionary must match the format of the table's keys (or lookup values), table's columns, the columns to be updated (if necc), and then the keys again
+                * This results fills out the *upsert_string* value
+                >>> upsert_string = f"""
+                    if not exists(
+                    select 1 
+                    from {table_name}
+                    where {' = ? and '.join(sql_table['keys'])} = ?
+                    )
+                    begin
+                    insert into {table_name}({', '.join(sql_table['columns'])})
+                    values({', '.join(['?'] * len(sql_table['columns']))})
+                    end
+                    else
+                    begin
+                    update {table_name} set {' = ?, '.join(col for col in sql_table['update_columns'])} = ?
+                    where {' = ? and '.join(sql_table['keys'])} = ?
+                    end
+                """
+
+        '''
+      
         self.tables = TABLES
         sql_table = self.tables[table_name]
         upsert_string = f'''
@@ -250,7 +303,7 @@ end
         try:
             params = [self._dict_to_params(data_dict, sql_table['keys'] + sql_table['columns'] + sql_table['update_columns'] + sql_table['keys']) for data_dict in data]
             cursor = self.raw_connection.cursor()
-            self.logger.info(f'Beginning upsert of {len(data)} rows to {table_name}...')
+            if len(data) > 50: self.logger.info(f'Beginning upsert of {len(data)} rows to {table_name}...')
             cursor.executemany(upsert_string, params)
             self.logger.info(f'{table_name} ╍ Upserted {len(data)} rows')
             self.raw_connection.commit()
@@ -268,3 +321,32 @@ end
         return tuple(d[k.replace('[', '').replace(']', '')] for k in keys)
     
 
+
+
+
+    def query_to_dataframe(self, query: Query):
+        '''`query_db`(self, query: **_Query_**)
+        ---
+        <hr>
+            
+        Given a **_Query_** (see AcumaticaDbQueries and CentralStoreQueries), execute its query and return a polars dataframe
+
+        <hr>
+
+        Parameters
+        -------------
+
+        :param (*str*) `query`: An instance of the Query class, the text of which will be executed and the results output to a polars DataFrame.
+        :type query: *str*
+
+        <hr>
+
+        Returns
+        -------------
+
+        :return `data_extract` (*pl.DataFrame*): polars DataFrame with results of query
+        '''
+        self.logger.info(f'Running {query.name} query...')
+        data = pl.read_database(query.query, self.engine)
+        self.logger.info(f'{data.height} rows returned')
+        return data

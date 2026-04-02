@@ -9,5 +9,8 @@
     "python-envs.defaultEnvManager": "ms-python.python:system",
     
     "autoDocstring.docstringFormat": "one-line-sphinx",
-    "autoDocstring.customTemplatePath": ".vscode/docstring.mustache"
+    "autoDocstring.customTemplatePath": ".vscode/docstring.mustache",
+
+    "editor.tabSize": 4,
+    "editor.detectIndentation": false
 }

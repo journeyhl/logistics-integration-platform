@@ -61,20 +61,19 @@ class Pipeline(ABC):
         self.run_timestamp = datetime.now(ZoneInfo('America/New_York'))
         self.logger.info(f'Starting {self.pipeline_name}')
 
-        self.logger.info('Extracting...')
+
+        if self.pipeline_name != 'rmi-status': self.logger.info('Extracting...')
         data_extract = self.extract()
 
 
-
-
-        self.logger.info('Transforming...')
+        if self.pipeline_name != 'rmi-status': self.logger.info('Transforming...')
         data_transformed = self.transform(data_extract)
 
 
-        self.logger.info('Loading...')
+        if self.pipeline_name != 'rmi-status': self.logger.info('Loading...')
         data_loaded = self.load(data_transformed)
 
-        self.logger.info('Logging...')
+        if self.pipeline_name != 'rmi-status': self.logger.info('Logging...')
         self.log_results(data_loaded)
         return{
             'pipeline': self.pipeline_name,
