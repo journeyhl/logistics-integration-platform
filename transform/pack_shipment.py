@@ -66,12 +66,60 @@ class Transform:
         return shipments
     
 
-    def group_tracking(self, data_transformed):
-        '''`group_tracking`(self, data_transformed)
-    ===
-    <hr>
+    def group_tracking(self, data_transformed: list):
+        '''`group_tracking`(self, data_transformed: *list*))
+        ---
+        <hr>
+        
+        Adds one entry per shipment to shipments dictionary, the key being the **ShipmentNbr**
+        
+        <hr>
+        
+        Parameters
+        ----------
+        
+        :param data_transformed: list of dicts containing Game info.
+        :type data_transformed: list
+        
+        <hr>
+        
+        Returns
+        ----------
+        
+        :return shipments (*dict*): Dictionary of Shipments, the key value being the ShipmentNbr. Prevents duplicating the same shipment
 
-    Groups shipment lines by **ShipmentNbr** and **TrackingNbr**
+
+         shipments must contain the following entries: **ShipmentNbr**, **PackagePayload**, **_FriendlyPackagePayload**     
+
+         **PackagePayload**: payload to be sent to Acumatica API via add_package_v2
+
+         **_FriendlyPackagePayload**: More readable version of PackagePayload, not for use.
+            
+            
+        >>> shipments = {
+            'ShipmentNbr': '078983',
+            'PackagePayload': {
+                'ShipmentNbr': {'value': '078983'}, 
+                'Packages': [
+                    {
+                        'BoxID': {'value': 'DEFAULT BOX'}, 
+                        'TrackingNbr': {'value': '380175841075'}, 
+                        'Description': {'value': 'Package added via API @ 04/02/2026 11:01:03'}, 
+                        'Weight': {'value': 0}, 
+                        'UOM': {'value': 'LBS'}, 
+                        'PackageContents': [
+                            {
+                                'InventoryID': {'value': '09054'}, 
+                                'Quantity': {'value': '2'}, 
+                                'UOM': {'value': 'EA'}, 
+                                'ShipmentSplitLineNbr': {'value': 2}
+                            }
+                        ]
+                    }
+                ]
+            },
+            '_FriendlyPackagePayload': [{...}]
+        }
         '''
         shipments = {}
         self.package_contents = {}
@@ -87,14 +135,32 @@ class Transform:
         
         return shipments
     
-    def _format_package(self, shipment_line_data, shipment_data,):
-        '''
-
-        Formats each Shipment's package as the payload needed for Acumatica API
+    def _format_package(self, shipment_line_data: dict, shipment_data: list):
+        '''`_format_package`(shipment_line_data: *dict*, shipment_data: list)
+        ---
+        <hr>
+        
+        For the Shipment passed in **shipment_line_data**, formats the Acumatica API payload to add package(s) to an Acumatica shipment.
+        
+        <hr>
+        
+        Parameters
+        ----------
+        
+        :param shipment_line_data: dict containing data for a single line from a Shipment
+        :type shipment_line_data: *dict*
+        :param shipment_data: Full list of Shipments that meet the criteria to be packed
+        :type shipment_data: *list*
+        
+        <hr>
+        
+        Returns
+        ----------        
+        
+        :return package_payload (*dict*): *dictionary containing ShipmentNbr and Packages, a list of all packages to be added to Acumatica.*
         '''
         now = datetime.now(ZoneInfo('America/New_York')).strftime('%m/%d/%Y %H:%M:%S')
         descr = f'Package added via API @ {now}'
-        packages = []
         if self.package_contents.get((shipment_line_data['ShipmentNbr'], shipment_line_data['TrackingNbr_3pl'])) == None:
             self.package_contents[(shipment_line_data['ShipmentNbr'], shipment_line_data['TrackingNbr_3pl'])] = [{
                     "InventoryID": { "value": pkg_line_data['InventoryCD'] },

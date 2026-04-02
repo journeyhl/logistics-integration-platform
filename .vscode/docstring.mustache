@@ -1,0 +1,25 @@
+`{{name}}`({{#args}}{{var}}{{^last}}, {{/last}}{{/args}})
+---
+<hr>
+
+{{summaryPlaceholder}}
+
+<hr>
+
+Parameters
+----------
+
+{{#args}}
+:param {{var}}: {{descriptionPlaceholder}}
+:type {{var}}: {{typePlaceholder}}
+{{/args}}
+
+<hr>
+
+Returns
+----------
+
+{{#returns}}
+:return {{descriptionPlaceholder}} (*type*): {{descriptionPlaceholder}}
+:rtype: {{typePlaceholder}}
+{{/returns}}

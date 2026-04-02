@@ -6,5 +6,8 @@
     "azureFunctions.projectRuntime": "~4",
     "debug.internalConsoleOptions": "neverOpen",
     "azureFunctions.projectLanguageModel": 2,
-    "python-envs.defaultEnvManager": "ms-python.python:system"
+    "python-envs.defaultEnvManager": "ms-python.python:system",
+    
+    "autoDocstring.docstringFormat": "one-line-sphinx",
+    "autoDocstring.customTemplatePath": ".vscode/docstring.mustache"
 }
