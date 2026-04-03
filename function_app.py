@@ -233,6 +233,38 @@ def pack_shipments(timer: af.TimerRequest):
 ##--------------------------     JJ     ----------------------------
 ############################‾‾‾‾‾‾‾‾‾‾‾‾############################
 
+
+#Send Shipments and Returns to RedStag every half hour. 4am-11pm
+@app.timer_trigger(
+    schedule = '5/30 4-23/1 * * *',
+    arg_name = 'timer',
+    run_on_startup = False
+)
+def redstag_send_shipment_return_pipeline(timer: af.TimerRequest):
+    '''`redstag_send_shipment_return_pipeline`
+    ---
+    <hr>
+
+    SendRedStagShipments
+    ===
+    
+    Sends Shipments to RedStag. If successful, marks as SentToWH in Acumatica along with any other attributes specified
+
+    <hr>
+
+    Schedule
+    ===
+     *Runs at :05 and :35 every hour from 4am-11pm*
+    '''
+    from pipelines import SendRedStagShipments
+    shipment_pipeline = SendRedStagShipments()
+    shipment_pipeline.run()
+
+
+############################____________############################
+##--------------------------     JJ     ----------------------------
+############################‾‾‾‾‾‾‾‾‾‾‾‾############################
+
 #region RedStag - Retrieve Inventory
 @app.timer_trigger(
     schedule = '10 4-23/2 * * *',

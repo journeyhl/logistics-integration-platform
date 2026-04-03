@@ -136,7 +136,7 @@ class Transform:
         return shipments
     
     def _format_package(self, shipment_line_data: dict, shipment_data: list):
-        '''`_format_package`(shipment_line_data: *dict*, shipment_data: list)
+        '''`_format_package`(self, shipment_line_data: *dict*, shipment_data: *list*)
         ---
         <hr>
         
