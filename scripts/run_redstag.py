@@ -6,8 +6,8 @@ from pipelines import SendRedStagShipments, RedStagInventory
 
 
 
-redstag_inventory = RedStagInventory()
-redstag_inventory.run()
+# redstag_inventory = RedStagInventory()
+# redstag_inventory.run()
 
 bp = 'here'
 

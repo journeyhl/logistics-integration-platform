@@ -1,25 +1,25 @@
-`{{name}}`({{#args}}{{var}}{{^last}}, {{/last}}{{/args}})
+`{{name}}`({{#args}}{{var}}: *{{typePlaceholder}}*{{^last}}, {{/last}}{{/args}})
 ---
 <hr>
 
-{{summaryPlaceholder}}
+put_summary_here
+
+### Downstream Function Calls 
+ #### :meth:`~folder.file.class.method`
+    - Description
 
 <hr>
 
 Parameters
-----------
-
+---
 {{#args}}
-:param {{var}}: {{descriptionPlaceholder}}
-:type {{var}}: {{typePlaceholder}}
+:param (*{{typePlaceholder}}*) `{{var}}`: {{descriptionPlaceholder}}
 {{/args}}
 
 <hr>
 
 Returns
-----------
-
+---
 {{#returns}}
-:return {{descriptionPlaceholder}} (*type*): {{descriptionPlaceholder}}
-:rtype: {{typePlaceholder}}
+:return `variablename` ({{typePlaceholder}}): {{descriptionPlaceholder}}
 {{/returns}}

@@ -186,7 +186,11 @@ def confirm_acu_shipments(timer: af.TimerRequest):
 
     *3. Sends payload to confirm each Shipment*
 
-    
+    <hr>
+
+    Schedule
+    ===
+     *Runs every 20 minutes from 4am-11pm*
     '''
     from pipelines import ShipmentsReadyToConfirm
     confirm_packed_shipments = ShipmentsReadyToConfirm()
@@ -222,6 +226,12 @@ def pack_shipments(timer: af.TimerRequest):
     *3. Matches results from Acumatica to one or both of the CentralStore extracts, then formats the Package payload to be sent to Acumatica's API*
 
     *4. Sends each Shipments Package Payload to Acumatica API*
+    
+    <hr>
+
+    Schedule
+    ===
+     *Runs every 15 minutes from 4am-11pm*
     '''
     from pipelines import PackShipments
     pack_shipments = PackShipments()
@@ -278,8 +288,42 @@ def redstag_inventory_retrieval(timer: af.TimerRequest):
     
     Loads Detailed Inventory information from RedStag via API and Upserts to **RedStagInventorySummary** and **RedStagInventoryDetail**
     
+    <hr>
+
+    Schedule
+    ===
+     *Runs at ten after every hour from 4am-11pm*
     '''
     from pipelines import RedStagInventory
     redstag_inventory = RedStagInventory()
     redstag_inventory.run()
+#endregion RedStag - Retrieve Inventory
+
+
+############################____________############################
+##--------------------------     JJ     ----------------------------
+############################‾‾‾‾‾‾‾‾‾‾‾‾############################
+
+#region RedStag - Retrieve Inventory
+@app.timer_trigger(
+    schedule = '40 * * * *',
+    arg_name = 'timer',
+    run_on_startup = False
+)
+def order_deletions(timer: af.TimerRequest):
+    '''`order_deletions`
+    ---
+    <hr>
+
+    Upserts Sales Orders that were deleted in Acumatica to _util.SOOrderDeletions in db_CentralStore
+    
+    <hr>
+
+    Schedule
+    ===
+     *Runs at :40 every hour*
+    '''
+    from pipelines import SOOrderDeletions
+    order_deletions = SOOrderDeletions()
+    order_deletions.run()
 #endregion RedStag - Retrieve Inventory

@@ -204,4 +204,17 @@ TABLES = {
             'Timestamp',
         ]
     },
+    '_util.SOOrderDeletions':{
+        'keys': ['OrderType', 'OrderNbr'],
+        'columns': [
+            'OrderType',
+            'OrderNbr',
+            'DeletedBy',
+            'DeletedDatetime'
+        ],
+        'update_columns':[
+            'DeletedBy',
+            'DeletedDatetime'
+        ]
+    },
 }

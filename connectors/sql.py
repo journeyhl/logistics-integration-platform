@@ -26,30 +26,32 @@ class Queries:
 
 class CentralStoreQueries(Queries):
     ReturnsPendingReciept: Query
-    '''Checks **rmi_RMAStatus** for any *Closed* **or** *Receipted* **Returns**
-    '''
+    '''Checks **rmi_RMAStatus** for any *Closed* **or** *Receipted* **Returns**'''
+
     StatusCheckRMI: Query
     '''Pulls each distinct RMANumber from **rmi_ClosedShipments**, **rmi_Receipts**, and **_util.rmi_send_log**
 
     Looks for:
      - *null* **RMAStatuses** or any rows with a **RMAStatus** not equal to '*CLOSED*' or *blank*
     OR
-     - **LastChecked** value *within the last two days* and **RMAStatus** not equal to '*OPEN*'
-    '''
+     - **LastChecked** value *within the last two days* and **RMAStatus** not equal to *'OPEN'*'''
+    
     AuditFulfillment: Query
-    '''No query yet
-    '''
+    '''No query yet'''
+
     PackShipment: Query
     '''This query originally drove the RedStag Confirmations celigo flow. 
 
-    Pulls shipments from CentralStore using the **acu.rs_** tables to determine which should be shipped
-    '''
+    Pulls shipments from CentralStore using the **acu.rs_** tables to determine which should be shipped'''
+
     RedStagEvents: Query
     '''More robust version of PackShipment, also a redundancy. 
     
-    Uses the **json.RedStagEvents** table to get all rows where **json_value(*jsonData, '$.topic')*** = '***shipment:packed***'
-    '''
+    Uses the **json.RedStagEvents** table to get all rows where **json_value(*jsonData, '$.topic')*** = ***'shipment:packed'***'''
 
+    NotifyFulfillmentOpsTeam: Query
+    '''Pulls all Open Return orders from _util.RMI_Send_Log that are stuck with the Item does not exist error from RMI
+    '''
 
 class AcumaticaDbQueries(Queries):
     SendRMIReturns: Query
@@ -110,8 +112,6 @@ class AcumaticaDbQueries(Queries):
      **SiteCD** = *'RedStag'*
         - Warehouse is RMI'''
 
-
-
     OpenRCsNoReceipt: Query
     '''Pulls all Open RC Orders that have been sent to RMI and do not have a Shipment(Receipt)
 
@@ -134,7 +134,6 @@ class AcumaticaDbQueries(Queries):
      **ShipmentNbr** *is null*
         - Order does not have a Shipment found when joining on SOLine -> SOShipLine'''
 
-
     ShipmentsReadyToConfirm: Query
     '''Pulls all *Open* Shipments that have a Tracking Number and are ready to be confirmed
     
@@ -151,7 +150,6 @@ class AcumaticaDbQueries(Queries):
      **left(SiteCD, 7)** = *'REDSTAG'*
         - Warehouse is REDSTAGSWT or REDSTAGSLC'''
 
-
     PackShipment: Query
     '''Query from adf that populates acu.rsFulfill
 
@@ -166,13 +164,30 @@ class AcumaticaDbQueries(Queries):
      **Status = 'N'** 
         - Status is Open'''
 
+    ValidateAddresses: Query
+    '''Pulls Orders that have unvalidated addresses
+
+    Where
+    ---
+    <hr>
+
+    **a.IsValidated** *is null* or **a.IsValidated** = **0**
+        - Address is not valid
+    
+    **OrderType** != **'QT'**
+         - Order is not a Quote
+    
+    **Status** not in *('L', 'C', 'S')*
+    '''
+
+    SOOrderDeletions: Query
+    '''Pulls orders that have been deleted in Acumatica for transfer to db_CentralStore'''
 
 
 _QUERY_CLASSES: dict[str, type[Queries]] = {
     'db_CentralStore': CentralStoreQueries,
     'AcumaticaDb': AcumaticaDbQueries,
 }
-
 QT = TypeVar('QT', bound=Queries)
 
 
@@ -181,6 +196,24 @@ class SQLConnector(Generic[QT]):
 
 
     def __init__(self, pipeline, database_name: str):
+        '''`init`(pipeline, database_name: *str*, )
+        ---
+        <hr>
+        
+        Initializes the SQLConnector for either db_CentralStore or AcumaticaDb
+        
+        <hr>
+        
+        Parameters
+        ---
+        :param `pipeline`: Pipeline using the SQLConnector. If just using the Connector without a pipe, send a str
+        :param (*str*) `database_name`: Name of database, either 'db_CentralStore' or 'AcumaticaDb'
+        
+        <hr>
+        
+        Returns
+        ---
+        '''
         self.pipeline = pipeline
         # self.logger = logging.getLogger(f'{pipeline.pipeline_name}.{database_name}')
         self.logger = logging.getLogger(f'{database_name}')
@@ -360,7 +393,7 @@ end
         :return `data_extract` (*pl.DataFrame*): polars DataFrame with results of query
         '''
         self.logger.info(f'Running {query.name} query...')
-        data = pl.read_database(query.query, self.engine)
+        data = pl.read_database(str(query.query), self.engine)
         self.logger.info(f'{data.height} rows returned')
         return data
     

@@ -782,6 +782,9 @@ class AcumaticaAPI:
     #endregion Customer/Contact
 
 
+
+
+
 #region Authentication/Logout
     def _auth(self):
         auth_url = 'https://erp.journeyhl.com/entity/auth/login'
@@ -801,3 +804,32 @@ class AcumaticaAPI:
         self.session.post('https://erp.journeyhl.com/entity/auth/logout')
         self.logger.info('Logged out of Acumatica API session')
 #endregion Authentication/Logout
+
+
+
+
+#region wip
+
+    def validate_address(self, ContactID):
+        '''**WORK IN PROGRESS**
+        ===
+        '''
+        payload = {
+            "entity": {
+                "ContactID":{
+                    "value": int(ContactID)
+                }
+            }
+        }
+        response = self.session.get(f'{self.base_uri}/Contact/54aff69a-0dac-ee11-a9cb-6045bdee253a')
+        print(response.status_code, response.text)
+
+        response = self.session.post(f'{self.base_uri}/Contact/ValidateContactAddress', json=payload)
+        try:
+            json_response = response.json()
+        except Exception as e:
+            self.logger.error(f'Issue validating address for Customer {ContactID}')
+            bp = 'here'
+        print(response.status_code, response.text)
+        bp = 'here'
+#endregion

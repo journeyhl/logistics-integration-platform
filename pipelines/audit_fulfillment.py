@@ -15,8 +15,7 @@ class AuditFulfillment(Pipeline):
         return data_extract
 
     def transform(self, data_extract):
-        data_transformed = self.transformer
-        self.acu_api.shipment_details
+        data_transformed = data_extract
         return data_transformed
     
     def load(self, data_transformed):
