@@ -11,7 +11,7 @@ class AuditFulfillment(Pipeline):
 
 
     def extract(self):
-        data_extract = self.centralstore.query_db(self.centralstore.queries.AuditFulfillment.query)
+        data_extract = self.centralstore.query_to_dataframe(self.centralstore.queries.AuditFulfillment)
         return data_extract
 
     def transform(self, data_extract):

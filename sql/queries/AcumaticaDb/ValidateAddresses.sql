@@ -26,7 +26,6 @@ left join Contact c on s.CompanyID = c.CompanyID and b.BAccountID = c.BAccountID
 left join Address a on s.CompanyID = a.CompanyID and b.BAccountID = a.BAccountID and sa.CustomerAddressID = a.AddressID
 
 where s.CompanyID = 2 and
-
 (a.IsValidated is null or a.IsValidated = 0)
 and s.[Status] not in('L', 'C', 'S')
 -- and s.OrderType != 'QT'

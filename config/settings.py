@@ -3,41 +3,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Database configurations as dictionaries
-DATABASES = {
-    'db_CentralStore': {
-        'server': os.getenv('CENTRALSTORE_SERVER'),
-        'database': os.getenv('CENTRALSTORE_DATABASE'),
-        'username': os.getenv('CENTRALSTORE_USERNAME'),
-        'password': os.getenv('CENTRALSTORE_PASSWORD'),
-    },
-    'AcumaticaDb': {
-        'server': os.getenv('ACUMATICA_SERVER'),
-        'database': os.getenv('ACUMATICA_DATABASE'),
-        'username': os.getenv('ACUMATICA_USERNAME'),
-        'password': os.getenv('ACUMATICA_PASSWORD'),
-    }
-}
-
-AVS = {
-    'account': os.getenv('AVS_ACCOUNT'),
-    'license': os.getenv('AVS_LICENSE')
-}
-RMI = {
-    'username': os.getenv('RMI_USERNAME'),
-    'password': os.getenv('RMI_PASSWORD')
-}
-
-REDSTAG = {
-    'username': os.getenv('REDSTAG_USERNAME'),
-    'password': os.getenv('REDSTAG_PASSWORD')
-}
-
-ACUMATICA_API = {
-    'username': os.getenv('ACUMATICA_API_USERNAME'),
-    'password': os.getenv('ACUMATICA_API_PASSWORD')
-}
-
 
 TABLES = {
     'rmi_Receipts':{
@@ -131,26 +96,6 @@ TABLES = {
             'LastChecked'
         ]
     }, 
-    '_util.acu_api_log':{
-        'keys': [
-            'Entity',
-            'KeyValue',
-            'Operation',
-            'Timestamp'
-        ],
-        'columns': [
-            'Entity',
-            'KeyValue',
-            'Operation',
-            'Payload',
-            'Response',
-            'Timestamp'
-        ],
-        'update_columns':[
-            'Payload',
-            'Response',
-        ]
-    },
     'RedstagInventorySummary':{
         'keys': ['InventoryCD',],
         'columns': [
@@ -208,6 +153,26 @@ TABLES = {
             'Timestamp',
         ]
     },
+    '_util.acu_api_log':{
+        'keys': [
+            'Entity',
+            'KeyValue',
+            'Operation',
+            'Timestamp'
+        ],
+        'columns': [
+            'Entity',
+            'KeyValue',
+            'Operation',
+            'Payload',
+            'Response',
+            'Timestamp'
+        ],
+        'update_columns':[
+            'Payload',
+            'Response',
+        ]
+    },
     '_util.SOOrderDeletions':{
         'keys': ['OrderType', 'OrderNbr'],
         'columns': [
@@ -221,4 +186,120 @@ TABLES = {
             'DeletedDatetime'
         ]
     },
+    'AdDetails': {
+        'keys': [
+            'AdCode',
+        ],
+        'columns': [
+            'AdCode',
+            'AdVersionID',
+            'PrimaryAdName',
+            'SecondaryAdName',
+            'Category',
+            'StartDate',
+            'DateCreated',
+            'CreatedBy',
+            'LastModBy'
+        ],
+        'update_columns': [
+            'AdVersionID',
+            'PrimaryAdName',
+            'SecondaryAdName',
+            'Category',
+            'StartDate',
+            'DateCreated',
+            'CreatedBy',
+            'LastModBy'
+        ],
+    }
+}
+'''# Tables
+
+Tables is used to drive the SQLConnector's checked_upsert functionality
+
+<hr>
+
+## Structure
+ >>> 'table_name': { #replace table_name with the name of the table. We'll use AdDetails
+        'keys': [ #replace keys entries with the names of the primary key column(s) in the table
+            'primary_key_column_1', 
+            'primary_key_column_2'
+        ],
+        'columns': [ #replace column entries with the names of all columns in the table
+            'primary_key_column_1',
+            'primary_key_column_2',
+            'column_1',
+            'column_2',
+            'column_3'
+        ],
+        'update_columns': [ #replace update_columns entries with column names that are NOT keys
+            'column_1',
+            'column_2',
+            'column_3'
+        ],
+ }
+ 
+ >>> 'AdDetails': {
+        'keys': [
+            'AdCode',
+        ],
+        'columns': [
+            'AdCode',
+            'AdVersionID',
+            'PrimaryAdName',
+            'SecondaryAdName',
+            'Category',
+            'StartDate',
+            'DateCreated',
+            'CreatedBy',
+            'LastModBy'
+        ],
+        'update_columns': [
+            'AdVersionID',
+            'PrimaryAdName',
+            'SecondaryAdName',
+            'Category',
+            'StartDate',
+            'DateCreated',
+            'CreatedBy',
+            'LastModBy'
+        ],
+ }
+'''
+
+
+
+# Database configurations as dictionaries
+DATABASES = {
+    'db_CentralStore': {
+        'server': os.getenv('CENTRALSTORE_SERVER'),
+        'database': os.getenv('CENTRALSTORE_DATABASE'),
+        'username': os.getenv('CENTRALSTORE_USERNAME'),
+        'password': os.getenv('CENTRALSTORE_PASSWORD'),
+    },
+    'AcumaticaDb': {
+        'server': os.getenv('ACUMATICA_SERVER'),
+        'database': os.getenv('ACUMATICA_DATABASE'),
+        'username': os.getenv('ACUMATICA_USERNAME'),
+        'password': os.getenv('ACUMATICA_PASSWORD'),
+    }
+}
+
+AVS = {
+    'account': os.getenv('AVS_ACCOUNT'),
+    'license': os.getenv('AVS_LICENSE')
+}
+RMI = {
+    'username': os.getenv('RMI_USERNAME'),
+    'password': os.getenv('RMI_PASSWORD')
+}
+
+REDSTAG = {
+    'username': os.getenv('REDSTAG_USERNAME'),
+    'password': os.getenv('REDSTAG_PASSWORD')
+}
+
+ACUMATICA_API = {
+    'username': os.getenv('ACUMATICA_API_USERNAME'),
+    'password': os.getenv('ACUMATICA_API_PASSWORD')
 }

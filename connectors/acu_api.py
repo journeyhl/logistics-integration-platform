@@ -809,8 +809,59 @@ class AcumaticaAPI:
 
 
 #region wip
+    def update_customer_address(self, payload: dict):
+        response = self.session.put(f'{self.base_uri}/Customer', json=payload)
+        try:
+            json_response = response.json()
+        except Exception as e:
+            self.logger.error(f'Issue updating address')
+            return False
+        response_str = f'{response.status_code}: {response.reason}'
+        self.data_log.append({
+            'Entity': 'Customer',
+            'KeyValue': payload['CustomerID']['value'],
+            'Operation': f'PUT - Update Address',
+            'Payload': payload,
+            'Response': response_str,
+            'Timestamp': datetime.now(ZoneInfo('America/New_York'))
+        })
+        bp = 'here'
+        return True
 
-    def validate_address(self, order_data: dict):
+    def validate_customer_address(self, customer_data: dict):
+        '''**WORK IN PROGRESS**
+        ===
+        '''
+        payload = {
+            "entity": {
+                "Type": {
+                    "value": "Customer"
+                },
+                "AcctCD": {
+                    "value": customer_data['AcctCD']
+                }
+            }
+        }
+
+        response = self.session.post(f'{self.base_uri}/Customer/validateCustomerAddresses', json=payload)
+        try:
+            json_response = response.json()
+        except Exception as e:
+            self.logger.error(f'Issue validating address for {customer_data['AcctCD']}')
+            bp = 'here'
+        response_str = f'{response.status_code}: {response.reason}'
+        self.data_log.append({
+            'Entity': 'Customer',
+            'KeyValue': customer_data['AcctCD'],
+            'Operation': f'POST - Validate Address',
+            'Payload': payload,
+            'Response': response_str,
+            'Timestamp': datetime.now(ZoneInfo('America/New_York'))
+        })
+        bp = 'here'
+
+
+    def validate_order_address(self, order_data: dict):
         '''**WORK IN PROGRESS**
         ===
         '''
@@ -836,5 +887,4 @@ class AcumaticaAPI:
             bp = 'here'
         print(response.status_code, response.text)
         bp = 'here'
-
 #endregion

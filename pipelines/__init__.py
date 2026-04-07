@@ -13,3 +13,4 @@ from .redstag_send_shipments import SendRedStagShipments
 from .redstag_inventory import RedStagInventory
 from .notify_fulfillment_ops import NotifyFulfillmentOps
 from .order_deletions import SOOrderDeletions
+from .address_validator import AddressValidator
