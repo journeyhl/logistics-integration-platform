@@ -4,3 +4,4 @@ from .rmi_xml import RMIXML
 from .rmi_api import RMIAPI
 from .acu_api import AcumaticaAPI
 from .redstag_api import RedStagAPI
+from .avs import AddressVerificationSystem

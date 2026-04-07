@@ -1,4 +1,5 @@
 select s.OrderNbr
+     , s.OrderType
      , rtrim(b.AcctCD) AcctCD
      , cast(s.OrderDate as date) OrderDate
      , sa.IsValidated

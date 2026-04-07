@@ -14,7 +14,7 @@ class AcumaticaAPI:
         self.version = '22.200.001'
         self.auth_type = 'Cookie'
         self.uri = 'https://erp.journeyhl.com/entity'
-        self.endpoint_name = 'Containers'
+        self.endpoint_name = 'pyplatform'
         self.base_uri = f'{self.uri}/{self.endpoint_name}/{self.version}'
         self.username = ACUMATICA_API['username']
         self.password = ACUMATICA_API['password']
@@ -810,26 +810,31 @@ class AcumaticaAPI:
 
 #region wip
 
-    def validate_address(self, ContactID):
+    def validate_address(self, order_data: dict):
         '''**WORK IN PROGRESS**
         ===
         '''
         payload = {
             "entity": {
-                "ContactID":{
-                    "value": int(ContactID)
+                "Type": {
+                    "value": "SalesOrder"
+                },
+                "OrderType": {
+                    "value": order_data['OrderType']
+                },
+                "OrderNbr": {
+                    "value": order_data['OrderNbr']
                 }
             }
         }
-        response = self.session.get(f'{self.base_uri}/Contact/54aff69a-0dac-ee11-a9cb-6045bdee253a')
-        print(response.status_code, response.text)
 
-        response = self.session.post(f'{self.base_uri}/Contact/ValidateContactAddress', json=payload)
+        response = self.session.post(f'{self.base_uri}/SalesOrder/ValidateAddresses', json=payload)
         try:
             json_response = response.json()
         except Exception as e:
-            self.logger.error(f'Issue validating address for Customer {ContactID}')
+            self.logger.error(f'Issue validating address for {order_data['OrderNbr']}')
             bp = 'here'
         print(response.status_code, response.text)
         bp = 'here'
+
 #endregion

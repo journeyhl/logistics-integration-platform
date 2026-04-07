@@ -19,6 +19,10 @@ DATABASES = {
     }
 }
 
+AVS = {
+    'account': os.getenv('AVS_ACCOUNT'),
+    'license': os.getenv('AVS_LICENSE')
+}
 RMI = {
     'username': os.getenv('RMI_USERNAME'),
     'password': os.getenv('RMI_PASSWORD')
