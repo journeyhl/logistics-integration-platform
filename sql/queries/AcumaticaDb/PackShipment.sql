@@ -30,7 +30,7 @@ left join SOShipLineSplitPackage splp on s.CompanyID = splp.CompanyID and s.Ship
 left join SOPackageDetail p on s.CompanyID = p.CompanyID and s.ShipmentNbr = p.ShipmentNbr and splp.PackageLineNbr = p.LineNbr
 inner join BAccount b on s.CompanyID = b.CompanyID and s.CustomerID = b.BAccountID
 where s.CompanyID = 2 
-and left(SiteCD, 7) = 'REDSTAG'
+and (left(SiteCD, 7) = 'REDSTAG' or SiteCD = 'RMI')
 and (
 s.LastModifiedDateTime >= @DateCutoff or
 sl.LastModifiedDateTime >= @DateCutoff or

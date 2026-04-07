@@ -57,7 +57,7 @@ class RMIAPI():
         url = f'{self.base_uri}api/ClosedShipmentsV1'
         from_date = datetime.today() - timedelta(days=21)
         from_date = from_date.date().strftime('%Y-%m-%dT%H:%M:%SZ')
-        to_date = datetime.now(ZoneInfo('America/New_York')).strftime('%Y-%m-%dT%H:%M:%SZ')
+        to_date = (datetime.now(ZoneInfo('America/New_York')) + timedelta(days=2)).strftime('%Y-%m-%dT%H:%M:%SZ')
         headers = {
             **self.headers, 
             "Accept": "application/json",

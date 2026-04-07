@@ -25,6 +25,8 @@ class Queries:
 
 
 class CentralStoreQueries(Queries):
+    '''Queries to be executed within db_CentralStore'''
+
     ReturnsPendingReciept: Query
     '''Checks **rmi_RMAStatus** for any *Closed* **or** *Receipted* **Returns**'''
 
@@ -39,10 +41,13 @@ class CentralStoreQueries(Queries):
     AuditFulfillment: Query
     '''No query yet'''
 
-    PackShipment: Query
+    PackShipmentRedStag: Query
     '''This query originally drove the RedStag Confirmations celigo flow. 
 
     Pulls shipments from CentralStore using the **acu.rs_** tables to determine which should be shipped'''
+
+    PackShipmentRMI: Query
+    '''Pulls closed Shipments from rmi_ClosedShipments'''
 
     RedStagEvents: Query
     '''More robust version of PackShipment, also a redundancy. 
@@ -54,6 +59,7 @@ class CentralStoreQueries(Queries):
     '''
 
 class AcumaticaDbQueries(Queries):
+    '''Queries to be executed within AcumaticaDb'''
     SendRMIReturns: Query
     '''Pulls all **RC** Sales Orders that are in **Open** status and have a *AttributeRCSHP2WH* value that is **null** or **not equal to 1**
 
@@ -72,7 +78,6 @@ class AcumaticaDbQueries(Queries):
 
      **(AttributeRCSHP2WH** != *1* *or* **AttributeRCSHP2WH** *is null***)** 
         - RC Order has not been sent to Warehouse'''
-
 
     SendRMIShipments: Query
     '''Pulls Shipments that are ready to be sent to RMI as type Ws

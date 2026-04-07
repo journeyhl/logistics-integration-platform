@@ -15,6 +15,7 @@ class Transform:
 
         central_transformed = data_extract['central_extract']
         redstag_transformed = self.transform_redstag_events(data_extract['redstag_event_extract'])
+        rmi_extract = data_extract['rmi_extract']
         acu_transformed = data_extract['acu_extract']
         data_transformed = []
         for acu_shipment in acu_transformed.iter_rows(named=True):
@@ -24,12 +25,21 @@ class Transform:
                     and acu_shipment['ShipmentLineNbr'] == cs_shipment['ShipLineNbr']
                     and acu_shipment['SplitLineNbr'] == cs_shipment['SplitLineNbr']
                     and acu_shipment['InventoryCD'] == cs_shipment['InventoryCD']
-                    ), None)
+                )
+            , None)
             match_redstag = next((
                 rs_shipment for rs_shipment in redstag_transformed
                     if acu_shipment['ShipmentNbr'] == rs_shipment['ShipmentNbr'].replace('-1', '').replace('-2', '').replace('-3', '')
                     and acu_shipment['InventoryCD'] == rs_shipment['InventoryCD']
-                    ), None)
+                )
+            , None)
+            match_rmi = next((
+                rmi_shipment for rmi_shipment in rmi_extract.iter_rows(named=True)
+                    if acu_shipment['ShipmentNbr'] == rmi_shipment['RMANumber']
+                    and acu_shipment['InventoryCD'] == rmi_shipment['InventoryCD']
+                )
+            , None)
+
             if match != None:
                 shipment_formatted = {
                     'ShipmentNbr': acu_shipment['ShipmentNbr'],
@@ -60,6 +70,23 @@ class Transform:
                     'Courier_3pl': match_redstag['Courier'],
                 }
                 data_transformed.append(shipment_formatted)
+            elif match_rmi != None:
+                shipment_formatted = {
+                    'ShipmentNbr': acu_shipment['ShipmentNbr'],
+                    'InventoryCD': acu_shipment['InventoryCD'],
+                    'OrderQty': acu_shipment['OrderQty'],
+                    'ShipQty': acu_shipment['ShipQty'],
+                    'SplitLineNbr': acu_shipment['SplitLineNbr'],
+                    'InventoryCD_3pl': match_rmi['InventoryCD'],
+                    'Qty_3pl': match_rmi['QtyShipped'],
+                    'TrackingNbr_3pl': match_rmi['Tracking'],
+                    'ItemsOnPackage_3pl': match_rmi['Lines'],
+                    'Courier_3pl': match_rmi['CarrierCode'],
+                }
+                if match_rmi['Lines'] > 1:
+                    bp = 'here'
+                data_transformed.append(shipment_formatted)
+
 
         self.logger.info(f'Matched {len(data_transformed)} rows')
         shipments = self.group_tracking(data_transformed)

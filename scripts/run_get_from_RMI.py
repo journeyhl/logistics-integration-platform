@@ -1,7 +1,7 @@
 import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from pipelines import Pipeline, GetReceiptsFromRMI, GetClosedShipmentsFromRMI, GetStatusFromRMI, CreateAcuReceipt
+from pipelines import Pipeline, GetReceiptsFromRMI, GetClosedShipmentsFromRMI, GetStatusFromRMI, CreateAcuReceipt, StageRMIStatusRetrieval
 
 
 
@@ -16,13 +16,13 @@ rmi_receipts_result = rmi_receipts.run()
 bp = 'here'
 
 
-rmi_statuses = GetStatusFromRMI()
-for RMANumber in rmi_statuses.data:
-    rmi_statuses.logger.info(RMANumber)
-    data_extract = rmi_statuses.extract(RMANumber)
-    data_transformed = rmi_statuses.transform(data_extract)
-    data_loaded = rmi_statuses.load(data_transformed)
-    bp = 'here'
+rma_status_staging_pipeline = StageRMIStatusRetrieval()
+rmi_statuses = rma_status_staging_pipeline.run()
+rma_numbers = rmi_statuses['loaded']    
+status_retrieval_pipeline = GetStatusFromRMI()
+for rma_number in rma_numbers:
+    status_retrieval_pipeline._re_init(rma_number = rma_number)
+    status_retrieval_pipeline.run()
 
-acu_receipt_creation = CreateAcuReceipt()
-acu_receipt_creation_result = acu_receipt_creation.run()
+# acu_receipt_creation = CreateAcuReceipt()
+# acu_receipt_creation_result = acu_receipt_creation.run()

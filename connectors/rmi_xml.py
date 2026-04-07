@@ -92,7 +92,7 @@ class RMIXML:
             <CompanyName>{shipment[0]['CompanyName'][:25].replace('&', '&amp;')}</CompanyName>
             <Contact>{shipment[0]['ShipToName'][:25].replace('&', '&amp;')}</Contact>
             <ContactEmail>{shipment[0]['ShipToEmailContact']}</ContactEmail>
-            <Address1>{shipment[0]['ShipToAddress1']}</Address1>
+            <Address1>{shipment[0]['ShipToAddress1'].replace('&', '&amp;')}</Address1>
             <Address2>{shipment[0]['ShipToAddress2']}</Address2>
             <City>{shipment[0]['ShipToCity']}</City>
             <State>{shipment[0]['ShipToState']}</State>
@@ -118,6 +118,7 @@ class RMIXML:
               self.rmi_response_str = f'{shipment[0]['RMANumber']} - CRITICAL ERROR: No response from RMI!'
               self.logger.error(self.rmi_response_str)
               print(send_str)
+              bp = 'here'
           if 'error' in self.rmi_response_str.lower() and 'already exists' not in self.rmi_response_str.lower():
               acu_response = f'{shipment[0]['RMANumber']} - RMI Error, did not attempt SendToWH in Acu'
               self.logger.warning(acu_response)
