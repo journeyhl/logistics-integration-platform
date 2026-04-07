@@ -6,7 +6,9 @@
   },
   "logging": {
     "logLevel": {
-      "default": "Information"
+      "default": "Information",
+      "Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker": "None",
+      "Microsoft.Azure.WebJobs.Script.WebHost.Controllers.HostController": "None"
     },
     "applicationInsights": {
       "samplingSettings": {

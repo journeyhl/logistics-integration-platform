@@ -250,7 +250,7 @@ def pack_shipments(timer: af.TimerRequest):
     arg_name = 'timer',
     run_on_startup = False
 )
-def redstag_send_shipment_return_pipeline(timer: af.TimerRequest):
+def redstag_send_shipment_pipeline(timer: af.TimerRequest):
     '''`redstag_send_shipment_return_pipeline`
     ---
     <hr>

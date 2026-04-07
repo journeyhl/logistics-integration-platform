@@ -35,19 +35,21 @@ class Load:
         data_transformed_copy = data_transformed
         data_loaded = []
         for shipment, data in data_transformed.items():
-            self.logger.info(f'Sending {shipment} to RedStag')
+            self.logger.info(f'Sending execution payload for {shipment} to RedStag')
             self.create_response = self.pipeline.redstag.target_api(payload_target=data['execution_payload'], operation=data['execution_operation'])
             if self.create_response.get('results'):
                 self.create_response = self.create_response['results'][0]
             
             if self.create_response['status'] == 'unable_to_process':
-                self.logger.warning(f'{self.create_response['status']} {shipment}!')
-                bp = 'here'
+                self.logger.warning(f'{self.create_response['status']} {shipment}!')                
             if self.create_response['status'] == 'new' or self.create_response['status'] == 'unable_to_process':
                 self.logger.info(f'Shipment {shipment} created at RedStag successfully!')
-                data['data_3pl'] = self.create_response
-                data['attribute_payload'] = self.pipeline.transformer.transform_acu_attribute_payload(data)
-                self.pipeline.acu_api.send_to_wh_v2(shipment, data['CustomerID'], data['attribute_payload'])
+            if data['note'] == 'Already at RedStag':
+                self.logger.info(f'Shipment had already been sent to RedStag, marking SentToWH as true in Acumatica')
+            
+            data['data_3pl'] = self.create_response
+            data['attribute_payload'] = self.pipeline.transformer.transform_acu_attribute_payload(data)
+            self.pipeline.acu_api.send_to_wh_v2(shipment, data['CustomerID'], data['attribute_payload'])
             bp = 'here'
 
         data_loaded = data_transformed

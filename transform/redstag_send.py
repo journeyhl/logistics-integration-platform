@@ -53,6 +53,7 @@ class Transform:
         for shipment in data_extract.iter_rows(named=True):
             shipment_nbr = shipment['ShipmentNbr']
             customer_id =  shipment['CustomerID']
+            self.note = None
             if self.shipments_done.get(f'{shipment['ShipmentNbr']}') == None:
                 rs_order_id = shipment['rsOrderID']
                 if not rs_order_id:
@@ -64,6 +65,7 @@ class Transform:
                     else:
                         self.order_create_payload = None
                         self.logger.info(f'Shipment already found at RedStag!')
+                        self.note = 'Already at RedStag'
                     bp = 'here'
             self.shipments_done[shipment_nbr] = {
                 'ShipmentNbr': shipment_nbr,
@@ -71,7 +73,8 @@ class Transform:
                 'lookup_payload': self.lookup_payload,
                 'order_create_payload': self.order_create_payload,
                 'execution_payload': self.lookup_payload if self.order_create_payload == None else self.order_create_payload,
-                'execution_operation': f'{shipment_nbr}, order.' + f'{'search' if self.order_create_payload == None else 'create'}'
+                'execution_operation': f'{shipment_nbr}, order.' + f'{'search' if self.order_create_payload == None else 'create'}',
+                'note': self.note
             }
         return self.shipments_done
 
