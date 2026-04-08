@@ -828,28 +828,27 @@ class AcumaticaAPI:
         bp = 'here'
         return True
 
+
+
     def validate_customer_address(self, customer_data: dict):
         '''**WORK IN PROGRESS**
         ===
         '''
         payload = {
             "entity": {
-                "Type": {
-                    "value": "Customer"
-                },
-                "AcctCD": {
+                "CustomerID": {
                     "value": customer_data['AcctCD']
-                }
+                },
             }
         }
 
         response = self.session.post(f'{self.base_uri}/Customer/validateCustomerAddresses', json=payload)
-        try:
-            json_response = response.json()
-        except Exception as e:
-            self.logger.error(f'Issue validating address for {customer_data['AcctCD']}')
-            bp = 'here'
         response_str = f'{response.status_code}: {response.reason}'
+        if response_str == '204: No Content':
+            self.logger.info(f"{customer_data['AcctCD']}'s address was validated successfully!")
+        else:
+            self.logger.error(f"Issue validating {customer_data['AcctCD']}'s address")
+            bp = 'here'
         self.data_log.append({
             'Entity': 'Customer',
             'KeyValue': customer_data['AcctCD'],
@@ -880,11 +879,44 @@ class AcumaticaAPI:
         }
 
         response = self.session.post(f'{self.base_uri}/SalesOrder/ValidateAddresses', json=payload)
-        try:
-            json_response = response.json()
-        except Exception as e:
+        response_str = f'{response.status_code}: {response.reason}'
+        if response_str == '204: No Content':
+            self.logger.info('Address Validated Successfully!')
+            response_str = '204: No Content (SUCCESS)'
+        else:
             self.logger.error(f'Issue validating address for {order_data['OrderNbr']}')
-            bp = 'here'
-        print(response.status_code, response.text)
+
+        self.data_log.append({
+            'Entity': 'SalesOrder',
+            'KeyValue': order_data['OrderNbr'],
+            'Operation': f'POST - Validate Address',
+            'Payload': payload,
+            'Response': response_str,
+            'Timestamp': datetime.now(ZoneInfo('America/New_York'))
+        })
         bp = 'here'
+
+
+
+    def target_api(self, endpoint: str, payload_data: dict, operation: str = 'put', descr: str = None):
+        if operation == 'put':
+            response = self.session.put(f'{self.base_uri}{endpoint}', json=payload_data['target_api_update_payload'])
+        elif operation == 'post':
+            response = self.session.post(f'{self.base_uri}{endpoint}', json=payload_data['target_api_update_payload'])
+        response_str = f'{response.status_code}: {response.reason}'
+
+        if descr == 'Override & Update':
+            try:
+                json_response = response.json()
+                self.logger.info(payload_data['log_update_success'])
+                return_bool = True
+            except Exception as e:
+                self.logger.info(payload_data['log_update_error'])
+                return_bool = False
+            self.data_log.append({
+                **payload_data['acu_api_data_log'],
+                'Response': response_str,
+                'Timestamp': datetime.now(ZoneInfo('America/New_York'))
+            })
+            return return_bool
 #endregion

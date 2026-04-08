@@ -23,37 +23,38 @@ class AddressVerificationSystem:
         pass
 
 
-    def validate(self, address_data: dict):
+    def validate(self, order_data: dict, s_or_b: str):
+        self.logger.info(f'{order_data['OrderNbr']}-{order_data['AcctCD']}: Validating with AVS')
         payload = {
-            "line1": address_data['AddressLine1'],
-            "line2": address_data['AddressLine2'],
+            "line1": order_data[f'{s_or_b}AddressLine1'],
+            "line2": order_data[f'{s_or_b}AddressLine2'],
             "textCase": "Mixed",
-            "city": address_data['City'],
-            "region": address_data['State'],
-            "country": address_data['CountryID'],
-            "postalCode": address_data['PostalCode']
+            "city": order_data[f'{s_or_b}City'],
+            "region": order_data[f'{s_or_b}State'],
+            "country": order_data[f'{s_or_b}CountryID'],
+            "postalCode": order_data[f'{s_or_b}PostalCode']
         }
         response = self.session.post(url = self.endpoint_validate, headers = self.headers, json = payload)
         try:
             self.json_response = response.json()
-            self.logger.info(f'Response received from AVS, parsing...')
-            address_data = self._parse_response(address_data)
+            self.logger.info(f'{order_data['OrderNbr']}-{order_data['AcctCD']}: Response received from AVS, parsing...')
+            order_data = self._parse_response(order_data, s_or_b)
         except Exception as e:
             self.logger.error(f'Could not reach AVS!')
             bp = 'here'
-        return address_data
+        return order_data
 
 
-    def _parse_response(self, address_data: dict) -> dict:
+    def _parse_response(self, order_data: dict, s_or_b: str) -> dict:
         validated_address = self.json_response['validatedAddresses']
         if len(validated_address) > 1:
-            self.logger.warning(f'Multiple addresses were returned')
+            self.logger.warning(f'{order_data['OrderNbr']}-{order_data['AcctCD']}: Multiple addresses were returned')
             bp = 'here'
         validated_address = validated_address[0]
-        address_data['vAddressLine1'] = validated_address['line1']
-        address_data['vAddressLine2'] = validated_address['line2'] if validated_address['line2'] != '' else None
-        address_data['vCity'] = validated_address['city']
-        address_data['vState'] = validated_address['region']
-        address_data['vCountryID'] = validated_address['country']
-        address_data['vPostalCode'] = validated_address['postalCode']
-        return address_data
+        order_data[f'v{s_or_b}AddressLine1'] = validated_address['line1']
+        order_data[f'v{s_or_b}AddressLine2'] = validated_address['line2'] if validated_address['line2'] != None else ''
+        order_data[f'v{s_or_b}City'] = validated_address['city']
+        order_data[f'v{s_or_b}State'] = validated_address['region']
+        order_data[f'v{s_or_b}CountryID'] = validated_address['country']
+        order_data[f'v{s_or_b}PostalCode'] = validated_address['postalCode']
+        return order_data
