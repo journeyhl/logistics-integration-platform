@@ -37,4 +37,6 @@ class Load:
                 self.pipeline.acu_api.validate_order_address(order_avs)
                 time.sleep(1)
                 self.pipeline.acu_api.order_remove_hold(order_avs)
+                time.sleep(1)
+                self.pipeline.acu_api.order_create_shipment(order_avs)
                 bp = 'here'

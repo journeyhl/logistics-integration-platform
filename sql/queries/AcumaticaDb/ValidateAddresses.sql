@@ -35,7 +35,8 @@ where s.CompanyID = 2 and
 (sa.IsValidated is null or sa.IsValidated = 0)
 and s.[Status] not in('L', 'C', 'S')
 and s.[Status] = 'H'
-and s.OrderType != 'QT'
+and s.OrderType = 'WB'
+-- and s.OrderType != 'QT'
 -- and b.AcctCD = 'C0006719'
 -- and s.OrderNbr = 'QT051749'
 order by OrderDate, OrderNbr

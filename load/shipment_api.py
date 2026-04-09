@@ -83,7 +83,7 @@ class Load:
                     receipt_response = self.pipeline.acu_api.get_package_details(receipt_response)
                 self.check_if_ready_for_confirm(receipt_response)
             else:
-                self.pipeline.acu_api.sales_order_create_receipt(order)
+                self.pipeline.acu_api.order_create_receipt(order)
                 self.logger.info(f'Waiting five seconds to give Shipment time to create...')
                 time.sleep(5)
                 shipment_data = self.pipeline.acu_api.sales_order_get_shipment(order)

@@ -56,8 +56,8 @@ class AcumaticaAPI:
         self._auth()
 
 #region SalesOrder
-    def sales_order_create_receipt(self, order_data: dict):
-        '''sales_order_create_receipt`(self, order_data)`
+    def order_create_receipt(self, order_data: dict):
+        '''order_create_receipt`(self, order_data)`
     ---
     <hr>
 
@@ -97,6 +97,49 @@ class AcumaticaAPI:
             'Timestamp': datetime.now(ZoneInfo('America/New_York'))
         })
 
+    def order_create_shipment(self, order_data: dict):
+        '''`order_create_shipment`(self, order_data: *dict*)
+        ---
+        <hr>
+        
+        Creates Shipment for Open SalesOrder
+            
+        <hr>
+        
+        Parameters
+        ---
+        :param (*dict*) `order_data`: Dictionary of Order data. Must contain OrderType, OrderNbr, and AcctCD
+        
+        <hr>
+        
+        Returns
+        ---
+        '''
+        self.logger.info(f'Creating Shipment for {order_data['OrderNbr']}')
+        body = {
+            "entity":{
+                "CustomerID": { "value": f"{order_data['AcctCD']}" },
+                "OrderType": {"value": f"{order_data['OrderType']}"},
+                "OrderNbr": { "value": f"{order_data['OrderNbr']}"}
+            }
+        }
+        try:
+            response = self.session.post(f'{self.base_uri}/SalesOrder/SalesOrderCreateShipment', json=body)
+            response_str = f'{response.status_code} {response.reason}'
+        except Exception as e:
+            bp = 'here'
+        if response_str and response_str == '202 Accepted':
+            self.logger.info(f'{order_data['OrderNbr']}: Shipment created! {response_str}')
+        else:
+            self.logger.warning(response_str)            
+        self.data_log.append({
+            'Entity': 'SalesOrder',
+            'KeyValue': order_data['OrderNbr'],
+            'Operation': f'POST - Create Shipment',
+            'Payload': body,
+            'Response': response_str,
+            'Timestamp': datetime.now(ZoneInfo('America/New_York'))
+        })
 
     def sales_order_get_shipment(self, order_data):
         '''`sales_order_get_shipment`(self, order_data)
@@ -263,7 +306,7 @@ class AcumaticaAPI:
             self.logger.info(f'{order_data['OrderNbr']}: Addresses validated!')
             response_str = '204 No Content (SUCCESS)'
         else:
-            self.logger.error(f'Issue validating addresses for {order_data['OrderNbr']}')
+            self.logger.error(f'{order_data['OrderNbr']}: Issue validating addresses!')
 
         self.data_log.append({
             'Entity': 'SalesOrder',
@@ -341,10 +384,10 @@ class AcumaticaAPI:
         response = self.session.post(f'{self.base_uri}/SalesOrder/ReleaseFromHold', json=payload)
         response_str = f'{response.status_code} {response.reason}'        
         if response_str == '204 No Content':
-            self.logger.info('Order removed from hold successfully!')
+            self.logger.info(f'{order_data['OrderNbr']} removed from hold successfully!')
             response_str = '204 No Content (SUCCESS)'
         else:
-            self.logger.error(f'Issue removeing {order_data['OrderNbr']} from hold')
+            self.logger.error(f'{order_data['OrderNbr']}: Issue removing from hold')
         
         self.data_log.append({
             'Entity': 'SalesOrder',
