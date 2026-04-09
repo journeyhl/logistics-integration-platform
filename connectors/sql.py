@@ -295,38 +295,64 @@ class SQLConnector(Generic[QT]):
 
     
     def checked_upsert(self, table_name: str, data: list):
-        '''`checked_upsert`(self, table_name: *str*, data: *list*)
+        '''
+        `checked_upsert`(self, table_name: *str*, data: *list*)
         ---
         <hr>
+
+        Given a table name and a list of rows (dicts) to insert, performs an upsert to database.
+    
+        ### Downstream Calls 
+         #### :meth:`~_dict_to_params`
+            - Utility function to format table keys, columns and update_columns with their respective values to parameters
+
+        <hr>
         
-        Given a table name and a list of rows to insert, performs an upsert to database.
+        Parameters
+        ---
+        :param (*str*) `table_name`: The name of the table to update (schema qualified)
 
+         - **'_util.acu_api_log'** or **'AdDetails'**
 
-        :param *str* table_name: The name of the table to update
+          - ***AdDetails** doesn't need the schema since it belongs to the **dbo** schema, but you could pass **'dbo.AdDetails'** if you wanted*
 
-        :param *list* data: list of dictionaries that correspond to the values in config/settings.py
+        :param (*list*) `data`: A list of dictionaries that correspond to the values in :data:`~config.settings.TABLES`
+        
+            * Each dictionary should be formatted to contain the values that were mapped in the table configuration in :data:`~config.settings.TABLES`
 
-            * Each dictionary must match the format of the table's keys (or lookup values), table's columns, the columns to be updated (if necc), and then the keys again
-                * This results fills out the *upsert_string* value
-                >>> upsert_string = f"""
-                    if not exists(
-                    select 1 
-                    from {table_name}
-                    where {' = ? and '.join(sql_table['keys'])} = ?
-                    )
-                    begin
-                    insert into {table_name}({', '.join(sql_table['columns'])})
-                    values({', '.join(['?'] * len(sql_table['columns']))})
-                    end
-                    else
-                    begin
-                    update {table_name} set {' = ?, '.join(col for col in sql_table['update_columns'])} = ?
-                    where {' = ? and '.join(sql_table['keys'])} = ?
-                    end
-                """
+                * Take **_util.SOOrderDeletions** for example. Its definition looks as follows:
+                >>> '_util.SOOrderDeletions':{
+                    'keys': ['OrderType', 'OrderNbr'],
+                    'columns': [
+                        'OrderType',
+                        'OrderNbr',
+                        'DeletedBy',
+                        'DeletedDatetime'
+                    ],
+                    'update_columns':[
+                        'DeletedBy',
+                        'DeletedDatetime'
+                    ]
+                },
 
+                * Using these values, we'll create **upsert_string**. Starting with the check first:
+
+                >>> if not exists(
+                select 1 
+                from {table_name}
+                where {' = %s and '.join(sql_table['keys'])} = %s
+                )
+
+                * Alrighty, replace `{table_name}` with `table_name`, or **_util.SOOrderDeletions** here. Then for each **key** in `keys`, we'll format the *where*
+                
+                >>> if not exists(
+                select 1 
+                from _util.SOOrderDeletions
+                where OrderType = %s and OrderNbr = %s
+                )
+
+                * That pattern continues on for the full execution statement.
         '''
-      
         self.tables = TABLES
         sql_table = self.tables[table_name]
         upsert_string = f'''

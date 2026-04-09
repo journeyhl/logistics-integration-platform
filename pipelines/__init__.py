@@ -14,3 +14,4 @@ from .redstag_inventory import RedStagInventory
 from .notify_fulfillment_ops import NotifyFulfillmentOps
 from .order_deletions import SOOrderDeletions
 from .address_validator import AddressValidator
+from .criteo import Criteo

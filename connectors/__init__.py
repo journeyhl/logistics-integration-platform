@@ -5,3 +5,4 @@ from .rmi_api import RMIAPI
 from .acu_api import AcumaticaAPI
 from .redstag_api import RedStagAPI
 from .avs import AddressVerificationSystem
+from .criteo_api import CriteoAPI

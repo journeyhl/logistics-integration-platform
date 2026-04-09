@@ -244,7 +244,8 @@ def pack_shipments(timer: af.TimerRequest):
 ############################‾‾‾‾‾‾‾‾‾‾‾‾############################
 
 
-#Send Shipments and Returns to RedStag every half hour. 4am-11pm
+#region Redstag - Send Shipments 
+#        4:35am-11:35pm, once/hr
 @app.timer_trigger(
     schedule = '5/30 4-23/1 * * *',
     arg_name = 'timer',
@@ -269,13 +270,16 @@ def redstag_send_shipment_pipeline(timer: af.TimerRequest):
     from pipelines import SendRedStagShipments
     shipment_pipeline = SendRedStagShipments()
     shipment_pipeline.run()
+#endregion Redstag - Send Shipments
 
 
 ############################____________############################
 ##--------------------------     JJ     ----------------------------
 ############################‾‾‾‾‾‾‾‾‾‾‾‾############################
 
+
 #region RedStag - Retrieve Inventory
+#          4:10am-11:10pm, once/2hrs
 @app.timer_trigger(
     schedule = '10 4-23/2 * * *',
     arg_name = 'timer',
@@ -304,7 +308,9 @@ def redstag_inventory_retrieval(timer: af.TimerRequest):
 ##--------------------------     JJ     ----------------------------
 ############################‾‾‾‾‾‾‾‾‾‾‾‾############################
 
-#region Order Deletions
+
+#region           Order Deletions
+#       12:40am-11:40pm, once/hr
 @app.timer_trigger(
     schedule = '40 * * * *',
     arg_name = 'timer',
@@ -329,12 +335,13 @@ def order_deletions(timer: af.TimerRequest):
 #endregion Order Deletions
 
 
-
 ############################____________############################
 ##--------------------------     JJ     ----------------------------
 ############################‾‾‾‾‾‾‾‾‾‾‾‾############################
 
-#region Address Validator
+
+#region         Address Validator
+#       12:55am-11:55pm, once/1hr
 @app.timer_trigger(
     schedule = '55 * * * *',
     arg_name = 'timer',
@@ -368,3 +375,50 @@ def address_validator(timer: af.TimerRequest):
     address_validator = AddressValidator()
     address_validator.run()
 #endregion Address Validator
+
+
+############################____________############################
+##--------------------------     JJ     ----------------------------
+############################‾‾‾‾‾‾‾‾‾‾‾‾############################
+
+
+#region               Criteo Ads
+#       12:01am-11:01pm, once/hr
+@app.timer_trigger(
+    schedule = '1 * * * *',
+    arg_name = 'timer',
+    run_on_startup = False
+)
+def criteo_ads(timer: af.TimerRequest):
+    '''`criteo_ads`
+    ---
+    <hr>
+
+    Initializes an instance of the Criteo Pipeline, :class:`~pipelines.criteo.Criteo`, then hits :meth:`~pipelines.criteo.Criteo._re_init` with the parameters for loading ads *incrementally*
+
+    1. Query **criteo.campaign_performance_daily** to get our current data
+
+    2. Hit :class:`~connectors.criteo_api.CriteoAPI` with :meth:`~connectors.criteo_api.CriteoAPI.fetch_campaign_data`, 
+    
+    3. Parse response in :meth:`~transform.criteo.Transform.transform_criteo`
+
+    4. Compare differences between parsed response and db in :meth:`~transform.criteo.Transform.find_differences`
+
+    5. Upsert to **criteo.campaign_performance_daily** and **criteo.diff_log** via :meth:`~connectors.sql.SQLConnector.checked_upsert`
+    
+    <hr>
+
+    Schedule
+    ===
+     *Runs at :01 every hour*
+    '''
+    from pipelines import Criteo
+    from datetime import timedelta
+    criteo_pipeline = Criteo()
+    criteo_pipeline._re_init(
+        start_date =  criteo_pipeline.incremental_end - timedelta(days=criteo_pipeline.lookback_days - 1),
+        end_date = criteo_pipeline.incremental_end,
+        mode = 'incremental'
+    )
+    criteo_pipeline.run()
+#endregion Criteo Ads

@@ -211,6 +211,59 @@ TABLES = {
             'CreatedBy',
             'LastModBy'
         ],
+    },
+    'criteo.campaign_performance_daily': {
+        'keys': [
+            'report_date',
+            'campaign_id'
+        ],
+        'columns': [
+            'report_date',
+            'advertiser_id',
+            'campaign_id',
+            'campaign_name',
+            'impressions',
+            'clicks',
+            'cost',
+            'conversions',
+            'revenue',
+            'load_timestamp',
+
+        ],
+        'update_columns': [
+            'advertiser_id',
+            'campaign_name',
+            'impressions',
+            'clicks',
+            'cost',
+            'conversions',
+            'revenue',
+            'load_timestamp',
+        ],
+    },
+    'criteo.diff_log': {
+        'keys': [
+            'report_date',
+            'campaign_id',
+            'last_ts'
+        ],
+        'columns': [
+            'report_date',
+            'campaign_id',
+            'last_ts',
+            'current_ts',
+            'impressions_diff',
+            'clicks_diff',
+            'cost_diff',
+            'revenue_diff'
+        ],
+        'update_columns': [
+            'current_ts',
+            'impressions_diff',
+            'clicks_diff',
+            'cost_diff',
+            'revenue_diff',
+        ],
     }
 }
 '''# Tables
@@ -302,4 +355,10 @@ REDSTAG = {
 ACUMATICA_API = {
     'username': os.getenv('ACUMATICA_API_USERNAME'),
     'password': os.getenv('ACUMATICA_API_PASSWORD')
+}
+
+CRITEO = {
+    'client_id': os.getenv('CRITEO_CLIENT_ID'),
+    'client_secret': os.getenv('CRITEO_CLIENT_SECRET'),
+    'ad_id': os.getenv('CRITEO_ADVERTISER_ID')
 }

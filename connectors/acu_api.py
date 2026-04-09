@@ -260,10 +260,10 @@ class AcumaticaAPI:
         response = self.session.post(f'{self.base_uri}/SalesOrder/ValidateAddresses', json=payload)
         response_str = f'{response.status_code} {response.reason}'
         if response_str == '204 No Content':
-            self.logger.info('Address Validated Successfully!')
+            self.logger.info(f'{order_data['OrderNbr']}: Addresses validated!')
             response_str = '204 No Content (SUCCESS)'
         else:
-            self.logger.error(f'Issue validating address for {order_data['OrderNbr']}')
+            self.logger.error(f'Issue validating addresses for {order_data['OrderNbr']}')
 
         self.data_log.append({
             'Entity': 'SalesOrder',
