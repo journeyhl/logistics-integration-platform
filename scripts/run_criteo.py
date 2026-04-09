@@ -20,4 +20,4 @@ criteo_pipeline._re_init(
     end_date = criteo_pipeline.backfill_end,
     mode = 'backfill'
 )
-backfill_results = criteo_pipeline.run()
+# backfill_results = criteo_pipeline.run()

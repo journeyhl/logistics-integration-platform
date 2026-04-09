@@ -31,10 +31,7 @@ class Criteo(Pipeline):
 
         return data_transformed
     
-    def load(self, data_transformed: dict[str, list]):
-        data_transformed['diff_log']
-        data_transformed['criteo_transformed']
-        
+    def load(self, data_transformed: dict[str, list]):        
         self.centralstore.checked_upsert('criteo.diff_log', data_transformed['diff_log'])
         self.centralstore.checked_upsert('criteo.campaign_performance_daily', data_transformed['criteo_transformed'])
         pass

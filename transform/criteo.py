@@ -19,13 +19,12 @@ class Transform:
         criteo_extract = data_extract['criteo_extract']
         criteo_transformed = self.transform_criteo(criteo_extract)
         
-        diff_log = self.find_differences(db_extract, criteo_transformed)
+        diff_log, criteo_transformed = self.find_differences(db_extract, criteo_transformed)
 
         data_transformed = {
             'diff_log': diff_log,
-            'criteo_transformed': criteo_transformed.to_dicts()
+            'criteo_transformed': criteo_transformed
         }
-        bp = 'here'
         return data_transformed
 
 
@@ -161,6 +160,7 @@ class Transform:
         db_transformed = db_extract.join(other = criteo_transformed, how = 'inner', on=['report_date', 'campaign_id'])
 
         diff_log = []
+        criteo = []
         for row in db_transformed.iter_rows(named = True):
             diff = False
             row_log = {
@@ -175,4 +175,16 @@ class Transform:
                     diff = True
             if diff:
                 diff_log.append(row_log)
-        return diff_log
+                criteo.append({
+                    'report_date': row['report_date'],
+                    'advertiser_id': row['advertiser_id'],
+                    'campaign_id': row['campaign_id'],
+                    'campaign_name': row['campaign_name'],
+                    'impressions': row['impressions'],
+                    'clicks': row['clicks'],
+                    'cost': row['cost'],
+                    'conversions': row['conversions'],
+                    'revenue': row['revenue'],
+                    'load_timestamp': row['load_timestamp'],
+                })
+        return diff_log, criteo
