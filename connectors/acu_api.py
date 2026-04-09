@@ -190,6 +190,139 @@ class AcumaticaAPI:
             'Timestamp': datetime.now(ZoneInfo('America/New_York'))
         })
         return self.status_description, body
+    
+
+    
+    def validate_order_address(self, order_data: dict):
+        """`validate_order_address`(self, order_data: *dict*)
+        ---
+        <hr>
+        
+        Given a dict containing **OrderType** and **OrderNbr**, attempts to validate a Sales Order's addresses
+        
+        <hr>
+        
+        Parameters
+        ---
+        :param (*dict*) `order_data`: dict containing **OrderNbr** and **OrderType**
+        
+        <hr>
+        
+        Returns
+        ---
+        """        
+        payload = {
+            "entity": {
+                "Type": {
+                    "value": "SalesOrder"
+                },
+                "OrderType": {
+                    "value": order_data['OrderType']
+                },
+                "OrderNbr": {
+                    "value": order_data['OrderNbr']
+                }
+            }
+        }
+
+        response = self.session.post(f'{self.base_uri}/SalesOrder/ValidateAddresses', json=payload)
+        response_str = f'{response.status_code} {response.reason}'
+        if response_str == '204 No Content':
+            self.logger.info('Address Validated Successfully!')
+            response_str = '204 No Content (SUCCESS)'
+        else:
+            self.logger.error(f'Issue validating address for {order_data['OrderNbr']}')
+
+        self.data_log.append({
+            'Entity': 'SalesOrder',
+            'KeyValue': order_data['OrderNbr'],
+            'Operation': f'POST - Validate Address',
+            'Payload': payload,
+            'Response': response_str,
+            'Timestamp': datetime.now(ZoneInfo('America/New_York'))
+        })
+        bp = 'here'
+
+
+
+    def target_api(self, endpoint: str, payload_data: dict, operation: str = 'put', descr: str = None):
+        """`target_api`(self, endpoint: *str*, payload_data: *dict*, operation: *str*, descr: *str*)
+        ---
+        <hr>
+        
+        put_summary_here
+        
+        <hr>
+        
+        Parameters
+        ---
+        :param (*str*) `endpoint`: The endpoint to append to the base URI.
+        :param (*dict*) `payload_data`: Dictionary containing **target_api_update_payload**, **log_update_success**, **log_update_error**, **acu_api_data_log**    
+        :param (*str*) `operation`: API Operation (**PUT**, **POST**, **GET**)
+        :param (*str*) `descr`: What the payload will do (**Override & Update**)
+
+        <hr>
+        
+        Returns
+        ---
+        :return `return_bool` (bool): If **descr == 'Override & Update'**, return **True** if success, else **False**
+        """        
+        if operation == 'put':
+            response = self.session.put(f'{self.base_uri}{endpoint}', json=payload_data['target_api_update_payload'])
+        elif operation == 'post':
+            response = self.session.post(f'{self.base_uri}{endpoint}', json=payload_data['target_api_update_payload'])
+        response_str = f'{response.status_code}: {response.reason}'
+
+        if descr == 'Override & Update':
+            try:
+                json_response = response.json()
+                self.logger.info(payload_data['log_update_success'])
+                return_bool = True
+            except Exception as e:
+                self.logger.info(payload_data['log_update_error'])
+                return_bool = False
+            self.data_log.append({
+                **payload_data['acu_api_data_log'],
+                'Response': response_str,
+                'Timestamp': datetime.now(ZoneInfo('America/New_York'))
+            })
+            return return_bool
+        
+
+    def order_remove_hold(self, order_data: dict):
+        self.logger.info(f'{order_data['OrderNbr']}: Removing Order from hold')
+        bp = 'here'   
+        payload = {
+            "entity": {
+                "Type": {
+                    "value": "SalesOrder"
+                },
+                "OrderType": {
+                    "value": order_data['OrderType']
+                },
+                "OrderNbr": {
+                    "value": order_data['OrderNbr']
+                }
+            }
+        }
+
+        response = self.session.post(f'{self.base_uri}/SalesOrder/ReleaseFromHold', json=payload)
+        response_str = f'{response.status_code} {response.reason}'        
+        if response_str == '204 No Content':
+            self.logger.info('Order removed from hold successfully!')
+            response_str = '204 No Content (SUCCESS)'
+        else:
+            self.logger.error(f'Issue removeing {order_data['OrderNbr']} from hold')
+        
+        self.data_log.append({
+            'Entity': 'SalesOrder',
+            'KeyValue': order_data['OrderNbr'],
+            'Operation': f'POST - Remove Hold',
+            'Payload': payload,
+            'Response': response_str,
+            'Timestamp': datetime.now(ZoneInfo('America/New_York'))
+        })
+
     #endregion SalesOrder
 
 
@@ -830,6 +963,14 @@ class AcumaticaAPI:
 
 
 
+
+
+#endregion
+
+
+
+#region Delete?
+
     def validate_customer_address(self, customer_data: dict):
         '''**WORK IN PROGRESS**
         ===
@@ -858,65 +999,4 @@ class AcumaticaAPI:
             'Timestamp': datetime.now(ZoneInfo('America/New_York'))
         })
         bp = 'here'
-
-
-    def validate_order_address(self, order_data: dict):
-        '''**WORK IN PROGRESS**
-        ===
-        '''
-        payload = {
-            "entity": {
-                "Type": {
-                    "value": "SalesOrder"
-                },
-                "OrderType": {
-                    "value": order_data['OrderType']
-                },
-                "OrderNbr": {
-                    "value": order_data['OrderNbr']
-                }
-            }
-        }
-
-        response = self.session.post(f'{self.base_uri}/SalesOrder/ValidateAddresses', json=payload)
-        response_str = f'{response.status_code}: {response.reason}'
-        if response_str == '204: No Content':
-            self.logger.info('Address Validated Successfully!')
-            response_str = '204: No Content (SUCCESS)'
-        else:
-            self.logger.error(f'Issue validating address for {order_data['OrderNbr']}')
-
-        self.data_log.append({
-            'Entity': 'SalesOrder',
-            'KeyValue': order_data['OrderNbr'],
-            'Operation': f'POST - Validate Address',
-            'Payload': payload,
-            'Response': response_str,
-            'Timestamp': datetime.now(ZoneInfo('America/New_York'))
-        })
-        bp = 'here'
-
-
-
-    def target_api(self, endpoint: str, payload_data: dict, operation: str = 'put', descr: str = None):
-        if operation == 'put':
-            response = self.session.put(f'{self.base_uri}{endpoint}', json=payload_data['target_api_update_payload'])
-        elif operation == 'post':
-            response = self.session.post(f'{self.base_uri}{endpoint}', json=payload_data['target_api_update_payload'])
-        response_str = f'{response.status_code}: {response.reason}'
-
-        if descr == 'Override & Update':
-            try:
-                json_response = response.json()
-                self.logger.info(payload_data['log_update_success'])
-                return_bool = True
-            except Exception as e:
-                self.logger.info(payload_data['log_update_error'])
-                return_bool = False
-            self.data_log.append({
-                **payload_data['acu_api_data_log'],
-                'Response': response_str,
-                'Timestamp': datetime.now(ZoneInfo('America/New_York'))
-            })
-            return return_bool
-#endregion
+#endregion Delete?

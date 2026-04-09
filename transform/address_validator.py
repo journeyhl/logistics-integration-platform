@@ -15,8 +15,10 @@ class Transform:
         data_transformed = []
         for order in data_extract.iter_rows(named=True):
             if order['Match'] == 1:
+                self.logger.info(f'{order['OrderNbr']}: Customer has same original Shipping/ Billing address')
                 order_avs = self.pipeline.avs.validate(order, 's')
             else:
+                self.logger.info(f'{order['OrderNbr']}: Customer has different original Shipping/ Billing addresses')
                 order_avs = self.pipeline.avs.validate(order, 's') #validate both
                 order_avs = self.pipeline.avs.validate(order, 'b') #validate both
             if order_avs.get(f'vsAddressLine1') == None:

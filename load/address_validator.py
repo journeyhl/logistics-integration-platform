@@ -35,4 +35,6 @@ class Load:
             # order_avs['validate_address'] = self.pipeline.acu_api.update_customer_address(order_avs['update_address_payload'])
             if order_avs['validate_address']:
                 self.pipeline.acu_api.validate_order_address(order_avs)
+                time.sleep(1)
+                self.pipeline.acu_api.order_remove_hold(order_avs)
                 bp = 'here'

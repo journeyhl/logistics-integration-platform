@@ -24,7 +24,7 @@ class AddressVerificationSystem:
 
 
     def validate(self, order_data: dict, s_or_b: str):
-        self.logger.info(f'{order_data['OrderNbr']}-{order_data['AcctCD']}: Validating with AVS')
+        self.logger.info(f'{order_data['OrderNbr']}: Validating with AVS')
         payload = {
             "line1": order_data[f'{s_or_b}AddressLine1'],
             "line2": order_data[f'{s_or_b}AddressLine2'],
@@ -37,7 +37,7 @@ class AddressVerificationSystem:
         response = self.session.post(url = self.endpoint_validate, headers = self.headers, json = payload)
         try:
             self.json_response = response.json()
-            self.logger.info(f'{order_data['OrderNbr']}-{order_data['AcctCD']}: Response received from AVS, parsing...')
+            self.logger.info(f'{order_data['OrderNbr']}: Response received from AVS, parsing...')
             order_data = self._parse_response(order_data, s_or_b)
         except Exception as e:
             self.logger.error(f'Could not reach AVS!')
@@ -48,7 +48,7 @@ class AddressVerificationSystem:
     def _parse_response(self, order_data: dict, s_or_b: str) -> dict:
         validated_address = self.json_response['validatedAddresses']
         if len(validated_address) > 1:
-            self.logger.warning(f'{order_data['OrderNbr']}-{order_data['AcctCD']}: Multiple addresses were returned')
+            self.logger.warning(f'{order_data['OrderNbr']}: Multiple addresses were returned')
             bp = 'here'
         validated_address = validated_address[0]
         order_data[f'v{s_or_b}AddressLine1'] = validated_address['line1']
