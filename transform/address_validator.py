@@ -32,28 +32,6 @@ class Transform:
             data_transformed.append(order_avs)
         return data_transformed
 
-
-
-    def format_customer_address_payload(self, order_avs: dict):
-        payload = {
-            "CustomerID": {"value": order_avs['AcctCD']},
-            "MainContact": {
-                "Address": {
-                    "AddressLine1": {"value": order_avs['vAddressLine1']},
-                    "AddressLine2": {"value": order_avs['vAddressLine2']},
-                    "City":         {"value": order_avs['vCity']},
-                    "State":        {"value": order_avs['vState']},
-                    "PostalCode":   {"value": order_avs['vPostalCode']},
-                    "Country":    {"value": order_avs['vCountryID']},
-                }
-            }
-        }
-        # order_avs['vAddressLine2'] = None if order_avs['AddressLine2'] == None and order_avs['vAddressLine2'] == '' else order_avs['vAddressLine2']
-        # order_avs['vAddressLine2'] = '' if order_avs['AddressLine2'] == '' and order_avs['vAddressLine2'] == None else order_avs['vAddressLine2']
-        # if order_avs['AddressLine2'] != order_avs['vAddressLine2']:
-        #     payload['MainContact']['Address']['AddressLine2'] ={"value": order_avs['vAddressLine2']}
-        self._log_differences(order_avs)
-        return payload
     
     
     def format_order_address_payload(self, order_avs: dict):
@@ -116,11 +94,6 @@ class Transform:
                 "PostalCode":   {"value": order_avs['vbPostalCode']},
                 "Country":      {"value": order_avs['vbCountryID']},                
             }
-        
-        # order_avs['vAddressLine2'] = None if order_avs['AddressLine2'] == None and order_avs['vAddressLine2'] == '' else order_avs['vAddressLine2']
-        # order_avs['vAddressLine2'] = '' if order_avs['AddressLine2'] == '' and order_avs['vAddressLine2'] == None else order_avs['vAddressLine2']
-        # if order_avs['AddressLine2'] != order_avs['vAddressLine2']:
-        #     payload['ShipToAddress']['AddressLine2'] ={"value": order_avs['vAddressLine2']}
         self._log_differences(order_avs)
         return payload
     
@@ -180,3 +153,28 @@ class Transform:
                     self.logger.info(f'{order_avs['OrderNbr']}: {name}: {current} -> {new}')
                     bp = 'here'
                 bp = 'here'
+
+
+
+#region Delete?
+    def format_customer_address_payload(self, order_avs: dict):
+        payload = {
+            "CustomerID": {"value": order_avs['AcctCD']},
+            "MainContact": {
+                "Address": {
+                    "AddressLine1": {"value": order_avs['vAddressLine1']},
+                    "AddressLine2": {"value": order_avs['vAddressLine2']},
+                    "City":         {"value": order_avs['vCity']},
+                    "State":        {"value": order_avs['vState']},
+                    "PostalCode":   {"value": order_avs['vPostalCode']},
+                    "Country":    {"value": order_avs['vCountryID']},
+                }
+            }
+        }
+        # order_avs['vAddressLine2'] = None if order_avs['AddressLine2'] == None and order_avs['vAddressLine2'] == '' else order_avs['vAddressLine2']
+        # order_avs['vAddressLine2'] = '' if order_avs['AddressLine2'] == '' and order_avs['vAddressLine2'] == None else order_avs['vAddressLine2']
+        # if order_avs['AddressLine2'] != order_avs['vAddressLine2']:
+        #     payload['MainContact']['Address']['AddressLine2'] ={"value": order_avs['vAddressLine2']}
+        self._log_differences(order_avs)
+        return payload
+#endregion Delete? 

@@ -7,12 +7,11 @@ import logging
 from dataclasses import dataclass
 from typing import Generic, TypeVar
 
-
+#region Queries
 @dataclass(frozen=True)
 class Query:
     name: str
     query: str
-
 
 class Queries:
     def __init__(self, database_name: str):
@@ -22,7 +21,6 @@ class Queries:
 
     def __getattr__(self, name: str) -> Query:
         raise AttributeError(f"No query named '{name}'")
-
 
 class CentralStoreQueries(Queries):
     '''Queries to be executed within db_CentralStore'''
@@ -188,13 +186,12 @@ class AcumaticaDbQueries(Queries):
     SOOrderDeletions: Query
     '''Pulls orders that have been deleted in Acumatica for transfer to db_CentralStore'''
 
-
 _QUERY_CLASSES: dict[str, type[Queries]] = {
     'db_CentralStore': CentralStoreQueries,
     'AcumaticaDb': AcumaticaDbQueries,
 }
 QT = TypeVar('QT', bound=Queries)
-
+#endregion
 
 class SQLConnector(Generic[QT]):
     queries: QT
@@ -216,11 +213,21 @@ class SQLConnector(Generic[QT]):
         
         <hr>
         
-        Returns
+        Sets
         ---
+        >>> self.pipeline = pipeline
+        >>> self.logger = logging.getLogger(f'{database_name}')
+        >>> if database_name not in DATABASES:
+             raise ValueError(f'Unknown db!')
+        >>> self.database_name = database_name
+        >>> self.config = DATABASES[database_name]
+        >>> self.engine = self._create_engine()
+        >>> self.raw_connection = self.engine.raw_connection()
+        >>> self.queries = _QUERY_CLASSES.get(database_name, Queries)(database_name)
+
+        **_create_engine** creates connection string using creds from :data:`~config.settings.DATABASES`
         '''
         self.pipeline = pipeline
-        # self.logger = logging.getLogger(f'{pipeline.pipeline_name}.{database_name}')
         self.logger = logging.getLogger(f'{database_name}')
         if database_name not in DATABASES:
             raise ValueError(f'Unknown db!')

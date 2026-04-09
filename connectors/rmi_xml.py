@@ -9,6 +9,35 @@ import logging
 
 class RMIXML:
     def __init__(self, pipeline):
+        """`init`(self, pipeline: *Pipeline | str*)
+        ---
+        <hr>
+        
+        Initializes RMIXML connector
+        
+        <hr>
+        
+        Parameters
+        ---
+        :param (*Pipeline | str*) `pipeline`: Pipeline the connector belongs to
+        
+        <hr>
+        
+        Sets
+        ---
+        >>> self.pipeline = pipeline
+        >>> self.logger = logging.getLogger(f'{pipeline.pipeline_name}.rmi_xml')
+        >>> self.session = requests.Session()
+        >>> self.login()
+        >>> self.send_url = 'https://jhl.returnsmanagement.com/webserviceV2/rma/rmaservice.asmx'
+        >>> self.send_headers = {
+            'Content-Type': 'text/xml; charset=utf-8',
+            'SOAPAction': 'http://bactracs.bactracksrl.com/rmaservice/CreateNew'
+        }
+        >>> self.results = []
+        
+        **self.login** logs in using creds from :data:`~config.settings.RMI`
+        """        
         self.pipeline = pipeline
         self.logger = logging.getLogger(f'{pipeline.pipeline_name}.rmi_xml')
         self.session = requests.Session()

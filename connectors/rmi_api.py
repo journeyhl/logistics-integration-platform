@@ -8,6 +8,37 @@ from config.settings import RMI
 class RMIAPI():
 
     def __init__(self, pipeline):
+        """`init`(self, pipeline: *Pipeline | str*)
+        ---
+        <hr>
+        
+        Initializes RMIAPI connector and Authenticates
+            
+        <hr>
+        
+        Parameters
+        ---
+        :param (*Pipeline | str*) `pipeline`: Pipeline the connector belongs to
+        
+        <hr>
+        
+        Sets
+        ---
+        >>> self.logger = logging.getLogger(f'{pipeline.pipeline_name}.rmi_api')
+        >>> self.base_uri = 'https://api.backtracksrl.com/'
+        >>> self.auth_type = 'Token'
+        >>> self.headers = {
+            'Content-Type': 'application/json', 
+            'ident': '64A648DD-E186-42E1-8A46-23D76A401FF0'
+        }
+
+        >>> self.username = RMI['username']
+        >>> self.password = RMI['password']
+        >>> self.session = requests.Session()
+        >>> self._auth()
+        
+        **self._auth** Authenticates using creds from :data:`~config.settings.RMI`
+        """        
         if type(pipeline) == str:
             self.logger = logging.getLogger(f'{pipeline}.rmi_api')
         else:

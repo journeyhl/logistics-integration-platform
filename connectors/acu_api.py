@@ -6,6 +6,38 @@ from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 class AcumaticaAPI:
     def __init__(self, pipeline):
+        """`init`(self, pipeline: *Pipeline | str*)
+        ---
+        <hr>
+        
+        Initializes AcumaticaAPI connector and Authenticates
+
+        <hr>
+        
+        Parameters
+        ---
+        :param (*Pipeline | str*) `pipeline`: Pipeline the connector belongs to
+        
+        <hr>
+        
+        Sets
+        ---
+        >>> self.logger = logging.getLogger(f'{pipeline.pipeline_name}.acu_api')
+        >>> self.pipeline = pipeline
+        >>> self.version = '22.200.001'
+        >>> self.auth_type = 'Cookie'
+        >>> self.uri = 'https://erp.journeyhl.com/entity'
+        >>> self.endpoint_name = 'pyplatform'
+        >>> self.base_uri = f'{self.uri}/{self.endpoint_name}/{self.version}'
+        >>> self.username = ACUMATICA_API['username']
+        >>> self.password = ACUMATICA_API['password']
+        >>> self.company = 'JHL'
+        >>> self.data_log = []
+        >>> self.session = requests.Session()
+        >>> self._auth() #logs into Acumatica API
+        
+        **self._auth** Authenticates using creds from :data:`~config.settings.ACUMATICA_API`
+        """        
         if type(pipeline) == str:            
             self.logger = logging.getLogger(f'{pipeline}.acu_api')
         else:

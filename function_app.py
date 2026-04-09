@@ -304,7 +304,7 @@ def redstag_inventory_retrieval(timer: af.TimerRequest):
 ##--------------------------     JJ     ----------------------------
 ############################‾‾‾‾‾‾‾‾‾‾‾‾############################
 
-#region RedStag - Retrieve Inventory
+#region Order Deletions
 @app.timer_trigger(
     schedule = '40 * * * *',
     arg_name = 'timer',
@@ -326,4 +326,45 @@ def order_deletions(timer: af.TimerRequest):
     from pipelines import SOOrderDeletions
     order_deletions = SOOrderDeletions()
     order_deletions.run()
-#endregion RedStag - Retrieve Inventory
+#endregion Order Deletions
+
+
+
+############################____________############################
+##--------------------------     JJ     ----------------------------
+############################‾‾‾‾‾‾‾‾‾‾‾‾############################
+
+#region Address Validator
+@app.timer_trigger(
+    schedule = '55 * * * *',
+    arg_name = 'timer',
+    run_on_startup = False
+)
+def address_validator(timer: af.TimerRequest):
+    '''`address_validator`
+    ---
+    <hr>
+
+    Pulls any WB orders that are On Hold and do not have a validated address.
+
+    Determines if the Billing and Shipping addresses are different or the same, then validates address(es) with Avalara AVS,.
+
+    Compares Validated address(es) to original(s).
+
+    Sends payload with updated address(es) to Acumatica API via target_api 
+     - :meth:`~connectors.acu_api.AcumaticaAPI.target_api`
+
+    Validates address(es)
+
+    Removes hold from Order
+    
+    <hr>
+
+    Schedule
+    ===
+     *Runs at :55 every hour*
+    '''
+    from pipelines import AddressValidator
+    address_validator = AddressValidator()
+    address_validator.run()
+#endregion Address Validator
