@@ -169,7 +169,7 @@ class Transform:
             elif row['report_date_right'] != None:
                 diff = False
                 row_log = {
-                    'report_date': row['report_date'],
+                    'report_date': row['report_date_right'],
                     'campaign_id': row['campaign_id'],
                     'last_ts': row['load_timestamp'],
                     'current_ts': row['load_timestamp_right']
