@@ -175,13 +175,23 @@ class Transform:
                     'current_ts': row['load_timestamp_right']
                 }
                 for item in ['impressions', 'clicks', 'cost', 'conversions', 'revenue']:
-                    row_log[f'{item}_diff'] = row[f'{item}_right'] - float(row[item])
-                    if row_log[f'{item}_diff'] != 0:
+                    col_name = 'impr' if item == 'impressions' else 'convr' if item == 'conversions' else item
+                    row_log[f'{col_name}_current'] = row[f'{item}_right']
+                    row_log[f'{col_name}_last'] = row[item]
+                    if row_log[f'{col_name}_current'] - float(row_log[f'{col_name}_last']) != 0:
                         diff = True
+                        
                 if diff:
-                    diff_log.append(row_log)
+                    row_log['diff'] = 1
                     criteo.append(self._format_table(row))
                     self.logger.info(f'{row['campaign_name_right']} - {row['report_date_right']} found in db with different values, set to update')
+                else:
+                    row_log['diff'] = 0
+                diff_log.append(row_log)
+            else:
+                db_report_date_none = row['report_date'] == None
+                crit_report_date_none = row['report_date_right'] == None
+                bp = 'here'
         if len(criteo) == 0:
             self.logger.info(f'No changes found since last execution')
         return diff_log, criteo

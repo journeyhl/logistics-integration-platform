@@ -252,17 +252,29 @@ TABLES = {
             'campaign_id',
             'last_ts',
             'current_ts',
-            'impressions_diff',
-            'clicks_diff',
-            'cost_diff',
-            'revenue_diff'
+            'impr_current',
+            'impr_last',
+            'clicks_current',
+            'clicks_last',
+            'cost_current',
+            'cost_last',
+            'revenue_current',
+            'revenue_last',
+            'diff'
         ],
         'update_columns': [
             'current_ts',
-            'impressions_diff',
-            'clicks_diff',
-            'cost_diff',
-            'revenue_diff',
+            'impr_current',
+            'impr_last',
+            'clicks_current',
+            'clicks_last',
+            'cost_current',
+            'cost_last',
+            'convr_current',
+            'convr_last',
+            'revenue_current',
+            'revenue_last',
+            'diff'
         ],
     }
 }
