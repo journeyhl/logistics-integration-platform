@@ -3,7 +3,8 @@ from connectors import CriteoAPI
 import polars as pl
 import json
 import time
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
+from zoneinfo import ZoneInfo
 from transform.criteo import Transform
 from typing import Literal
 
@@ -14,8 +15,8 @@ class Criteo(Pipeline):
         self.transformer = Transform(self)
         self.lookback_days = 30
         self.api_max_days = 90
-        self.incremental_end = datetime.now().date()
-        self.backfill_end = datetime.now().date() - timedelta(days=1)
+        self.incremental_end = datetime.now(ZoneInfo('America/New_York')).date()
+        self.backfill_end = datetime.now(ZoneInfo('America/New_York')).date() - timedelta(days=1)
 
     def extract(self) -> dict[str, pl.DataFrame]:
         db_extract = self.centralstore.query_db('select * from criteo.campaign_performance_daily')
@@ -45,7 +46,7 @@ class Criteo(Pipeline):
         pass
 
 
-    def _re_init(self, start_date: str, end_date: str, mode: Literal['incremental', 'backfill'] = 'incremental'):
+    def _re_init(self, start_date: date, end_date: date, mode: Literal['incremental', 'backfill'] = 'incremental'):
         self.mode = mode
         self.start_date = start_date
         self.end_date = end_date

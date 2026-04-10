@@ -10,8 +10,13 @@
       "Microsoft.AspNetCore": "None",
       "Microsoft.Azure.WebJobs.Script.Description": "None",
       "Microsoft.Azure.WebJobs.Script.WebHost": "None",
+      "Microsoft.Azure.WebJobs.Script.WebHost.Security": "None",
+      "Microsoft.Azure.WebJobs.Script.WebHost.Management": "None",
       "Microsoft.Azure.WebJobs.Host": "None",
-      "Microsoft.Azure.WebJobs.Script": "Information"
+      "Microsoft.Azure.WebJobs.Host.Executors": "None",
+      "Microsoft.Azure.WebJobs.Script": "Information",
+      "Host.Results": "Warning",
+      "Host.Aggregator": "Warning"
     },
     "applicationInsights": {
       "samplingSettings": {

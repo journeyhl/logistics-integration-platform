@@ -7,6 +7,7 @@ import polars as pl
 import pandas as pd
 import re
 from datetime import datetime
+from zoneinfo import ZoneInfo
 class Transform:
     def __init__(self, pipeline: Criteo):
         self.pipeline = pipeline
@@ -29,7 +30,7 @@ class Transform:
 
 
     def transform_criteo(self, criteo_extract: pl.DataFrame):
-        load_timestamp = datetime.now()
+        load_timestamp = datetime.now(ZoneInfo('America/New_York'))
         data_transformed = criteo_extract
         # ── Drop rollup rows (Day is null or empty) ─────────────────────────
         day_col = next(
@@ -142,7 +143,7 @@ class Transform:
             pl.col('conversions').cast(pl.Int64, strict=False).fill_null(0),
             pl.col('revenue').cast(pl.Float64, strict=False).fill_null(0.0).round(4),
             pl.lit(self.pipeline.criteoapi.ad_id).alias('advertiser_id'),
-            pl.lit(datetime.now()).alias('load_timestamp'),
+            pl.lit(datetime.now(ZoneInfo('America/New_York'))).alias('load_timestamp'),
         ])
 
         # ── Final column order ──────────────────────────────────────────────
