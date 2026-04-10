@@ -1,10 +1,10 @@
 import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from pipelines import SOOrderDeletions
+from pipelines import AcumaticaDeletions
 
-order_deletions = SOOrderDeletions()
+acu_deletions = AcumaticaDeletions()
 
-completed_order_deletions = order_deletions.run()
+completed_acu_deletions = acu_deletions.run()
 
 bp = 'here'

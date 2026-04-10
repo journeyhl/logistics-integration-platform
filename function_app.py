@@ -309,19 +309,21 @@ def redstag_inventory_retrieval(timer: af.TimerRequest):
 ############################‾‾‾‾‾‾‾‾‾‾‾‾############################
 
 
-#region           Order Deletions
+#region           Acumatica Deletions
 #       12:40am-11:40pm, once/hr
 @app.timer_trigger(
     schedule = '40 * * * *',
     arg_name = 'timer',
     run_on_startup = False
 )
-def order_deletions(timer: af.TimerRequest):
+def acu_deletions(timer: af.TimerRequest):
     '''`order_deletions`
     ---
     <hr>
 
-    Upserts Sales Orders that were deleted in Acumatica to _util.SOOrderDeletions in db_CentralStore
+    Upserts records that were deleted in Acumatica to db_CentralStore
+
+    Currently tracking SOOrder, SOLine, SOShipment, and SOOrderShipment tables
     
     <hr>
 
@@ -329,9 +331,9 @@ def order_deletions(timer: af.TimerRequest):
     ===
      *Runs at :40 every hour*
     '''
-    from pipelines import SOOrderDeletions
-    order_deletions = SOOrderDeletions()
-    order_deletions.run()
+    from pipelines import AcumaticaDeletions
+    acu_deletions = AcumaticaDeletions()
+    acu_deletions.run()
 #endregion Order Deletions
 
 

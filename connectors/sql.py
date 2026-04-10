@@ -184,7 +184,16 @@ class AcumaticaDbQueries(Queries):
     '''
 
     SOOrderDeletions: Query
-    '''Pulls orders that have been deleted in Acumatica for transfer to db_CentralStore'''
+    '''Pulls records from SOOrder that have been deleted in Acumatica for transfer to db_CentralStore'''
+
+    SOLineDeletions: Query
+    '''Pulls records from SOLine that have been deleted in Acumatica for transfer to db_CentralStore'''
+
+    SOShipmentDeletions: Query
+    '''Pulls records from SOShipment that have been deleted in Acumatica for transfer to db_CentralStore'''
+
+    SOOrderShipmentDeletions: Query
+    '''Pulls records from SOOrderShipment that have been deleted in Acumatica for transfer to db_CentralStore'''
 
 _QUERY_CLASSES: dict[str, type[Queries]] = {
     'db_CentralStore': CentralStoreQueries,
