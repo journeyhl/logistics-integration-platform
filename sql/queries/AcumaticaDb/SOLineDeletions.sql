@@ -53,5 +53,5 @@ select OrderType
      , MarginPct 
      , CreatedDatetime 
      , CreatedBy 
-from SOLineDetetions
+from SOLineDeletions
 -- where DeletedDatetime >= dateadd(hour, -2, getdate())

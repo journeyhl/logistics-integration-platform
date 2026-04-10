@@ -300,6 +300,36 @@ TABLES = {
             'CreatedBy',
         ]
     },
+    '_util.SOShipmentDeletions':{
+        'keys': ['ShipmentNbr'],
+        'columns': [
+            'ShipmentNbr',
+            'ShipDate',
+            'DeletedBy',
+            'DeletedDatetime'
+        ],
+        'update_columns':[
+            'ShipDate',
+            'DeletedBy',
+            'DeletedDatetime'
+        ]
+    },
+    '_util.SOOrderShipmentDeletions':{
+        'keys': ['OrderType', 'OrderNbr', 'ShipmentNbr'],
+        'columns': [
+            'OrderType',
+            'OrderNbr',
+            'ShipmentNbr',
+            'ShipDate',
+            'DeletedBy',
+            'DeletedDatetime'
+        ],
+        'update_columns':[
+            'ShipDate',
+            'DeletedBy',
+            'DeletedDatetime'
+        ]
+    },
     'AdDetails': {
         'keys': [
             'AdCode',

@@ -17,4 +17,4 @@ ShipmentNbr varchar(15),
 ShipDate date,
 DeletedBy varchar(200),
 DeletedDatetime datetime,
-primary key(OrderType, OrderNbr))
+primary key(OrderType, OrderNbr, ShipmentNbr))
