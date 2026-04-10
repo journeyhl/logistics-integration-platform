@@ -29,6 +29,7 @@ class Transform:
 
 
     def transform_criteo(self, criteo_extract: pl.DataFrame):
+        load_timestamp = datetime.now()
         data_transformed = criteo_extract
         # ── Drop rollup rows (Day is null or empty) ─────────────────────────
         day_col = next(
@@ -157,34 +158,47 @@ class Transform:
         return data_transformed
     
     def find_differences(self, db_extract: pl.DataFrame, criteo_transformed: pl.DataFrame):    
-        db_transformed = db_extract.join(other = criteo_transformed, how = 'inner', on=['report_date', 'campaign_id'])
-
+        self.logger.info(f'Checking for differences in database data and Criteo API extract...')
+        db_transformed = db_extract.join(other = criteo_transformed, how = 'full', on=['report_date', 'campaign_id'])
         diff_log = []
         criteo = []
         for row in db_transformed.iter_rows(named = True):
-            diff = False
-            row_log = {
-                'report_date': row['report_date'],
-                'campaign_id': row['campaign_id'],
-                'last_ts': row['load_timestamp'],
-                'current_ts': row['load_timestamp_right']
-            }
-            for item in ['impressions', 'clicks', 'cost', 'conversions', 'revenue']:
-                row_log[f'{item}_diff'] = row[f'{item}_right'] - float(row[item])
-                if row_log[f'{item}_diff'] != 0:
-                    diff = True
-            if diff:
-                diff_log.append(row_log)
-                criteo.append({
+            if row['report_date'] == None:
+                criteo.append(self._format_table(row))
+                self.logger.info(f'{row['campaign_name_right']} - {row['report_date_right']} not found in db, set to insert')
+            elif row['report_date_right'] != None:
+                diff = False
+                row_log = {
                     'report_date': row['report_date'],
-                    'advertiser_id': row['advertiser_id'],
                     'campaign_id': row['campaign_id'],
-                    'campaign_name': row['campaign_name'],
-                    'impressions': row['impressions'],
-                    'clicks': row['clicks'],
-                    'cost': row['cost'],
-                    'conversions': row['conversions'],
-                    'revenue': row['revenue'],
-                    'load_timestamp': row['load_timestamp'],
-                })
+                    'last_ts': row['load_timestamp'],
+                    'current_ts': row['load_timestamp_right']
+                }
+                for item in ['impressions', 'clicks', 'cost', 'conversions', 'revenue']:
+                    row_log[f'{item}_diff'] = row[f'{item}_right'] - float(row[item])
+                    if row_log[f'{item}_diff'] != 0:
+                        diff = True
+                if diff:
+                    diff_log.append(row_log)
+                    criteo.append(self._format_table(row))
+                    self.logger.info(f'{row['campaign_name_right']} - {row['report_date_right']} found in db with different values, set to update')
+        if len(criteo) == 0:
+            self.logger.info(f'No changes found since last execution')
         return diff_log, criteo
+    
+
+    def _format_table(self, row: dict):
+        criteo_table_format = {
+            'report_date': row['report_date_right'],
+            'advertiser_id': row['advertiser_id_right'],
+            'campaign_id': row['campaign_id_right'],
+            'campaign_name': row['campaign_name_right'],
+            'impressions': row['impressions_right'],
+            'clicks': row['clicks_right'],
+            'cost': row['cost_right'],
+            'conversions': row['conversions_right'],
+            'revenue': row['revenue_right'],
+            'load_timestamp': row['load_timestamp_right'],
+        }
+        return criteo_table_format
+        
