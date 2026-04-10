@@ -54,4 +54,4 @@ select OrderType
      , CreatedDatetime 
      , CreatedBy 
 from SOLineDeletions
--- where DeletedDatetime >= dateadd(hour, -2, getdate())
+where DeletedDatetime >= dateadd(hour, -2, getdate())

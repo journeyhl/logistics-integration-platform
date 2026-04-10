@@ -5,4 +5,4 @@ select OrderType
      , DeletedBy
      , DeletedDatetime
 from SOOrderShipmentDeletions
--- where DeletedDatetime >= dateadd(hour, -2, getdate())
+where DeletedDatetime >= dateadd(hour, -2, getdate())

@@ -3,4 +3,4 @@ select ShipmentNbr
      , DeletedBy
      , DeletedDatetime
 from SOShipmentDeletions
--- where DeletedDatetime >= dateadd(hour, -2, getdate())
+where DeletedDatetime >= dateadd(hour, -2, getdate())

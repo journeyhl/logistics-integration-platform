@@ -7,7 +7,6 @@ class AcumaticaDeletions(Pipeline):
 
 
     def extract(self):
-        data_extract = self.acudb.query_to_dataframe(self.acudb.queries.SOOrderDeletions)
         data_extract = {
             'SOOrderDeletions': self.acudb.query_to_dataframe(self.acudb.queries.SOOrderDeletions),
             'SOLineDeletions': self.acudb.query_to_dataframe(self.acudb.queries.SOLineDeletions),
