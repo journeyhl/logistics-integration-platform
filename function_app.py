@@ -1,4 +1,4 @@
-import azure.functions as af
+import azure.functions as af #type: ignore
 app = af.FunctionApp()
 
 #region RMI - Send Shipments & Returns

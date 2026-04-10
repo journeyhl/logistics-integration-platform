@@ -4,7 +4,7 @@ import logging
 
 class RedStagAPI:
     def __init__(self, pipeline):
-        """`init`(self, pipeline: *Pipeline | str*)
+        '''`init`(self, pipeline: *Pipeline | str*)
         ---
         <hr>
         
@@ -21,6 +21,7 @@ class RedStagAPI:
         Sets
         ---
         >>> self.logger = logging.getLogger(f'{pipeline.pipeline_name}.redstag_api')
+        >>> self.logger = logging.getLogger(f'{pipeline.pipeline_name}.redstag_api')
         >>> self.base_uri = 'https://wms.redstagfulfillment.com/api/jsonrpc'
         >>> self.auth_type = 'Token'
         >>> self.username = REDSTAG['username']
@@ -33,7 +34,8 @@ class RedStagAPI:
         >>> self._auth() #Logs into RedStag API
 
         **self._auth** Authenticates using creds from :data:`~config.settings.REDSTAG`
-        """        
+        '''
+        self.pipeline = pipeline
         if type(pipeline) == str:
             self.logger = logging.getLogger(f'{pipeline}.redstag_api')
         else:

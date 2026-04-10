@@ -15,9 +15,9 @@ criteo_pipeline._re_init(
 incremental_results = criteo_pipeline.run()
 bp = 'here'
 
-criteo_pipeline._re_init(
-    start_date =  date.fromisoformat('2025-01-01'),
-    end_date = criteo_pipeline.backfill_end,
-    mode = 'backfill'
-)
-backfill_results = criteo_pipeline.run()
+# criteo_pipeline._re_init(
+#     start_date =  date.fromisoformat('2025-01-01'),
+#     end_date = criteo_pipeline.backfill_end,
+#     mode = 'backfill'
+# )
+# backfill_results = criteo_pipeline.run()

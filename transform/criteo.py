@@ -16,6 +16,30 @@ class Transform:
     
 
     def landing(self, data_extract: dict[str, pl.DataFrame]):
+        '''`landing`(se;f, data_extract: *dict[str, pl.DataFrame]*)
+        ---
+        <hr>
+        
+        Landing function called from :class:`~pipelines.criteo.Criteo`.:meth:`~pipelines.criteo.Criteo.transform`
+        
+        ### Downstream Calls 
+         #### :meth:`~transform_criteo`
+            - Handles primary Criteo data_extract transformation which cleans data data prior to upsertting **criteo.campaign_performance_daily**
+         #### :meth:`~find_differences`
+            - Compares data pulled from **criteo.campaign_performance_daily** before extraction and the transformed data returned from :class:`~connectors.criteo_api.CriteoAPI`.:meth:`~connectors.criteo_api.CriteoAPI.fetch_campaign_data` (:meth:`~transform_criteo`)
+        
+        <hr>
+        
+        Parameters
+        ---
+        :param (*dict[str, pl.DataFrame]*) `data_extract`: dict containing **`db_extract`** and **`criteo_extract`** DataFrames.
+        
+        <hr>
+        
+        Returns
+        ---
+        :return `variablename` (_type_): _description_
+        '''
         db_extract = data_extract['db_extract']
         criteo_extract = data_extract['criteo_extract']
         criteo_transformed = self.transform_criteo(criteo_extract)
@@ -30,6 +54,29 @@ class Transform:
 
 
     def transform_criteo(self, criteo_extract: pl.DataFrame):
+        '''`transform_criteo`(self, criteo_extract: *pl.DataFrame*)
+        ---
+        <hr>
+        
+        Handles primary Criteo data_extract transformation which cleans data data prior to upsertting **criteo.campaign_performance_daily**
+        
+        ### Upstream Calls 
+         #### :meth:`~landing`
+
+            >>> criteo_transformed = self.transform_criteo(criteo_extract)
+            
+        <hr>
+        
+        Parameters
+        ---
+        :param (*pl.DataFrame*) `criteo_extract`: _description_
+        
+        <hr>
+        
+        Returns
+        ---
+        :return `variablename` (_type_): _description_
+        '''
         load_timestamp = datetime.now(ZoneInfo('America/New_York'))
         data_transformed = criteo_extract
         # ── Drop rollup rows (Day is null or empty) ─────────────────────────
@@ -158,7 +205,38 @@ class Transform:
         self.logger.info(f"Campaigns       : {sorted(data_transformed['campaign_name'].drop_nulls().unique().to_list())}")
         return data_transformed
     
-    def find_differences(self, db_extract: pl.DataFrame, criteo_transformed: pl.DataFrame):    
+
+
+    def find_differences(self, db_extract: pl.DataFrame, criteo_transformed: pl.DataFrame):
+        '''`find_differences`(db_extract: *pl.DataFrame*, criteo_transformed: *pl.DataFrame*, )
+        ---
+        <hr>
+        
+        Compares data pulled from **criteo.campaign_performance_daily** before extraction and the transformed data returned from :class:`~connectors.criteo_api.CriteoAPI`.:meth:`~connectors.criteo_api.CriteoAPI.fetch_campaign_data` (:meth:`~transform_criteo`)
+        
+        ### Downstream Calls 
+         #### :meth:`~_format_table`
+            - Formats row to be upserted for **criteo.campaign_performance_daily** table
+        
+        ### Upstream Calls 
+         #### :meth:`~landing`
+
+            >>> diff_log, criteo_transformed = self.find_differences(db_extract, criteo_transformed)
+            
+        <hr>
+        
+        Parameters
+        ---
+        :param (*pl.DataFrame*) `db_extract`: Data extracted from campaign_performance_daily (*query is just 'select * from criteo.campaign_performance_daily'*)
+        :param (*pl.DataFrame*) `criteo_transformed`: Cleaned data extracted from :class:`~connectors.criteo_api.CriteoAPI`
+        
+        <hr>
+        
+        Returns
+        ---
+        :return `diff_log` (list): Data to be upserted to **criteo.diff_log**
+        :return `criteo` (list): Data to be upserted to **criteo.campaign_performance_daily**
+        '''
         self.logger.info(f'Checking for differences in database data and Criteo API extract...')
         db_transformed = db_extract.join(other = criteo_transformed, how = 'full', on=['report_date', 'campaign_id'])
         diff_log = []
@@ -183,8 +261,8 @@ class Transform:
                         diff = True
                         
                 if diff:
-                    row_log['diff'] = 1
                     criteo.append(self._format_table(row))
+                    row_log['diff'] = 1
                     self.logger.info(f'{row['campaign_name_right']} - {row['report_date_right']} found in db with different values, set to update')
                 else:
                     row_log['diff'] = 0
@@ -199,6 +277,33 @@ class Transform:
     
 
     def _format_table(self, row: dict):
+        '''`_format_table`(self, row: *dict*)
+        ---
+        <hr>
+        
+        If a row is to be inserted or updated (determined in :meth:`~find_differences`), format it accordingly for **criteo.campaign_performance_daily**
+        
+        ### Upstream Calls 
+         #### :meth:`~find_differences`
+            >>> if row['report_date'] == None:
+                criteo.append(self._format_table(row))
+
+            >>> if diff:
+                criteo.append(self._format_table(row))
+            
+            
+        <hr>
+        
+        Parameters
+        ---
+        :param (*dict*) `row`: A single row (dict) from the extracted dataset found to be ready for upsert
+        
+        <hr>
+        
+        Returns
+        ---
+        :return `criteo_table_format` (_type_): dict ready to be upserted to criteo.campaign_performance_daily
+        '''
         criteo_table_format = {
             'report_date': row['report_date_right'],
             'advertiser_id': row['advertiser_id_right'],

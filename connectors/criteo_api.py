@@ -10,7 +10,57 @@ import polars as pl
 import io
 
 class CriteoAPI:
+    '''`CriteoAPI`
+    ===
+    
+    CriteoAPI is an api connector for the Criteo ad api
+    
+    ## Functions 
+     ### :meth:`~__init__`
+        #### Initializes Criteo API connector and Authenticates
+     ### :meth:`~_auth`
+        #### Request a fresh Bearer token from the Criteo OAuth2 endpoint.
+     ### :meth:`~fetch_campaign_data`
+        - #### using **`self.ad_id`**, **`self.pipeline.start_date`**, and **`self.pipeline.end_date`**, build json payload to send to *post* to api
+        - #### Use self.token from :meth:`~_auth` as bearer token Authorization header
+        - #### return polars DataFrame containing API response    
+    '''
     def __init__(self, pipeline: Criteo):
+        '''`init`(pipeline: *Criteo*)
+        ---
+        <hr>
+        
+        Initializes Criteo API connector and Authenticates
+        
+        ### Downstream Calls 
+         #### :meth:`~_auth`
+            - Request a fresh Bearer token from the Criteo OAuth2 endpoint.
+        
+        <hr>
+        
+        Parameters
+        ---
+        :param (*Criteo*) `pipeline`: Pipeline the connector belongs to, **will always be Criteo Pipeline**
+        
+        <hr>
+        
+        Sets
+        ---
+        >>> self.pipeline = pipeline
+        >>> self.logger = logging.getLogger(f'{pipeline.pipeline_name}.redstag_api')
+        >>> self.token_url = 'https://api.criteo.com/oauth2/token'
+        >>> self.stats_url = 'https://api.criteo.com/2026-01/statistics/report'
+        >>> self.client_id = CRITEO['client_id']
+        >>> self.client_secret = CRITEO['client_secret']
+        >>> self.ad_id = CRITEO['ad_id']
+        >>> self.headers = {
+            "Content-Type": "application/x-www-form-urlencoded"
+        }
+        >>> self.session = requests.Session()
+        >>> self._auth() #Logs into Criteo
+
+        **`self._client_id`**, **`self.client_secret`**, and **`self.ad_id`** come from :data:`~config.settings.CRITEO`
+        '''
         self.pipeline = pipeline
         if type(pipeline) == str:
             self.logger = logging.getLogger(f'{pipeline}.criteo_api')
@@ -36,14 +86,7 @@ class CriteoAPI:
         <hr>
 
         Request a fresh Bearer token from the Criteo OAuth2 endpoint.
-        Tokens are valid for 15 minutes
-        
             
-        <hr>
-        
-        Parameters
-        ---
-        
         <hr>
         
         Returns
@@ -77,13 +120,21 @@ class CriteoAPI:
         return token
     
 
-        
-
-
-
-
     def fetch_campaign_data(self) -> pl.DataFrame:
+        '''`fetch_campaign_data`(self)
+        ---
+        <hr>
         
+        using **`self.ad_id`**, **`self.pipeline.start_date`**, and **`self.pipeline.end_date`**, build json payload to send to *post* to api
+
+        Use self.token from :meth:`~_auth` as bearer token Authorization header 
+        
+        <hr>
+        
+        Returns
+        ---
+        :return `data_extract` (pl.DataFrame): Data returned from criteo
+        '''
         self.logger.info(f"[API]   Pulling {self.pipeline.start_date} to {self.pipeline.end_date}  (advertiser_id={self.ad_id})")
 
         payload = {
