@@ -62,10 +62,7 @@ class CriteoAPI:
         **`self._client_id`**, **`self.client_secret`**, and **`self.ad_id`** come from :data:`~config.settings.CRITEO`
         '''
         self.pipeline = pipeline
-        if type(pipeline) == str:
-            self.logger = logging.getLogger(f'{pipeline}.criteo_api')
-        else:
-            self.logger = logging.getLogger(f'{pipeline.pipeline_name}.api')
+        self.logger = logging.getLogger(f'{pipeline.pipeline_name}.criteo_api')
         self.token_url = 'https://api.criteo.com/oauth2/token'
         self.stats_url = 'https://api.criteo.com/2026-01/statistics/report'
         self.client_id = CRITEO['client_id']

@@ -3,7 +3,7 @@ app = af.FunctionApp()
 
 #region RMI - Send Shipments & Returns
 @app.timer_trigger(
-    schedule = '10/30 4-23/1 * * *',
+    schedule = '10/30 * * * *',
     arg_name = 'timer',
     run_on_startup = False    
 )
@@ -50,7 +50,7 @@ def rmi_send_shipment_return_pipeline(timer: af.TimerRequest):
 
 #region RMI - Data Retrieval
 @app.timer_trigger(
-    schedule = '25 4-23/1 * * *',
+    schedule = '25 * * * *',
     arg_name = 'timer',
     run_on_startup = False
 )
@@ -121,7 +121,7 @@ def rmi_data_retrieval_pipeline(timer: af.TimerRequest):
 
 #region RMI/Acu - Create Receipts
 @app.timer_trigger(
-    schedule = '50 8-20 * * *',
+    schedule = '50 * * * *',
     arg_name = 'timer',
     run_on_startup = False
 )
@@ -171,7 +171,7 @@ def create_acu_receipts(timer: af.TimerRequest):
 
 #region Acu - Confirm Shipments
 @app.timer_trigger(
-    schedule = '*/20 4-23 * * *',
+    schedule = '*/20 * * * *',
     arg_name = 'timer',
     run_on_startup = False
 )
@@ -205,7 +205,7 @@ def confirm_acu_shipments(timer: af.TimerRequest):
 
 #region Acu - Pack Shipments
 @app.timer_trigger(
-    schedule = '*/15 4-23 * * *',
+    schedule = '*/15 * * * *',
     arg_name = 'timer',
     run_on_startup = False
 )
@@ -247,7 +247,7 @@ def pack_shipments(timer: af.TimerRequest):
 #region Redstag - Send Shipments 
 #        4:35am-11:35pm, once/hr
 @app.timer_trigger(
-    schedule = '5/30 4-23/1 * * *',
+    schedule = '5/30 * * * *',
     arg_name = 'timer',
     run_on_startup = False
 )
@@ -281,7 +281,7 @@ def redstag_send_shipment_pipeline(timer: af.TimerRequest):
 #region RedStag - Retrieve Inventory
 #          4:10am-11:10pm, once/2hrs
 @app.timer_trigger(
-    schedule = '10 4-23/2 * * *',
+    schedule = '10 */2 * * *',
     arg_name = 'timer',
     run_on_startup = False
 )

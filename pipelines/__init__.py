@@ -15,3 +15,4 @@ from .notify_fulfillment_ops import NotifyFulfillmentOps
 from .acu_deletions import AcumaticaDeletions
 from .address_validator import AddressValidator
 from .criteo import Criteo
+from .hubspot_send_order_data import SendHubSpotOrderData

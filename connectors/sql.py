@@ -237,7 +237,10 @@ class SQLConnector(Generic[QT]):
         **_create_engine** creates connection string using creds from :data:`~config.settings.DATABASES`
         '''
         self.pipeline = pipeline
-        self.logger = logging.getLogger(f'{database_name}')
+        if type(pipeline) == str:
+            self.logger = logging.getLogger(f'{pipeline}.{database_name}')
+        else:
+            self.logger = logging.getLogger(f'{pipeline.pipeline_name}.{database_name}')
         if database_name not in DATABASES:
             raise ValueError(f'Unknown db!')
 

@@ -37,9 +37,12 @@ class RMIXML:
         >>> self.results = []
         
         **self.login** logs in using creds from :data:`~config.settings.RMI`
-        """        
+        """
         self.pipeline = pipeline
-        self.logger = logging.getLogger(f'{pipeline.pipeline_name}.rmi_xml')
+        if type(pipeline) == str:
+            self.logger = logging.getLogger(f'{pipeline}.rmi_xml')
+        else:
+            self.logger = logging.getLogger(f'{pipeline.pipeline_name}.rmi_xml')
         self.session = requests.Session()
         self.login()
         self.send_url = 'https://jhl.returnsmanagement.com/webserviceV2/rma/rmaservice.asmx'

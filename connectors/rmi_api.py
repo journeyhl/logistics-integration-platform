@@ -38,7 +38,8 @@ class RMIAPI():
         >>> self._auth()
         
         **self._auth** Authenticates using creds from :data:`~config.settings.RMI`
-        """        
+        """
+        self.pipeline = pipeline
         if type(pipeline) == str:
             self.logger = logging.getLogger(f'{pipeline}.rmi_api')
         else:

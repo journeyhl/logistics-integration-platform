@@ -37,12 +37,12 @@ class AcumaticaAPI:
         >>> self._auth() #logs into Acumatica API
         
         **self._auth** Authenticates using creds from :data:`~config.settings.ACUMATICA_API`
-        """        
+        """    
+        self.pipeline = pipeline    
         if type(pipeline) == str:            
             self.logger = logging.getLogger(f'{pipeline}.acu_api')
         else:
             self.logger = logging.getLogger(f'{pipeline.pipeline_name}.acu_api')
-        self.pipeline = pipeline
         self.version = '22.200.001'
         self.auth_type = 'Cookie'
         self.uri = 'https://erp.journeyhl.com/entity'

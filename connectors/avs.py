@@ -44,12 +44,12 @@ class AddressVerificationSystem:
             "Content-Type": "application/json"
         }
         >>> self.session = requests.Session()
-        """        
+        """       
+        self.pipeline = pipeline 
         if type(pipeline) == str:            
             self.logger = logging.getLogger(f'{pipeline}.avs')
         else:
             self.logger = logging.getLogger(f'{pipeline.pipeline_name}.avs')
-        self.pipeline = pipeline
         self.base_uri = 'https://rest.avatax.com'
         self.endpoint_validate = f'{self.base_uri}/api/v2/addresses/resolve'
         self.credentials = f"{AVS['account']}:{AVS['license']}"
