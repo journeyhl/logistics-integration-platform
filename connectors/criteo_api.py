@@ -15,7 +15,7 @@ class CriteoAPI:
     
     CriteoAPI is an api connector for the Criteo ad api
     
-    ## Functions 
+    ## Methods 
      ### :meth:`~__init__`
         #### Initializes Criteo API connector and Authenticates
      ### :meth:`~_auth`

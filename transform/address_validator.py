@@ -16,11 +16,11 @@ class Transform:
         for order in data_extract.iter_rows(named=True):
             if order['Match'] == 1:
                 self.logger.info(f'{order['OrderNbr']}: Customer has same original Shipping/ Billing address')
-                order_avs = self.pipeline.avs.validate(order, 's')
+                order_avs = self.pipeline.avs.validate(order_data=order, s_or_b='s')
             else:
                 self.logger.info(f'{order['OrderNbr']}: Customer has different original Shipping/ Billing addresses')
-                order_avs = self.pipeline.avs.validate(order, 's') #validate both
-                order_avs = self.pipeline.avs.validate(order, 'b') #validate both
+                order_avs = self.pipeline.avs.validate(order_data=order, s_or_b='s') #validate both
+                order_avs = self.pipeline.avs.validate(order_data=order, s_or_b='b') #validate both
             if order_avs.get(f'vsAddressLine1') == None:
                 self.logger.error(f'{order_avs['OrderNbr']}: No AddressLine1 returned from AVS')
                 bp = 'ERROR'
@@ -98,6 +98,24 @@ class Transform:
         return payload
     
     def format_acu_api_log_update_override(self, order_avs: dict):
+        '''`format_acu_api_log_update_override`(self, order_avs: *dict*)
+        ---
+        <hr>
+        
+        Formats the constant part of the dict of data that we'll load to **_util.acu_api_log** when overriding and updating an address
+            
+        <hr>
+        
+        Parameters
+        ---
+        :param (*dict*) `order_avs`: Dictionary containing **OrderNbr**, and **update_order_address_payload** (the return from :meth:`~format_order_address_payload`)
+        
+        <hr>
+        
+        Returns
+        ---
+        :return `data_log_entry` (dict): _description_
+        '''
         data_log_entry = {            
             'Entity': 'SalesOrder',
             'KeyValue': f'{order_avs['OrderNbr']}',
@@ -107,6 +125,24 @@ class Transform:
         return data_log_entry
     
     def format_acu_api_log_validate(self, order_avs: dict):
+        '''`format_acu_api_log_validate`(self, order_avs: *dict*)
+        ---
+        <hr>
+        
+        Formats the constant part of the dict of data that we'll load to **_util.acu_api_log** when
+            
+        <hr>
+        
+        Parameters
+        ---
+        :param (*dict*) `order_avs`: Dictionary containing **OrderNbr**, and **update_order_address_payload** (the return from :meth:`~format_order_address_payload`)
+        
+        <hr>
+        
+        Returns
+        ---
+        :return `data_log_entry` (dict): constant values used for _util.acu_aupi_log
+        '''
         data_log_entry = {            
             'Entity': 'SalesOrder',
             'KeyValue': f'{order_avs['OrderNbr']}',

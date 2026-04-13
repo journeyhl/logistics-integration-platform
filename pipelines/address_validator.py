@@ -6,6 +6,22 @@ from load.address_validator import Load
 import json
 import time
 class AddressValidator(Pipeline):
+    '''`AddressValidator`()
+    ---
+    <hr>
+    
+    put_summary_here
+
+    # Extraction
+     - Returns Sales Orders from **AcumaticaDb** that require address validation
+        - Currently looks at **WB** orders in **Open** status that **do not have a validated address**
+
+    # Transformation
+     - 
+
+    # Load
+     - 
+    '''
     def __init__(self):
         super().__init__('address-validator')
         self.avs = AddressVerificationSystem(self)

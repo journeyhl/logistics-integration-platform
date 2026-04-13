@@ -2,6 +2,32 @@ from . import Pipeline
 import polars as pl
 
 class AcumaticaDeletions(Pipeline):
+    '''`AcumaticaDeletions`(Pipeline)
+    ---
+    <hr>
+    
+    Pipeline to extract deleted records from **SOOrder**, **SOLine**, **SOOrderShipment** and **SOShipment** in *Acumatica* and load them to ***db_CentralStore***
+    
+    # Extraction
+     - Returns records from **AcumaticaDb** that were deleted in Acumatica within the past two hours from tracked tables with triggers enabled
+     - Tracked Tables:
+        - **SOOrderDeletions**
+        - **SOLineDeletions**
+        - **SOShipmentDeletions**
+        - **SOOrderShipmentDeletions**
+
+
+    # Transformation
+     - Transforms *polars DataFrames* retrieved by :meth:`~extract` to a list of dicts
+
+    # Load
+     - Using :class:`~connectors.sql.SQLConnector`.:meth:`~connectors.sql.SQLConnector.checked_upsert`, upsert to respective **_util** table
+        - **SOOrderDeletions** -> ***_util.SOOrderDeletions***
+        - **SOLineDeletions** -> ***_util.SOLineDeletions***
+        - **SOShipmentDeletions** -> ***_util.SOShipmentDeletions***
+        - **SOOrderShipmentDeletions** -> ***_util.SOOrderShipmentDeletions***
+
+    '''
     def __init__(self):
         super().__init__('acumatica-deletions')
 
