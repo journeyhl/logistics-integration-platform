@@ -2,8 +2,9 @@ import azure.functions as af #type: ignore
 app = af.FunctionApp()
 
 #region RMI - Send Shipments & Returns
+#                 3x/hour (10, 20, 40)
 @app.timer_trigger(
-    schedule = '10/30 * * * *',
+    schedule = '20,10/30 * * * *',
     arg_name = 'timer',
     run_on_startup = False    
 )
@@ -49,6 +50,7 @@ def rmi_send_shipment_return_pipeline(timer: af.TimerRequest):
 
 
 #region RMI - Data Retrieval
+#                1x/hour (25)
 @app.timer_trigger(
     schedule = '25 * * * *',
     arg_name = 'timer',
@@ -120,6 +122,7 @@ def rmi_data_retrieval_pipeline(timer: af.TimerRequest):
 
 
 #region RMI/Acu - Create Receipts
+#                    1x/hour (50)
 @app.timer_trigger(
     schedule = '50 * * * *',
     arg_name = 'timer',
@@ -170,6 +173,7 @@ def create_acu_receipts(timer: af.TimerRequest):
 
 
 #region Acu - Confirm Shipments
+#           3x/hour (0, 20, 40)
 @app.timer_trigger(
     schedule = '*/20 * * * *',
     arg_name = 'timer',
@@ -204,6 +208,7 @@ def confirm_acu_shipments(timer: af.TimerRequest):
 
 
 #region Acu - Pack Shipments
+#    4x/hour (0, 15, 30, 45)
 @app.timer_trigger(
     schedule = '*/15 * * * *',
     arg_name = 'timer',
@@ -245,9 +250,9 @@ def pack_shipments(timer: af.TimerRequest):
 
 
 #region Redstag - Send Shipments 
-#        4:35am-11:35pm, once/hr
+#           3x/hour (05, 15, 35)
 @app.timer_trigger(
-    schedule = '5/30 * * * *',
+    schedule = '15,5/30 * * * *',
     arg_name = 'timer',
     run_on_startup = False
 )
@@ -279,7 +284,7 @@ def redstag_send_shipment_pipeline(timer: af.TimerRequest):
 
 
 #region RedStag - Retrieve Inventory
-#          4:10am-11:10pm, once/2hrs
+#                     once/2hrs (10)
 @app.timer_trigger(
     schedule = '10 */2 * * *',
     arg_name = 'timer',
@@ -310,7 +315,7 @@ def redstag_inventory_retrieval(timer: af.TimerRequest):
 
 
 #region           Acumatica Deletions
-#       12:40am-11:40pm, once/hr
+#                        1x/hour (40)
 @app.timer_trigger(
     schedule = '40 * * * *',
     arg_name = 'timer',
@@ -343,7 +348,7 @@ def acu_deletions(timer: af.TimerRequest):
 
 
 #region         Address Validator
-#       12:55am-11:55pm, once/1hr
+#                   once/1hr (55)
 @app.timer_trigger(
     schedule = '55 * * * *',
     arg_name = 'timer',
@@ -385,7 +390,7 @@ def address_validator(timer: af.TimerRequest):
 
 
 #region               Criteo Ads
-#       12:01am-11:01pm, once/hr
+#                   once/hr (01)
 @app.timer_trigger(
     schedule = '1 * * * *',
     arg_name = 'timer',
