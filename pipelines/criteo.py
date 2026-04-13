@@ -9,6 +9,24 @@ from transform.criteo import Transform
 from typing import Literal
 
 class Criteo(Pipeline):
+    '''`Criteo`(Pipeline)
+    ---
+    <hr>
+
+    
+
+    # Extraction
+     - 
+
+    # Transformation
+     - 
+
+    # Load
+     - 
+
+    # Logging
+     - Upserts Acumatica API interactions to **_util.acu_api_log** 
+    '''
     def __init__(self):
         '''`init`()
         ---

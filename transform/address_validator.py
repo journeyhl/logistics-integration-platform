@@ -58,7 +58,7 @@ class Transform:
         
         Returns
         ---
-        :return `payload` (_type_): payload ready to send to Acumatica API (SalesOrder endpoint)
+        :return `payload` (dict): payload ready to send to Acumatica API (SalesOrder endpoint)
         '''
         payload = {
             "OrderType":   { "value": order_avs['OrderType'] },
@@ -129,7 +129,7 @@ class Transform:
         ---
         <hr>
         
-        Formats the constant part of the dict of data that we'll load to **_util.acu_api_log** when
+        Formats the constant part of the dict of data that we'll load to **_util.acu_api_log** when validating an address
             
         <hr>
         
@@ -155,7 +155,13 @@ class Transform:
 
 
     
-    def _log_differences(self, order_avs):
+    def _log_differences(self, order_avs: dict):
+        '''`_log_differences`(self, order_avs: *_type_*)
+        ---
+        <hr>
+        
+        Notes differences between the original address we got from Acumatica and the response from AVS
+        '''
         self.logger.info(f'{order_avs['OrderNbr']}: Comparing AVS address to original...')
         if order_avs['Match'] == 1:
             for (current, new, name) in [
@@ -191,26 +197,3 @@ class Transform:
                 bp = 'here'
 
 
-
-#region Delete?
-    def format_customer_address_payload(self, order_avs: dict):
-        payload = {
-            "CustomerID": {"value": order_avs['AcctCD']},
-            "MainContact": {
-                "Address": {
-                    "AddressLine1": {"value": order_avs['vAddressLine1']},
-                    "AddressLine2": {"value": order_avs['vAddressLine2']},
-                    "City":         {"value": order_avs['vCity']},
-                    "State":        {"value": order_avs['vState']},
-                    "PostalCode":   {"value": order_avs['vPostalCode']},
-                    "Country":    {"value": order_avs['vCountryID']},
-                }
-            }
-        }
-        # order_avs['vAddressLine2'] = None if order_avs['AddressLine2'] == None and order_avs['vAddressLine2'] == '' else order_avs['vAddressLine2']
-        # order_avs['vAddressLine2'] = '' if order_avs['AddressLine2'] == '' and order_avs['vAddressLine2'] == None else order_avs['vAddressLine2']
-        # if order_avs['AddressLine2'] != order_avs['vAddressLine2']:
-        #     payload['MainContact']['Address']['AddressLine2'] ={"value": order_avs['vAddressLine2']}
-        self._log_differences(order_avs)
-        return payload
-#endregion Delete? 

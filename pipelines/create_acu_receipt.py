@@ -11,25 +11,40 @@ from connectors import AcumaticaAPI
 import json
 
 class CreateAcuReceipt(Pipeline):
-    '''CreateAcuReceipt
-===
-Queries CentralStore for any RMA orders with an RMAStatus of CLOSED and a DFStatus of RECEIVED
-    * These orders should be Receipted in Acumatica if it's not already done so
+    '''`CreateAcuReceipt`(Pipeline:)
+    ---
+    <hr>
 
-Queries Acudb for any RC Orders that are pending Receipt creation
+    Pipeline to create a Receipt for any RC type Orders in Acumatica that, from RMI, have an *RMAStatus* of **CLOSED** and a *DFStatus* of **RECEIVED**
 
-Matches Orders across datasets to find any Acumatica Orders that are ready to be Receipted.
+    # Extraction
+     - Queries CentralStore for any RMA orders with an RMAStatus of CLOSED and a DFStatus of RECEIVED
+        - These orders should be Receipted in Acumatica if it's not already done so
+     - Queries Acudb for any RC Orders that are pending Receipt creation
 
-*For each* Matched Order:
- * Check if it has a *Receipt*(Shipment) or not via *Acumatica API*
-    * If Receipt, retrieve details via *Acu API*
-    * If no Receipt, create one via *Acu API* then retrieve details
- * For *each line* on the Shipment:
-    * Verify the **Reason Code** is set to **RETURN**. If not, update via *Acu API*
- * If there's no **Package** *or* the # of lines on the Package != Line Details, create Package
- * Verify Shipment Details and Package Items and Quantities match
- * If all checks are passed, Confirm Shipment
+    # Transformation
+     - Matches Orders across datasets to find any Acumatica Orders that are ready to be Receipted.
 
+    # Load
+     - ***For each*** matched order:
+        - Check if it has a *Receipt*(Shipment) or not via :class:`~connectors.acu_api.AcumaticaAPI`.:meth:`~connectors.acu_api.AcumaticaAPI.sales_order_get_shipment`
+        - If Receipt: 
+            - Retrieve details via :class:`~connectors.acu_api.AcumaticaAPI`.:meth:`~connectors.acu_api.AcumaticaAPI.shipment_details`
+            - Determine if we should add package or try to retrieve details
+                - Add package via :class:`~connectors.acu_api.AcumaticaAPI`.:meth:`~connectors.acu_api.AcumaticaAPI.add_package`
+                - Retrieve details via :class:`~connectors.acu_api.AcumaticaAPI`.:meth:`~connectors.acu_api.AcumaticaAPI.get_package_details`
+        - If **NO** Receipt:
+            - Create Receipt(shipment) via :class:`~connectors.acu_api.AcumaticaAPI`.:meth:`~connectors.acu_api.AcumaticaAPI.order_create_receipt`
+            - Check for Shipment on Order via :class:`~connectors.acu_api.AcumaticaAPI`.:meth:`~connectors.acu_api.AcumaticaAPI.sales_order_get_shipment`
+            - Retrieve details via :class:`~connectors.acu_api.AcumaticaAPI`.:meth:`~connectors.acu_api.AcumaticaAPI.shipment_details`
+            - Add package via :class:`~connectors.acu_api.AcumaticaAPI`.:meth:`~connectors.acu_api.AcumaticaAPI.add_package`
+        - For each line:
+            - Check that the Reason Code is set to **RETURN**. If not, update via :class:`~connectors.acu_api.AcumaticaAPI`.:meth:`~connectors.acu_api.AcumaticaAPI.update_reason_code`
+        - Check if Shipment is ready to be confirmed by verifying Shipment Details and Package Items and Quantities match
+        - If ready, Confirm Shipment via :class:`~connectors.acu_api.AcumaticaAPI`.:meth:`~connectors.acu_api.AcumaticaAPI.confirm_shipment`
+
+    # Logging
+     - Upserts Acumatica API interactions to **_util.acu_api_log** 
     '''
     def __init__(self):
         super().__init__('create-receipts')

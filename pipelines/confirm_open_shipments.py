@@ -4,6 +4,25 @@ from connectors import AcumaticaAPI
 import json
 import time
 class ShipmentsReadyToConfirm(Pipeline):
+    '''`ShipmentsReadyToConfirm`(Pipeline:)
+    ---
+    <hr>
+
+    Pipeline to confirm any **Open** Shipments that are **fully packed**    
+
+    # Extraction
+     - Extracts data using :attr:`~connectors.sql.AcumaticaDbQueries.ShipmentsReadyToConfirm` query
+
+    # Transformation
+     - Transforms :attr:`~connectors.sql.AcumaticaDbQueries.ShipmentsReadyToConfirm` result to a list of dictionaries, each containing ShipmentNbr
+
+
+    # Load
+     - Confirms Shipments coming from :meth:`~transform` via :meth:`~connectors.acu_api.AcumaticaAPI.confirm_shipment`
+
+    # Logging
+     - Upserts Acumatica API interactions to **_util.acu_api_log** 
+    '''
     def __init__(self):
         super().__init__('shipment-confirmations')
         self.acu_api = AcumaticaAPI(self)

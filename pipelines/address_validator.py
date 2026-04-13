@@ -6,21 +6,30 @@ from load.address_validator import Load
 import json
 import time
 class AddressValidator(Pipeline):
-    '''`AddressValidator`()
+    '''`AddressValidator(Pipeline)`
     ---
     <hr>
     
-    put_summary_here
+    Pipeline to ***override, update and validate*** any unvalidated addresses on WB orders with a status of **On Hold**. Afterwards, **Removes from hold** and **creates Shipment**
 
     # Extraction
      - Returns Sales Orders from **AcumaticaDb** that require address validation
         - Currently looks at **WB** orders in **Open** status that **do not have a validated address**
 
     # Transformation
-     - 
+     - Given a dictionary containing a response from AVS, format the payload needed to override and update a Customer's ShipTo Address on a particular **Order**
+     - Formats the constant part of the dict of data that we'll load to **_util.acu_api_log** when overriding and updating an address
+     - Formats the constant part of the dict of data that we'll load to **_util.acu_api_log** when validating an address
+
 
     # Load
-     - 
+     - Overrides and updates Order addresses
+     - Validates Order address
+     - Removes Order from hold
+     - Creates Shipment
+
+    # Logging
+     - Upserts Acumatica API interactions to **_util.acu_api_log**
     '''
     def __init__(self):
         super().__init__('address-validator')
