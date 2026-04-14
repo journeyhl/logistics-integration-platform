@@ -47,7 +47,7 @@ class Load:
             ):
                 shipment_data = self.pipeline.acu_api.add_package_v2(shipment_data)
             else:
-                shipment_data = self.pipeline.acu_api.get_package_details(shipment_data)
+                shipment_data = self.pipeline.acu_api.get_package_details(shipment_data, 'put')
             bp = 'here'
 
 
@@ -80,7 +80,7 @@ class Load:
                 if receipt_response['package_count'] == 0 or receipt_response['package_count'] != receipt_response['line_count']:
                     receipt_response = self.pipeline.acu_api.add_package(receipt_response)
                 else:
-                    receipt_response = self.pipeline.acu_api.get_package_details(receipt_response)
+                    receipt_response = self.pipeline.acu_api.get_package_details(receipt_response, 'put')
                 self.check_if_ready_for_confirm(receipt_response)
             else:
                 self.pipeline.acu_api.order_create_receipt(order)
