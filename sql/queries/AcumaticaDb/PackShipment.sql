@@ -22,7 +22,7 @@ else null end ShipStatus
      , case when splp.PackageLineNbr is not null then 'Has Package' else 'No Package' end Package
 from SOShipment s
 inner join SOShipLine sl on s.CompanyID = sl.CompanyID and s.ShipmentNbr = sl.ShipmentNbr  
-inner join SOShipLineSplit spl on s.CompanyID = spl.CompanyID and s.ShipmentNbr = spl.ShipmentNbr  
+inner join SOShipLineSplit spl on s.CompanyID = spl.CompanyID and s.ShipmentNbr = spl.ShipmentNbr  and sl.LineNbr = spl.LineNbr
 inner join InventoryItem i on s.CompanyID = i.CompanyID and sl.InventoryID = i.InventoryID and spl.InventoryID = i.InventoryID 
 inner join INSite si on s.CompanyID = si.CompanyID and s.SiteID = si.SiteID
 left join SOShipLineSplitPackage splp on s.CompanyID = splp.CompanyID and s.ShipmentNbr = splp.ShipmentNbr

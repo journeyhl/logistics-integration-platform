@@ -177,6 +177,9 @@ class Transform:
                 for shipment_line in data_extract.iter_rows(named=True)
             if shipment['ShipmentNbr'] == shipment_line['ShipmentNbr']
         ]
+        if len(item_payload) == 2 and item_payload[0]['item_ref'] == item_payload[1]['item_ref']:
+            item_payload[0]['qty'] += item_payload[1]['qty']
+            item_payload = item_payload[:1]
         item_payload, ship_via = self._determine_shipvia(shipment=shipment, item_payload=item_payload)
         reference_numbers = {} if shipment['OrigOrderType'] != 'RT' else shipment['CustomerOrderNbr']
 

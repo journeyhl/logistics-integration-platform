@@ -188,28 +188,50 @@ class Transform:
         '''
         now = datetime.now(ZoneInfo('America/New_York')).strftime('%m/%d/%Y %H:%M:%S')
         descr = f'Package added via API @ {now}'
-        if self.package_contents.get((shipment_line_data['ShipmentNbr'], shipment_line_data['TrackingNbr_3pl'])) == None:
-            self.package_contents[(shipment_line_data['ShipmentNbr'], shipment_line_data['TrackingNbr_3pl'])] = [{
-                    "InventoryID": { "value": pkg_line_data['InventoryCD'] },
-                    "Quantity": { "value": pkg_line_data['Qty_3pl'] },
-                    "UOM": { "value": "EA" },
-                    "ShipmentSplitLineNbr": { "value": pkg_line_data['SplitLineNbr']}
-                }
-                for pkg_line_data in shipment_data if shipment_line_data['TrackingNbr_3pl'] == pkg_line_data['TrackingNbr_3pl'] and shipment_line_data['ShipmentNbr'] == pkg_line_data['ShipmentNbr']
-            ]
+        matched_shipment_data = [diff_track_nbr for diff_track_nbr in shipment_data if shipment_line_data['ShipmentNbr'] == diff_track_nbr['ShipmentNbr']]
+        # for pkg_line_data in shipment_data:
+        bp = 'here'
+        packages = []
 
-        package_payload = {
-            "ShipmentNbr": { "value": f"{shipment_line_data['ShipmentNbr']}" },
-            "Packages": [
-                {
+        if shipment_line_data['ShipmentNbr'] == '079754':
+            bp = 'here'
+        for i, line in enumerate(matched_shipment_data):
+            if self.package_contents.get((line['ShipmentNbr'], line['TrackingNbr_3pl'])) == None:
+                distinct_items = len({line['InventoryCD'] for line in matched_shipment_data})
+                qty_value = line['Qty_3pl'] if distinct_items == len(matched_shipment_data) else line['ShipQty']
+                
+                self.package_contents[(line['ShipmentNbr'], line['TrackingNbr_3pl'])] = [{
+                        "InventoryID": { "value": pkg_line_data['InventoryCD'] },
+                        "Quantity": { "value": qty_value },
+                        "UOM": { "value": "EA" },
+                        "ShipmentSplitLineNbr": { "value": pkg_line_data['SplitLineNbr']}
+                    }
+                    for j, pkg_line_data in enumerate(matched_shipment_data) if line['TrackingNbr_3pl'] == pkg_line_data['TrackingNbr_3pl'] and line['ShipmentNbr'] == pkg_line_data['ShipmentNbr']
+                ]
+                package = {
                     "BoxID": { "value": "DEFAULT BOX" },
-                    "TrackingNbr": { "value": f"{shipment_line_data['TrackingNbr_3pl']}" },
+                    "TrackingNbr": { "value": f"{line['TrackingNbr_3pl']}" },
                     "Description": { "value": f"{descr}" },
                     "Weight": { "value": 0 },
                     "UOM": { "value": "LBS" },
-                    "PackageContents": self.package_contents[(shipment_line_data['ShipmentNbr'], shipment_line_data['TrackingNbr_3pl'])]
+                    "PackageContents": self.package_contents[(line['ShipmentNbr'], line['TrackingNbr_3pl'])]
                 }
-            ]
+                packages.append(package)
+                bp = 'here'
+                
+        # if self.package_contents.get((shipment_line_data['ShipmentNbr'], shipment_line_data['TrackingNbr_3pl'])) == None:
+        #     self.package_contents[(shipment_line_data['ShipmentNbr'], shipment_line_data['TrackingNbr_3pl'])] = [{
+        #             "InventoryID": { "value": pkg_line_data['InventoryCD'] },
+        #             "Quantity": { "value": pkg_line_data['Qty_3pl'] },
+        #             "UOM": { "value": "EA" },
+        #             "ShipmentSplitLineNbr": { "value": pkg_line_data['SplitLineNbr']}
+        #         }
+        #         for pkg_line_data in shipment_data if shipment_line_data['TrackingNbr_3pl'] == pkg_line_data['TrackingNbr_3pl'] and shipment_line_data['ShipmentNbr'] == pkg_line_data['ShipmentNbr']
+        #     ]
+
+        package_payload = {
+            "ShipmentNbr": { "value": f"{shipment_line_data['ShipmentNbr']}" },
+            "Packages": packages
         }
 
         return package_payload
@@ -260,14 +282,26 @@ class Transform:
                 redstag_row = {
                     'ShipmentNbr': row['ShipmentNbr_3pl'],
                     'InventoryCD': items[0]['sku'],
-                    'TrackingNbr': tracking_nbrs[0],
+                    'TrackingNbr': tracking_nbrs[0] if len(tracking_nbrs) == 1 else tracking_nbrs[1],
                     'Qty': items[0]['quantity'],
                     'Courier': packages[0]['manifest_courier'],
                     'order_item_qty': items[0]['order_item_qty']
                 }
                 redstag_events.append(redstag_row)
             else:
-                bp = 'here'
+                for i, item in enumerate(items):
+                    redstag_row = {
+                        'ShipmentNbr': row['ShipmentNbr_3pl'],
+                        'InventoryCD': item['sku'],
+                        'TrackingNbr': tracking_nbrs[0] if len(tracking_nbrs) == 1 else tracking_nbrs[i],
+                        'Qty': item['quantity'],
+                        'Courier': packages[0]['manifest_courier'] if len(packages) == 1 else packages[i]['manifest_courier'],
+                        'order_item_qty': item['order_item_qty']
+                    }
+                    redstag_events.append(redstag_row)
+                    bp = 'here'
             bp = 'here'
         bp = 'here'
         return redstag_events
+    
+    # def get_redstag_row(self)
