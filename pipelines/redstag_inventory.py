@@ -8,6 +8,24 @@ from transform.redstag_inventory import Transform
 
 
 class RedStagInventory(Pipeline):
+    '''`RedStagInventory`(Pipeline:)
+    ---
+    <hr>
+
+    Pipeline to retrieve inventory levels from RedStag 3PL through their API and load to db_CentralStore (**RedstagInventorySummary** and **RedstagInventoryDetail**)
+    
+    # Extraction
+     - Extracts detailed inventory data from RedStag via :class:`~connectors.redstag_api.RedStagAPI`.:meth:`~connectors.redstag_api.RedStagAPI.target_api`
+
+    # Transformation
+     - Transforms response from RedStag to a dictionary containing two lists of dicts for upsert to **RedstagInventorySummary** and **RedstagInventoryDetail**
+
+    # Load
+     - Loads Inventory Summary and Detail level data to **RedstagInventorySummary** and **RedstagInventoryDetail** via :class:`~connectors.sql.SQLConnector`.:meth:`~connectors.sql.SQLConnector.checked_upsert`
+     
+    # Results Logging
+     - None needed
+    '''
 
     def __init__(self):
         super().__init__('redstag-inventory')

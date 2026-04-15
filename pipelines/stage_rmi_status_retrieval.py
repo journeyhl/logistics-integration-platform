@@ -4,6 +4,25 @@ import polars as pl
 
 
 class StageRMIStatusRetrieval(Pipeline):
+    '''`GetStatusFromRMI`(Pipeline)
+    ---
+    <hr>
+
+    Gets all recently sent Shipments & Returns and recently retrieved ClosedShipments and Receipts
+
+    # Extraction
+     - Gets all recently sent Shipments & Returns and recently retrieved ClosedShipments and Receipts from db_CentralStore
+
+    # Transformation
+     - Transforms extracted data into a list of distinct RMANumbers
+
+    # Load
+     - Skipped
+
+    # Logging
+     - None needed
+    '''
+
     def __init__(self):
         super().__init__('rmi-status-staging')
 

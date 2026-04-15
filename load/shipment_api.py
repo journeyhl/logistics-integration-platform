@@ -42,8 +42,8 @@ class Load:
             shipment_data = self.pipeline.acu_api.shipment_details(data)
             if (shipment_data['package_count'] == 0
             or shipment_data['package_count'] != shipment_data['line_count']
-            or len(shipment_data['PackageLines']) != shipment_data['package_count']
-            or len(shipment_data['PackageLines']) != shipment_data['line_count']
+            # or len(shipment_data['PackageLines']) != shipment_data['package_count']
+            # or len(shipment_data['PackageLines']) != shipment_data['line_count']
             ):
                 shipment_data = self.pipeline.acu_api.add_package_v2(shipment_data)
             else:

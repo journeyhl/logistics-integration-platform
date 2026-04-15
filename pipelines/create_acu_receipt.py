@@ -43,7 +43,7 @@ class CreateAcuReceipt(Pipeline):
         - Check if Shipment is ready to be confirmed by verifying Shipment Details and Package Items and Quantities match
         - If ready, Confirm Shipment via :class:`~connectors.acu_api.AcumaticaAPI`.:meth:`~connectors.acu_api.AcumaticaAPI.confirm_shipment`
 
-    # Logging
+    # Results Logging
      - Upserts Acumatica API interactions to **_util.acu_api_log** 
     '''
     def __init__(self):

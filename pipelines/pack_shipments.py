@@ -5,6 +5,35 @@ from load.shipment_api import Load
 import json
 
 class PackShipments(Pipeline):
+    '''`PackShipments`(Pipeline:)
+    ---
+    <hr>
+
+    Pipeline to pack any Shipments that have tracking data from 3PLs
+    
+    # Extraction
+     - Four data sources are queried:
+        - **central_extract**: Query originally drove the RedStag Confirmations celigo flow. Pulls shipments from CentralStore using the acu.rs_ tables to determine which should be shipped
+            - Query: **PackShipmentRedStag**
+        - **redstag_event_extract**: Uses the json.RedStagEvents table to get all rows where json_value(jsonData, '$.topic') = 'shipment:packed'
+            - Query: **RedStagEvents**
+        - **rmi_extract**: Pulls closed Shipments from rmi_ClosedShipments
+            - Query: **PackShipmentRMI**
+        - **acu_extract**: Query from adf that populates acu.rsFulfill. Pulls Open Shipments without Tracking data
+            - Query: **PackShipment**
+
+    # Transformation
+     - For each shipment in **acu_extract**, determine if a match can be found in the other data sources. If a match is found, format the payloads we'll need to drop to Acumatica
+
+    # Load
+     - In :meth:`~load.shipment_api.Load.load_shipments`, for each shipment ***that was matched***, hit the :class:`~connectors.acu_api.AcumaticaAPI` to get the Shipment's details (:meth:`~connectors.acu_api.AcumaticaAPI.shipment_details`)
+     - In we need to add a package, add it and get details, if not, just get details of package.
+        - :meth:`~connectors.acu_api.AcumaticaAPI.add_package_v2` and :meth:`~connectors.acu_api.AcumaticaAPI.get_package_details`
+
+    # Results Logging
+     - Upserts Acumatica API interactions to **_util.acu_api_log** 
+    '''
+
     def __init__(self):
         super().__init__('pack-shipments')
         self.acu_api = AcumaticaAPI(self)

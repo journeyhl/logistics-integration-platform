@@ -20,7 +20,7 @@ class ShipmentsReadyToConfirm(Pipeline):
     # Load
      - Confirms Shipments coming from :meth:`~transform` via :meth:`~connectors.acu_api.AcumaticaAPI.confirm_shipment`
 
-    # Logging
+    # Results Logging
      - Upserts Acumatica API interactions to **_util.acu_api_log** 
     '''
     def __init__(self):

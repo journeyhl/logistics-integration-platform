@@ -8,15 +8,24 @@ from connectors import RMIAPI
 from transform.rmi_receipt_pull import Transform
 
 class GetStatusFromRMI(Pipeline):
-    '''GetStatusFromRMI
-===
-From CentralStore: 
- * Gets all recently pulled Closed Shipments and Receipts, 
- * Gets all recently sent Shipments & Returns
+    '''`GetStatusFromRMI`(Pipeline)
+    ---
+    <hr>
 
-For each row, hits RMI's rma endpoint to determine the status on their end.
+    After :class:`~pipelines.stage_rmi_status_retrieval.StageRMIStatusRetrieval` is run, re initialize GetStatusFromRMI for each RMANumber.
 
-Upserts results to **RMA_Statuses**
+    # Extraction
+     - Extract ClosedShipments data via :class:`~connectors.rmi_api.RMIAPI`.:meth:`~connectors.rmi_api.RMIAPI.get_rma`
+     - This pulls the status for each RMANumber we send
+
+    # Transformation
+     - Transforms extracted data into format needed for upsert to **rmi_RMAStatus**
+
+    # Load
+     - Upserts data to **rmi_RMAStatus** via :meth:`~connectors.sql.SQLConnector.checked_upsert`
+
+    # Logging
+     - None needed
     '''
     def __init__(self):
         super().__init__('rmi-status')

@@ -6,14 +6,36 @@ from transform.rmi_receipt_pull import Transform
 
 
 class GetClosedShipmentsFromRMI(Pipeline):
-    '''GetClosedShipmentsFromRMI
-===
+    '''`GetClosedShipmentsFromRMI`(Pipeline)
+    ---
+    <hr>
 
-Hits RMI's *ClosedShipmentsV1* endpoint
+    Hits RMI's *ClosedShipmentsV1* endpoint, retrieves all Closed Shipments and upsert to **rmi_ClosedShipments** in db_CentralStore
 
-Upserts to **rmi_ClosedShipments**
+    # Extraction
+     - Extract ClosedShipments data via :class:`~connectors.rmi_api.RMIAPI`.:meth:`~connectors.rmi_api.RMIAPI.closed_shipments`
+
+    # Transformation
+     - Transforms extracted data into format needed for upsert to **rmi_ClosedShipments**
+
+    # Load
+     - Upserts data to **rmi_ClosedShipments** via :meth:`~connectors.sql.SQLConnector.checked_upsert`
+
+    # Results Logging
+     - None needed
     '''
     def __init__(self):
+        '''`__init__`(self)
+        ---
+        <hr>
+        
+        Initializes GetClosedShipmentsFromRMI Pipeline 
+        
+        Sets
+        ---
+        >>> self.rmi = RMIAPI(self)
+        >>> self.transformer = Transform(self)  
+        '''
         super().__init__('rmi-shipments')
         self.rmi = RMIAPI(self)
         self.transformer = Transform(self)

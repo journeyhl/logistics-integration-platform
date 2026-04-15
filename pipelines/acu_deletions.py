@@ -27,8 +27,8 @@ class AcumaticaDeletions(Pipeline):
         - **SOShipmentDeletions** -> ***_util.SOShipmentDeletions***
         - **SOOrderShipmentDeletions** -> ***_util.SOOrderShipmentDeletions***
 
-    # Logging
-     - Upserts Acumatica API interactions to **_util.acu_api_log**
+    # Results Logging
+     - None needed
     '''
     def __init__(self):
         super().__init__('acumatica-deletions')

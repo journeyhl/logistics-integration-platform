@@ -28,7 +28,7 @@ class AddressValidator(Pipeline):
      - Removes Order from hold
      - Creates Shipment
 
-    # Logging
+    # Results Logging
      - Upserts Acumatica API interactions to **_util.acu_api_log**
     '''
     def __init__(self):

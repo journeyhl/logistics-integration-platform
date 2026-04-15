@@ -13,19 +13,22 @@ class Criteo(Pipeline):
     ---
     <hr>
 
-    
+    Pipeline to load incremental Criteo ad data from their API to db_CentralStore
 
     # Extraction
-     - 
+     - Extracts data from **criteo.campaign_performance_daily** via :class:`~connectors.sql.SQLConnector`.:meth:`~connectors.sql.SQLConnector.query_db`
+     - Extracts data from Criteo's API with parameters set in :meth:`~_re_init` via :class:`~connectors.criteo_api.CriteoAPI`.:meth:`~connectors.criteo_api.CriteoAPI.fetch_campaign_data`
+        
 
     # Transformation
-     - 
+     - Transforms data_extract with **`self.transformer`**, :class:`~transform.criteo.Transform`
 
     # Load
-     - 
+     - Upserts data to **criteo.campaign_performance_daily** and **criteo.diff_log** via :meth:`~connectors.sql.SQLConnector.checked_upsert`
+        - If any Campaigns are found to have different results from the intial database extraction, a difference will be marked in **criteo.diff_log**
 
-    # Logging
-     - Upserts Acumatica API interactions to **_util.acu_api_log** 
+    # Results Logging
+     - None needed
     '''
     def __init__(self):
         '''`init`()

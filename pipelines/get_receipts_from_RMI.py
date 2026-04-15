@@ -3,13 +3,24 @@ from connectors import RMIAPI, SQLConnector
 from transform.rmi_receipt_pull import Transform
 
 class GetReceiptsFromRMI(Pipeline):
-    '''GetReceiptsFromRMI
-===
+    '''`GetReceiptsFromRMI`(Pipeline)
+    ---
+    <hr>
 
-Hits RMI's *Receipts* endpoint
+    Hits RMI's *Receipts* endpoint, retrieves all Receipts and upsert to **rmi_Receipts** in db_CentralStore
 
-Upserts results to **rmi_Receipts**
-'''
+    # Extraction
+     - Extract ClosedShipments data via :class:`~connectors.rmi_api.RMIAPI`.:meth:`~connectors.rmi_api.RMIAPI.get_receipts`
+
+    # Transformation
+     - Transforms extracted data into format needed for upsert to **rmi_Receipts**
+
+    # Load
+     - Upserts data to **rmi_Receipts** via :meth:`~connectors.sql.SQLConnector.checked_upsert`
+
+    # Logging
+     - None needed
+    '''
     def __init__(self):
         super().__init__('rmi-receipts')
         self.rmi = RMIAPI(self)
