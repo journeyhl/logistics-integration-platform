@@ -4,12 +4,29 @@ from transform.rmi_send import Transform
 import polars as pl
 import json
 class SendRMIReturns(Pipeline):
-    '''SendRMIReturns
-===
+    '''`SendRMIReturns`(Pipeline:)
+    ---
+    <hr>
 
-Queries *AcumaticaDb* for any **Open RC Orders** from RMI that have **NOT** been sent to the warehouse
+    Pipeline to send Open RC Sales Orders that have a AttributeRCSHP2WH value that's null or not equal to 1
 
-Sends Return Order payload to RMI and upserts *_util.rmi_send_log*'''
+    ***Sent as Type 3***
+    
+    # Extraction
+     - Pulls all RC Sales Orders that are in Open status and have a AttributeRCSHP2WH value that is null or not equal to 1
+        - Query: SendRMIReturns
+    # Transformation
+     - Creates a dictionary with RMANumber as key, then holds a list containing a dict with data for each row (line) that Order has
+        
+    # Load
+     - Format the payload we'll send to RMI through :class:`~connectors.rmi_xml.RMIXML`.:meth:`~connectors.rmi_xml.RMIXML.post_3`
+        - To get the data for each line, we'll do so in :class:`~connectors.rmi_xml.RMIXML`.:meth:`~connectors.rmi_xml.RMIXML._format_3_lines`
+     - Once formatted, post to RMI via :class:`~connectors.rmi_xml.RMIXML`.:meth:`~connectors.rmi_xml.RMIXML.post_3`
+
+    # Results Logging
+     - Upserts Acumatica API interactions to **_util.acu_api_log** 
+     - Inserts RMI XML interactions to **_util.rmi_send_log**
+    '''
     def __init__(self):
         super().__init__('rmi-send-returns')
         self.transformer = Transform(self)

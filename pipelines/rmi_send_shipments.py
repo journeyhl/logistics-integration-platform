@@ -4,6 +4,37 @@ from transform.rmi_send import Transform
 import polars as pl
 import json
 class SendRMIShipments(Pipeline):
+    '''`SendRMIShipments`(Pipeline:)
+    ---
+    <hr>
+
+    Pipeline to send Open RC Sales Orders that have a AttributeRCSHP2WH value that's null or not equal to 1
+    
+    ***Sent as Type W***
+
+    # Extraction
+     - Pulls Shipments that are ready to be sent to RMI as type Ws
+        - OrigOrderType != 'RC'
+            - Order associated with Shipment is NOT a Return
+        - Status not in('C', 'L', 'F', 'I')
+            - Completed, Cancelled, Confirmed, Invoiced
+        - AttributeSHP2WH = 0
+            - Not sent to Warehouse
+        -SiteCD = 'RMI'
+            - Warehouse is RMI
+
+    # Transformation
+     - Creates a dictionary with RMANumber as key, then holds a list containing a dict with data for each row (line) that shipment has
+        
+    # Load
+     - Format the payload we'll send to RMI through :class:`~connectors.rmi_xml.RMIXML`.:meth:`~connectors.rmi_xml.RMIXML.post_w`
+        - To get the data for each line, we'll do so in :class:`~connectors.rmi_xml.RMIXML`.:meth:`~connectors.rmi_xml.RMIXML._format_w_lines`
+     - Once formatted, post to RMI via :class:`~connectors.rmi_xml.RMIXML`.:meth:`~connectors.rmi_xml.RMIXML.post_w`
+
+    # Results Logging
+     - Upserts Acumatica API interactions to **_util.acu_api_log** 
+     - Inserts RMI XML interactions to **_util.rmi_send_log**
+    '''
     '''SendShipments
 ===
 

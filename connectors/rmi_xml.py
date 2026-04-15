@@ -1,4 +1,9 @@
-import requests
+from __future__ import annotations
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from pipelines.rmi_send_shipments import SendRMIShipments
+    from pipelines.rmi_send_returns import SendRMIReturns
+    import requests
 from config.settings import RMI
 import json
 import xmltodict
@@ -8,7 +13,7 @@ import time
 import logging
 
 class RMIXML:
-    def __init__(self, pipeline):
+    def __init__(self, pipeline: SendRMIShipments | SendRMIReturns):
         """`init`(self, pipeline: *Pipeline | str*)
         ---
         <hr>

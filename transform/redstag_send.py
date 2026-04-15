@@ -25,7 +25,7 @@ class Transform:
         <hr>
 
         Transforms **data_extract**.
-
+        
         If there's no RedStag OrderID value in Acumatica, lookup the ShipmentNbr at RedStag to confirm it hasn't been sent yet
 
         Parameters

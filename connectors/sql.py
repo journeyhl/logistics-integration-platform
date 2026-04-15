@@ -112,8 +112,8 @@ class AcumaticaDbQueries(Queries):
      **AttributeSHP2WH** = **0**
         - Not sent to Warehouse
 
-     **SiteCD** = *'RedStag'*
-        - Warehouse is RMI'''
+     **left(SiteCD, 7)** = *'RedStag'* (This covers REDSTAGSWT and REDSTAGSLC)
+        - Warehouse is RedStag'''
 
     OpenRCsNoReceipt: Query
     '''Pulls all Open RC Orders that have been sent to RMI and do not have a Shipment(Receipt)
