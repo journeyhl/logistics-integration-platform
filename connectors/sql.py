@@ -56,6 +56,7 @@ class CentralStoreQueries(Queries):
     '''Pulls all Open Return orders from _util.RMI_Send_Log that are stuck with the Item does not exist error from RMI
     '''
 
+
 class AcumaticaDbQueries(Queries):
     '''Queries to be executed within AcumaticaDb'''
     SendRMIReturns: Query
@@ -194,6 +195,9 @@ class AcumaticaDbQueries(Queries):
 
     SOOrderShipmentDeletions: Query
     '''Pulls records from SOOrderShipment that have been deleted in Acumatica for transfer to db_CentralStore'''
+    AcuToDbc_Quotes: Query
+    '''Pulls Orders of QT Order Type for upsert to acu.Quotes
+    '''
 
 _QUERY_CLASSES: dict[str, type[Queries]] = {
     'db_CentralStore': CentralStoreQueries,
@@ -443,7 +447,7 @@ end
         :return `data_extract` (*pl.DataFrame*): polars DataFrame with results of query
         '''
         self.logger.info(f'Running {query.name} query...')
-        data = pl.read_database(str(query.query), self.engine)
+        data = pl.read_database(str(query.query), self.engine, infer_schema_length = None)
         self.logger.info(f'{data.height} rows returned')
         return data
     

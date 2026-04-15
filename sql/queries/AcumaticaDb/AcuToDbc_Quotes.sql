@@ -1,9 +1,9 @@
 
 
 select s.OrderType
-	 , s.OrderNbr
+	 , s.OrderNbr QuoteNbr
 	 , l.LineNbr LineNbr 
-	 , cast(s.OrderDate as date) Date
+	 , cast(s.OrderDate as date) DatePlaced
 	 , rtrim(b.AcctCD) CustomerID
 	 , b.AcctName CustomerName
 	 , c.CustomerClassID CustomerClass
@@ -18,7 +18,7 @@ select s.OrderType
 	 , o.AcctName SalespersonName
 	 , null SalespersonEmail
 	 , rtrim(sp.SalespersonCD) B2BSalesperson
-	 , l.DiscountID DicountCode
+	 , l.DiscountID DiscountCode
 	 , cast(l.DiscAmt  as decimal(18,2))	DiscountAmt
 	 , cast(l.ExtCost as decimal(18,2)) LineCost
 	 , cast(s.PaidAmt as decimal(18,2)) TotalPaid
@@ -31,9 +31,11 @@ select s.OrderType
 	 , sa.PostalCode	 Zip
 	 , sa.CountryID	 Country
 	 , cast(l.LineAmt  as decimal(18,2)) LineAmount
-	 , r.ReplenishmentClassID
+	 , r.ReplenishmentClassID ReplenishmentClass
 	 , i.StkItem StockItem
 	 , rtrim(si.SiteCD) OrderLineWH
+	 , s.LastModifiedDatetime LastModifiedDT
+	 , s.CreatedDatetime CreatedDT
 	 , ph.OrderType AttachedOrderType
 	 , ph.OrderNbr AttachedOrderNbr
 from SOOrder s 
@@ -69,6 +71,6 @@ and s.OrderType = 'QT'
 --and b.AcctCD in('')
 --and b.AcctName like '%%'
 --and c.CustomerClassID in('')
-order by Date desc
+order by DatePlaced desc
 
 
