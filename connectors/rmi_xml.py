@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from pipelines.rmi_send_shipments import SendRMIShipments
     from pipelines.rmi_send_returns import SendRMIReturns
-    import requests
+import requests
 from config.settings import RMI
 import json
 import xmltodict

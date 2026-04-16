@@ -71,6 +71,7 @@ and s.OrderType = 'QT'
 --and b.AcctCD in('')
 --and b.AcctName like '%%'
 --and c.CustomerClassID in('')
+-- and s.LastModifiedDateTime >= cast(getdate()-1 as date)
 order by DatePlaced desc
 
 

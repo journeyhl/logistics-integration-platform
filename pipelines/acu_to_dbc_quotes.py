@@ -21,13 +21,12 @@ class AcuToDbcQuotes(Pipeline):
         return data_extract
 
     def transform(self, data_extract: dict[str, pl.DataFrame]):
-        # acu_transformed = data_extract['acu_extract']
-        # dbc_transformed = data_extract['dbc_exctract']
         dbc_extract = data_extract['dbc_extract']
 
         acu_extract = data_extract['acu_extract'].join(
             dbc_extract, on='QuoteNbr', how='anti'
         )
+        # acu_extract = data_extract['acu_extract']
         acu_extract = acu_extract.with_columns(
             pl.col('LineNbr').fill_null(99).alias('LineNbr')
         ).to_dicts()
@@ -54,9 +53,10 @@ class AcuToDbcQuotes(Pipeline):
                 self.centralstore.checked_upsert('acu.Quotes', data_transformed[start:])
                 bp = 'here'
             bp = 'here'
-            
-
-
+        else:
+            for item in data_transformed:
+                item['LastChecked'] = datetime.now(ZoneInfo('America/New_York'))
+            self.centralstore.checked_upsert('acu.Quotes', data_transformed)
         data_loaded = data_transformed
         return data_loaded
     
