@@ -604,3 +604,8 @@ CRITEO = {
     'client_secret': os.getenv('CRITEO_CLIENT_SECRET'),
     'ad_id': os.getenv('CRITEO_ADVERTISER_ID')
 }
+
+
+KUSTOMER = {
+    'webhook': os.getenv('KUSTOMER_WEBHOOK')
+}

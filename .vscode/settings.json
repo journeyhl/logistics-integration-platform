@@ -9,6 +9,7 @@
     "python-envs.defaultEnvManager": "ms-python.python:system",
     "autoDocstring.docstringFormat": "one-line-sphinx",
     "autoDocstring.customTemplatePath": ".vscode/docstring.mustache",
+    "python.analysis.typeCheckingMode": "basic",
 
     
 }

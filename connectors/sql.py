@@ -57,6 +57,10 @@ class CentralStoreQueries(Queries):
     '''
     SalesOrderCleaner: Query
     '''Pulls all Sales Orders from acu.SalesOrders that have rows with different statuses.'''
+    Kustomer_FilteredOutOrders : Query
+    ''''''
+
+
 
 class AcumaticaDbQueries(Queries):
     '''Queries to be executed within AcumaticaDb'''
@@ -199,6 +203,12 @@ class AcumaticaDbQueries(Queries):
     AcuToDbc_Quotes: Query
     '''Pulls Orders of QT Order Type for upsert to acu.Quotes
     '''
+    Kustomer_OrderIngest : Query
+    """Pulls top level Order, Line and Customer data to be sent to Kustomer when **'ingest' *or* no params** are passed to :class:`~pipelines.kustomer.SendOrderDetailsToKustomer`.:meth:`~pipelines.kustomer.SendOrderDetailsToKustomer._re_init`"""
+    Kustomer_OrderIngestBackfill : Query
+    '''Pulls top level Order, Line and Customer data to be sent to Kustomer when **'backfill'** is passed as a param to :class:`~pipelines.kustomer.SendOrderDetailsToKustomer`.:meth:`~pipelines.kustomer.SendOrderDetailsToKustomer._re_init`'''
+    Kustomer_ShipmentData : Query
+    '''Pulls Shipments associated with the orders found in the Kustomer_OrderIngest (or Backfill) extract'''
 
 _QUERY_CLASSES: dict[str, type[Queries]] = {
     'db_CentralStore': CentralStoreQueries,

@@ -18,3 +18,4 @@ from .criteo import Criteo
 from .hubspot_send_order_data import SendHubSpotOrderData
 from .acu_to_dbc_quotes import AcuToDbcQuotes
 from .sales_order_cleaner import SalesOrderCleaner
+from .kustomer import SendOrderDetailsToKustomer

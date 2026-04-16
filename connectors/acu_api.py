@@ -320,7 +320,7 @@ class AcumaticaAPI:
 
 
 
-    def target_api(self, endpoint: str, payload_data: dict, operation: str = 'put', descr: str = None):
+    def target_api(self, endpoint: str, payload_data: dict, operation: str = 'put', descr: str = None): #type: ignore
         """`target_api`(self, endpoint: *str*, payload_data: *dict*, operation: *str*, descr: *str*)
         ---
         <hr>
