@@ -55,7 +55,8 @@ class CentralStoreQueries(Queries):
     NotifyFulfillmentOpsTeam: Query
     '''Pulls all Open Return orders from _util.RMI_Send_Log that are stuck with the Item does not exist error from RMI
     '''
-
+    SalesOrderCleaner: Query
+    '''Pulls all Sales Orders from acu.SalesOrders that have rows with different statuses.'''
 
 class AcumaticaDbQueries(Queries):
     '''Queries to be executed within AcumaticaDb'''
@@ -467,4 +468,5 @@ end
         self.logger.info(f'Executing query with raw_execute')
         db_msg = cursor.execute(query)
         self.raw_connection.commit()
-        return db_msg.rowcount
+        if cursor.rowcount:
+            self.logger.info(f'{cursor.rowcount} rows affected')

@@ -27,6 +27,9 @@ class AcumaticaDeletions(Pipeline):
         - **SOShipmentDeletions** -> ***_util.SOShipmentDeletions***
         - **SOOrderShipmentDeletions** -> ***_util.SOOrderShipmentDeletions***
 
+    # Clean
+     - After deletions are loaded, check **acu.SalesOrders** and **acu.Shipments** against our deletion tables and reconcile.
+
     # Results Logging
      - None needed
     '''
@@ -58,7 +61,54 @@ class AcumaticaDeletions(Pipeline):
                 self.centralstore.checked_upsert(f'_util.{item}', dict_list)
         else:
             self.logger.info(f'_util.{item}: No rows to load to CentralStore')
+        self.clean()
         return data_loaded
     
+    def clean(self):
+        cleaners = [
+            {
+                'name': 'sales_order_del',
+                'table': 'acu.SalesOrders',
+                'query': 'select s.* from acu.SalesOrders s inner join _util.SOOrderDeletions d on s.OrderNumber = d.OrderNbr',
+                'delete_cmd': '''
+                    delete from s
+                    from acu.SalesOrders s
+                    inner join _util.SOOrderDeletions d on s.OrderNumber = d.OrderNbr
+                '''
+            },
+            {
+                'name': 'sales_order_line_del',
+                'table': 'acu.SalesOrders',
+                'query': 'select s.* from acu.SalesOrders s inner join _util.SOLineDeletions d on s.OrderNumber = d.OrderNbr and s.LineNbr = d.LineNbr',
+                'delete_cmd': '''
+                    delete from s
+                    from acu.SalesOrders s
+                    inner join _util.SOLineDeletions d on s.OrderNumber = d.OrderNbr and s.LineNbr = d.LineNbr
+                '''
+            },
+            {
+                'name': 'ship_del',
+                'table': 'acu.Shipments',
+                'query': 'select s.* from acu.Shipments s inner join _util.SOShipmentDeletions d on s.ShipmentNbr = d.ShipmentNbr',
+                'delete_cmd': '''
+                    delete from s
+                    from acu.Shipments s
+                    inner join _util.SOShipmentDeletions d on s.ShipmentNbr = d.ShipmentNbr
+                '''
+            },
+        ]
+        for cleaner in cleaners:
+            self.logger.info(f'Cleaning {cleaner['table']}')
+            results = self.centralstore.query_db(cleaner['query'])
+            rows = results.height
+            self.logger.info(f'{rows} rows need to be deleted from {cleaner['table']} via {cleaner['name']} cleaner')
+            if rows > 0:
+                self.centralstore.raw_execute(cleaner['delete_cmd'])
+                self.logger.info(f'{rows} rows were deleted from {cleaner['table']}')
+            else:
+                bp = 'here'
+
+        bp = 'here'
+
     def log_results(self, data_loaded):
         pass
