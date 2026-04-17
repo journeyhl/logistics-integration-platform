@@ -14,6 +14,8 @@ This file generates the neccessary entry in TABLES (config/settings.py) for chec
 dbc = 'db_CentralStore'
 acudb = 'AcumaticaDb'
 query = '''
+
+with TopLevel as(
 select s.schema_id SchemaID
      , t.object_id TableID
      , c.column_id ColumnID
@@ -23,11 +25,22 @@ select s.schema_id SchemaID
      , case when k.object_id is not null then 'Key' 
             when c.is_nullable = 0 then 'Not Null (Maybe key)'
        else 'Update' end ColumnType
+     , row_number() over(partition by s.schema_id, t.object_id, c.column_id order by case when k.object_id is not null then 'Key' when c.is_nullable = 0 then 'Not Null (Maybe key)' else 'Update' end ) rownum
 from sys.schemas s
 inner join sys.tables t on s.schema_id = t.schema_id
 inner join sys.columns c on t.object_id = c.object_id
 left join sys.index_columns k on t.object_id = k.object_id and c.column_id = k.column_id 
 where s.name = '{schema}' and t.name = '{table}'
+)
+select t.SchemaID
+     , t.TableID
+     , t.ColumnID
+     , t.sName
+     , t.tName
+     , t.cName
+     , t.ColumnType
+from TopLevel t
+where rownum = 1
 '''
 
 db_input = input('Enter db name or at least first 2 characters: ').lower()

@@ -11,9 +11,56 @@ import io
 
 class Kustomer:
     def __init__(self, pipeline: SendOrderDetailsToKustomer) -> None:
-        pass
+        self.webhook = str(KUSTOMER['webhook'])
         self.pipeline = pipeline
         if type(pipeline) == str:
             self.logger = logging.getLogger(f'{pipeline}.kustomer_connector')
         else:
             self.logger = logging.getLogger(f'{pipeline.pipeline_name}.kustomer_connector')
+        
+        self.session = requests.Session()
+        pass
+
+
+
+    def target_api(self, payload_data: dict, operation: str = 'post', descr: str = None): #type: ignore
+        """`target_api`(self, endpoint: *str*, payload_data: *dict*, operation: *str*, descr: *str*)
+        ---
+        <hr>
+        
+        put_summary_here
+        
+        <hr>
+        
+        Parameters
+        ---
+        :param (*dict*) `payload_data`: Dictionary containing **execution_payload**, **log_update_success**, **log_update_error**  
+        :param (*str*) `operation`: API Operation (**PUT**, **POST**, **GET**)
+        :param (*str*) `descr`: What the payload will do
+
+        <hr>
+        
+        Returns
+        ---
+        :return `replace_me` (bool): replace_me
+        """
+        if operation == 'post':
+            try:
+                response = self.session.post(
+                    url = self.webhook,
+                    json='',
+                    headers={"Content-Type": "application/json"}
+                )
+                bp = 'here'
+            except Exception as e:
+                logging.error(f'Error! {e}')
+        printStr = ''
+
+        if response.ok:
+            # printStr = f'{order['OrderNbr']} sent successfully'
+            logging.info(f'{printStr}')
+        else:
+            logging.error(f'')
+            # printStr = f'{order['OrderNbr']} failed: {response.status_code} - {response.text}'
+
+        return printStr, response

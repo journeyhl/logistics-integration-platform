@@ -17,7 +17,7 @@ class Load:
     '''
     def __init__(self, pipeline: CreateAcuReceipt | PackShipments | SendRedStagShipments):
         self.pipeline = pipeline
-        self.logger = logging.getLogger(f'{pipeline.pipeline_name}.transform')
+        self.logger = logging.getLogger(f'{pipeline.pipeline_name}.load')
 
     def load_shipments(self, data_transformed: dict):
         '''`load_shipments`(self, data_transformed: *dict*)

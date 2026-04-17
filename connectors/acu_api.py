@@ -325,7 +325,7 @@ class AcumaticaAPI:
         ---
         <hr>
         
-        put_summary_here
+        Allows us to target the acumatica api with multiple endpoints in one method
         
         <hr>
         

@@ -82,7 +82,6 @@ class AcumaticaDbQueries(Queries):
 
      **(AttributeRCSHP2WH** != *1* *or* **AttributeRCSHP2WH** *is null***)** 
         - RC Order has not been sent to Warehouse'''
-
     SendRMIShipments: Query
     '''Pulls Shipments that are ready to be sent to RMI as type Ws
 
@@ -101,7 +100,6 @@ class AcumaticaDbQueries(Queries):
 
      **SiteCD** = *'RMI'*
         - Warehouse is RMI'''
-
     SendRedStagShipments: Query
     '''Pulls Shipments that are ready to be sent to RedStag
 
@@ -120,7 +118,6 @@ class AcumaticaDbQueries(Queries):
 
      **left(SiteCD, 7)** = *'RedStag'* (This covers REDSTAGSWT and REDSTAGSLC)
         - Warehouse is RedStag'''
-
     OpenRCsNoReceipt: Query
     '''Pulls all Open RC Orders that have been sent to RMI and do not have a Shipment(Receipt)
 
@@ -142,7 +139,6 @@ class AcumaticaDbQueries(Queries):
         
      **ShipmentNbr** *is null*
         - Order does not have a Shipment found when joining on SOLine -> SOShipLine'''
-
     ShipmentsReadyToConfirm: Query
     '''Pulls all *Open* Shipments that have a Tracking Number and are ready to be confirmed
     
@@ -158,7 +154,6 @@ class AcumaticaDbQueries(Queries):
         
      **left(SiteCD, 7)** = *'REDSTAG'*
         - Warehouse is REDSTAGSWT or REDSTAGSLC'''
-
     PackShipment: Query
     '''Query from adf that populates acu.rsFulfill
 
@@ -172,7 +167,6 @@ class AcumaticaDbQueries(Queries):
 
      **Status = 'N'** 
         - Status is Open'''
-
     ValidateAddresses: Query
     '''Pulls Orders that have unvalidated addresses
 
@@ -186,29 +180,25 @@ class AcumaticaDbQueries(Queries):
     **OrderType** != **'QT'**
          - Order is not a Quote
     
-    **Status** not in *('L', 'C', 'S')*
-    '''
-
+    **Status** not in *('L', 'C', 'S')*'''
     SOOrderDeletions: Query
     '''Pulls records from SOOrder that have been deleted in Acumatica for transfer to db_CentralStore'''
-
     SOLineDeletions: Query
     '''Pulls records from SOLine that have been deleted in Acumatica for transfer to db_CentralStore'''
-
     SOShipmentDeletions: Query
     '''Pulls records from SOShipment that have been deleted in Acumatica for transfer to db_CentralStore'''
-
     SOOrderShipmentDeletions: Query
     '''Pulls records from SOOrderShipment that have been deleted in Acumatica for transfer to db_CentralStore'''
     AcuToDbc_Quotes: Query
-    '''Pulls Orders of QT Order Type for upsert to acu.Quotes
-    '''
+    '''Pulls Orders of QT Order Type for upsert to acu.Quotes'''
     Kustomer_OrderIngest : Query
     """Pulls top level Order, Line and Customer data to be sent to Kustomer when **'ingest' *or* no params** are passed to :class:`~pipelines.kustomer.SendOrderDetailsToKustomer`.:meth:`~pipelines.kustomer.SendOrderDetailsToKustomer._re_init`"""
     Kustomer_OrderIngestBackfill : Query
     '''Pulls top level Order, Line and Customer data to be sent to Kustomer when **'backfill'** is passed as a param to :class:`~pipelines.kustomer.SendOrderDetailsToKustomer`.:meth:`~pipelines.kustomer.SendOrderDetailsToKustomer._re_init`'''
     Kustomer_ShipmentData : Query
     '''Pulls Shipments associated with the orders found in the Kustomer_OrderIngest (or Backfill) extract'''
+    AcuToDbc_SalesOrders: Query    
+    AcuToDbc_Shipments: Query
 
 _QUERY_CLASSES: dict[str, type[Queries]] = {
     'db_CentralStore': CentralStoreQueries,
@@ -389,7 +379,7 @@ from {table_name}
 where {' = %s and '.join(sql_table['keys'])} = %s
 )
 begin
-insert into {table_name}({', '.join(sql_table['columns'])})
+insert into {table_name}({', '.join(sql_table['columns'])}  )
 values({', '.join(['%s'] * len(sql_table['columns']))})
 end
 else
