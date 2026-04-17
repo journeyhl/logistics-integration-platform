@@ -92,7 +92,7 @@ and s.OrderType not in('QT', 'RA', 'RC', 'RR', 'RM')
 --and b.AcctCD in('')
 --and b.AcctName like '%%'
 --and c.CustomerClassID in('')
--- and s.LastModifiedDateTime >= cast(getdate()-1 as date)
+and s.LastModifiedDateTime >= cast(getdate()-1 as date)
 and b.AcctCD != 'C0008267'
 order by DatePlaced desc
 

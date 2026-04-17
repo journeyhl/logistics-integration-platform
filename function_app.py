@@ -429,3 +429,62 @@ def criteo_ads(timer: af.TimerRequest):
     )
     criteo_pipeline.run()
 #endregion Criteo Ads
+
+
+
+
+#region Acu to dbc - Sales Orders
+#           6x/hour (0, 10, 20, 30, 40, 50)
+@app.timer_trigger(
+    schedule = '*/10 * * * *',
+    arg_name = 'timer',
+    run_on_startup = False
+)
+def acu_to_dbc_sales_orders(timer: af.TimerRequest):
+    '''`acu_to_dbc_sales_orders`
+    ---
+    <hr>
+
+    AcuToDbcSalesOrders
+    ===
+    
+    Loads Sales Orders from *AcumaticaDb* to **acu.SalesOrders** in *db_CentralStore*
+
+    <hr>
+
+    Schedule
+    ===
+     *Runs at :05 and :35 every hour from 4am-11pm*
+    '''
+    from pipelines import AcuToDbcSalesOrders
+    sales_orders_pipeline = AcuToDbcSalesOrders()
+    sales_orders_pipeline.run()
+#endregion Acu to dbc - Sales Orders
+
+#region Acu to dbc - Quotes
+#           2x/hour (0, 30)
+@app.timer_trigger(
+    schedule = '*/30 * * * *',
+    arg_name = 'timer',
+    run_on_startup = False
+)
+def acu_to_dbc_quotes(timer: af.TimerRequest):
+    '''`acu_to_dbc_quotes`
+    ---
+    <hr>
+
+    AcuToDbcQuotes
+    ===
+    
+    Loads Quotes from *AcumaticaDb* to **acu.Quotes** in *db_CentralStore*
+
+    <hr>
+
+    Schedule
+    ===
+     *Runs at :00 and :30 every hour*
+    '''
+    from pipelines import AcuToDbcQuotes
+    quotes_pipeline = AcuToDbcQuotes()
+    quotes_pipeline.run()
+#endregion Acu to dbc - Sales Orders
