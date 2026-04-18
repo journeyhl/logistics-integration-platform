@@ -22,10 +22,10 @@ class AcuToDbcSalesOrders(Pipeline):
 
     def transform(self, data_extract: dict[str, pl.DataFrame]):
         dbc_extract = data_extract['dbc_extract']
-        # acu_extract = data_extract['acu_extract']
-        acu_extract = data_extract['acu_extract'].join(
-            dbc_extract, on='OrderNumber', how='anti'
-        )
+        acu_extract = data_extract['acu_extract']
+        # acu_extract = data_extract['acu_extract'].join(
+        #     dbc_extract, on='OrderNumber', how='anti'
+        # )
         acu_extract = acu_extract.with_columns(
             pl.col('LineNbr').fill_null(99).alias('LineNbr')
         ).to_dicts()
