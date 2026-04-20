@@ -1,13 +1,14 @@
 import azure.functions as af #type: ignore
 app = af.FunctionApp()
 
-#region RMI - Send Shipments & Returns
-#                 3x/hour (10, 20, 40)
 @app.timer_trigger(
     schedule = '20,10/30 * * * *',
     arg_name = 'timer',
     run_on_startup = False    
 )
+#region rmi_send_shipment_return_pipeline
+#            Send RMI Shipments & Returns
+#                    3x/hour (10, 20, 40)
 def rmi_send_shipment_return_pipeline(timer: af.TimerRequest):
     '''`rmi_send_shipment_return_pipeline`
     ---
@@ -41,16 +42,13 @@ def rmi_send_shipment_return_pipeline(timer: af.TimerRequest):
 
     return_pipeline = SendRMIReturns()
     return_pipeline.run()
-#endregion RMI - Send Shipments & Returns
+#endregion rmi_send_shipment_return_pipeline
 
 
-############################____________############################
-##--------------------------     JJ     ----------------------------
-############################‾‾‾‾‾‾‾‾‾‾‾‾############################
 
-
-#region RMI - Data Retrieval
-#                1x/hour (25)
+#region rmi_data_retrieval_pipeline
+#            Retrieve data from RMI
+#                      1x/hour (25)
 @app.timer_trigger(
     schedule = '25 * * * *',
     arg_name = 'timer',
@@ -60,7 +58,6 @@ def rmi_data_retrieval_pipeline(timer: af.TimerRequest):
     '''`rmi_data_retrieval_pipeline`
     ---
     <hr>
-
     
     GetClosedShipmentsFromRMI
     ===
@@ -96,7 +93,6 @@ def rmi_data_retrieval_pipeline(timer: af.TimerRequest):
 
     Schedule
     ===
-
      *Runs at :25 every hour from 4am-11pm*
     '''
     from pipelines import GetClosedShipmentsFromRMI, GetReceiptsFromRMI, GetStatusFromRMI, StageRMIStatusRetrieval
@@ -113,16 +109,90 @@ def rmi_data_retrieval_pipeline(timer: af.TimerRequest):
     for rma_number in rma_numbers:
         status_retrieval_pipeline._re_init(rma_number = rma_number)
         status_retrieval_pipeline.run()
-#endregion RMI Data Retrieval
+#endregion rmi_data_retrieval_pipeline
 
 
-############################____________############################
-##--------------------------     JJ     ----------------------------
-############################‾‾‾‾‾‾‾‾‾‾‾‾############################
 
 
-#region RMI/Acu - Create Receipts
-#                    1x/hour (50)
+
+
+
+#region redstag_send_shipment_pipeline
+#             Redstag - Send Shipments 
+#                 3x/hour (05, 15, 35)
+@app.timer_trigger(
+    schedule = '15,5/30 * * * *',
+    arg_name = 'timer',
+    run_on_startup = False
+)
+def redstag_send_shipment_pipeline(timer: af.TimerRequest):
+    '''`redstag_send_shipment_return_pipeline`
+    ---
+    <hr>
+
+    SendRedStagShipments
+    ===
+    
+    Sends Shipments to RedStag. If successful, marks as SentToWH in Acumatica along with any other attributes specified
+
+    <hr>
+
+    Schedule
+    ===
+     *Runs at :05 and :35 every hour from 4am-11pm*
+    '''
+    from pipelines import SendRedStagShipments
+    shipment_pipeline = SendRedStagShipments()
+    shipment_pipeline.run()
+#endregion redstag_send_shipment_pipeline
+
+
+#                      +‾‾‾-__-‾‾‾+
+##                    { --- JJ --- }
+#                      +___-‾‾-___+
+
+
+#region redstag_inventory_retrieval
+#      RedStag - Retrieve Inventory
+#                    once/2hrs (10)
+@app.timer_trigger(
+    schedule = '10 */2 * * *',
+    arg_name = 'timer',
+    run_on_startup = False
+)
+def redstag_inventory_retrieval(timer: af.TimerRequest):
+    '''`redstag_inventory_retrieval`
+    ---
+    <hr>
+    
+    Loads Detailed Inventory information from RedStag via API and Upserts to **RedStagInventorySummary** and **RedStagInventoryDetail**
+    
+    <hr>
+
+    Schedule
+    ===
+     *Runs at ten after every hour from 4am-11pm*
+    '''
+    from pipelines import RedStagInventory
+    redstag_inventory = RedStagInventory()
+    redstag_inventory.run()
+#endregion redstag_inventory_retrieval
+
+
+
+
+
+
+
+
+
+
+
+
+
+#region create_acu_receipts
+# RMI/Acu - Create Receipts
+#              1x/hour (50)
 @app.timer_trigger(
     schedule = '50 * * * *',
     arg_name = 'timer',
@@ -163,52 +233,15 @@ def create_acu_receipts(timer: af.TimerRequest):
     from pipelines import CreateAcuReceipt
     create_receipt_pipeline = CreateAcuReceipt()
     create_receipt_pipeline.run()
-
-#endregion RMI/Acu - Create Receipts
-
-
-############################____________############################
-##--------------------------     JJ     ----------------------------
-############################‾‾‾‾‾‾‾‾‾‾‾‾############################
-
-
-#region Acu - Confirm Shipments
-#           3x/hour (0, 20, 40)
-@app.timer_trigger(
-    schedule = '*/20 * * * *',
-    arg_name = 'timer',
-    run_on_startup = False
-)
-def confirm_acu_shipments(timer: af.TimerRequest):
-    '''`confirm_acu_shipments`
-    ---
-    <hr>
     
-    *1. Pulls all Open RedStag Shipments that have a Tracking Number and are ready to be confirmed*
-
-    *2. Formats payload for Shipment Confirmation via Acumatica API*
-
-    *3. Sends payload to confirm each Shipment*
-
-    <hr>
-
-    Schedule
-    ===
-     *Runs every 20 minutes from 4am-11pm*
-    '''
-    from pipelines import ShipmentsReadyToConfirm
-    confirm_packed_shipments = ShipmentsReadyToConfirm()
-    confirm_packed_shipments.run()
-#endregion Acu - Confirm Shipments
+#endregion create_acu_receipts
 
 
-############################____________############################
-##--------------------------     JJ     ----------------------------
-############################‾‾‾‾‾‾‾‾‾‾‾‾############################
 
 
-#region Acu - Pack Shipments
-#    4x/hour (0, 15, 30, 45)
+#region     pack_shipments
+#     Acu - Pack Shipments
+#  4x/hour (0, 15, 30, 45)
 @app.timer_trigger(
     schedule = '*/15 * * * *',
     arg_name = 'timer',
@@ -241,81 +274,45 @@ def pack_shipments(timer: af.TimerRequest):
     from pipelines import PackShipments
     pack_shipments = PackShipments()
     pack_shipments.run()
-#endregion Acu - Pack Shipments
+#endregion pack_shipments
 
 
-############################____________############################
-##--------------------------     JJ     ----------------------------
-############################‾‾‾‾‾‾‾‾‾‾‾‾############################
 
 
-#region Redstag - Send Shipments 
-#           3x/hour (05, 15, 35)
+#region confirm_acu_shipments
+#     Acu - Confirm Shipments
+#         3x/hour (0, 20, 40)
 @app.timer_trigger(
-    schedule = '15,5/30 * * * *',
+    schedule = '*/20 * * * *',
     arg_name = 'timer',
     run_on_startup = False
 )
-def redstag_send_shipment_pipeline(timer: af.TimerRequest):
-    '''`redstag_send_shipment_return_pipeline`
+def confirm_acu_shipments(timer: af.TimerRequest):
+    '''`confirm_acu_shipments`
     ---
     <hr>
-
-    SendRedStagShipments
-    ===
     
-    Sends Shipments to RedStag. If successful, marks as SentToWH in Acumatica along with any other attributes specified
+    *1. Pulls all Open RedStag Shipments that have a Tracking Number and are ready to be confirmed*
+
+    *2. Formats payload for Shipment Confirmation via Acumatica API*
+
+    *3. Sends payload to confirm each Shipment*
 
     <hr>
 
     Schedule
     ===
-     *Runs at :05 and :35 every hour from 4am-11pm*
+     *Runs every 20 minutes from 4am-11pm*
     '''
-    from pipelines import SendRedStagShipments
-    shipment_pipeline = SendRedStagShipments()
-    shipment_pipeline.run()
-#endregion Redstag - Send Shipments
+    from pipelines import ShipmentsReadyToConfirm
+    confirm_packed_shipments = ShipmentsReadyToConfirm()
+    confirm_packed_shipments.run()
+#endregion confirm_acu_shipments
 
 
-############################____________############################
-##--------------------------     JJ     ----------------------------
-############################‾‾‾‾‾‾‾‾‾‾‾‾############################
-
-
-#region RedStag - Retrieve Inventory
-#                     once/2hrs (10)
-@app.timer_trigger(
-    schedule = '10 */2 * * *',
-    arg_name = 'timer',
-    run_on_startup = False
-)
-def redstag_inventory_retrieval(timer: af.TimerRequest):
-    '''`redstag_inventory_retrieval`
-    ---
-    <hr>
-    
-    Loads Detailed Inventory information from RedStag via API and Upserts to **RedStagInventorySummary** and **RedStagInventoryDetail**
-    
-    <hr>
-
-    Schedule
-    ===
-     *Runs at ten after every hour from 4am-11pm*
-    '''
-    from pipelines import RedStagInventory
-    redstag_inventory = RedStagInventory()
-    redstag_inventory.run()
-#endregion RedStag - Retrieve Inventory
-
-
-############################____________############################
-##--------------------------     JJ     ----------------------------
-############################‾‾‾‾‾‾‾‾‾‾‾‾############################
-
-
-#region           Acumatica Deletions
-#                        1x/hour (40)
+#region acu_deletions
+# Acumatica Deletions
+#        1x/hour (40)
 @app.timer_trigger(
     schedule = '40 * * * *',
     arg_name = 'timer',
@@ -339,16 +336,12 @@ def acu_deletions(timer: af.TimerRequest):
     from pipelines import AcumaticaDeletions
     acu_deletions = AcumaticaDeletions()
     acu_deletions.run()
-#endregion Order Deletions
+#endregion acu_deletions
 
 
-############################____________############################
-##--------------------------     JJ     ----------------------------
-############################‾‾‾‾‾‾‾‾‾‾‾‾############################
-
-
-#region         Address Validator
-#                   once/1hr (55)
+#region address_validator
+#       Address Validator
+#           once/1hr (55)
 @app.timer_trigger(
     schedule = '55 * * * *',
     arg_name = 'timer',
@@ -381,16 +374,12 @@ def address_validator(timer: af.TimerRequest):
     from pipelines import AddressValidator
     address_validator = AddressValidator()
     address_validator.run()
-#endregion Address Validator
+#endregion address_validator
 
 
-############################____________############################
-##--------------------------     JJ     ----------------------------
-############################‾‾‾‾‾‾‾‾‾‾‾‾############################
-
-
-#region               Criteo Ads
-#                   once/hr (01)
+#region criteo_ads
+#       Criteo Ads
+#     once/hr (01)
 @app.timer_trigger(
     schedule = '1 * * * *',
     arg_name = 'timer',
@@ -428,13 +417,14 @@ def criteo_ads(timer: af.TimerRequest):
         mode = 'incremental'
     )
     criteo_pipeline.run()
-#endregion Criteo Ads
+#endregion criteo_ads
 
 
 
 
-#region Acu to dbc - Sales Orders
-#           6x/hour (0, 10, 20, 30, 40, 50)
+#region     acu_to_dbc_sales_orders
+#         Acu to dbc - Sales Orders
+#   6x/hour (0, 10, 20, 30, 40, 50)
 @app.timer_trigger(
     schedule = '*/10 * * * *',
     arg_name = 'timer',
@@ -459,10 +449,11 @@ def acu_to_dbc_sales_orders(timer: af.TimerRequest):
     from pipelines import AcuToDbcSalesOrders
     sales_orders_pipeline = AcuToDbcSalesOrders()
     sales_orders_pipeline.run()
-#endregion Acu to dbc - Sales Orders
+#endregion acu_to_dbc_sales_orders
 
-#region Acu to dbc - Quotes
-#           2x/hour (0, 30)
+#region acu_to_dbc_quotes
+#     Acu to dbc - Quotes
+#         2x/hour (0, 30)
 @app.timer_trigger(
     schedule = '*/30 * * * *',
     arg_name = 'timer',
@@ -487,4 +478,43 @@ def acu_to_dbc_quotes(timer: af.TimerRequest):
     from pipelines import AcuToDbcQuotes
     quotes_pipeline = AcuToDbcQuotes()
     quotes_pipeline.run()
-#endregion Acu to dbc - Sales Orders
+#endregion acu_to_dbc_quotes
+
+
+
+
+
+
+
+#region 
+#     Acu to dbc - Quotes
+#         2x/hour (0, 30)
+@app.timer_trigger(
+    schedule = '*/30 * * * *',
+    arg_name = 'timer',
+    run_on_startup = False
+)
+def kustomer_order_ingest(timer: af.TimerRequest):
+    '''`kustomer_order_ingest`
+    ---
+    <hr>
+
+    AcuToDbcQuotes
+    ===
+    
+    Loads Quotes from *AcumaticaDb* to **acu.Quotes** in *db_CentralStore*
+
+    <hr>
+
+    Schedule
+    ===
+     *Runs at :00 and :30 every hour*
+    '''
+    from pipelines import SendOrderDetailsToKustomer
+    kustomer_pipeline = SendOrderDetailsToKustomer()
+    kustomer_pipeline.logger.info(f'Starting ingest pipeline execution')
+    kustomer_pipeline._re_init()
+    kustomer_pipeline.logger.info(f'Starting backfill pipeline execution')
+    kustomer_pipeline._re_init('backfill')
+
+#endregion acu_to_dbc_quotes

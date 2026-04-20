@@ -294,9 +294,6 @@ class SQLConnector(Generic[QT]):
         data_extract = pl.read_database(query, self.engine, execute_options=execute_options)
         if log_str == '':
             self.logger.info(f'Extracted {data_extract.height} rows')
-        else:
-            action = 'Will send' if data_extract.height > 0 else 'Excluding'
-            self.logger.info(f'{action} {log_str}')
             
         return data_extract
     

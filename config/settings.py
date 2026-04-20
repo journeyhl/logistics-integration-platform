@@ -606,10 +606,29 @@ TABLES = {
             'LastChecked'
         ],
     },
-        'json.K_OrderIngest': {
+    #     'json.K_OrderIngest': {
+    #     'keys': [
+    #         'OrderNbr',
+    #         'AcuStatus',
+    #     ],
+    #     'columns': [
+    #         'OrderNbr',
+    #         'jsonData',
+    #         'AcuStatus',
+    #         'DatetimeSent',
+    #         'ResponseText',
+    #     ],
+    #     'update_columns': [
+    #         'jsonData',
+    #         'DatetimeSent',
+    #         'ResponseText',
+    #     ],
+    # },
+    'K_OrderIngest': {
         'keys': [
             'OrderNbr',
             'AcuStatus',
+            'Status',
         ],
         'columns': [
             'OrderNbr',
@@ -617,11 +636,14 @@ TABLES = {
             'AcuStatus',
             'DatetimeSent',
             'ResponseText',
+            'Status',
+            'LastChecked',
         ],
         'update_columns': [
             'jsonData',
             'DatetimeSent',
             'ResponseText',
+            'LastChecked',
         ],
     },
 }

@@ -1,4 +1,4 @@
-select top 120 cast(s.OrderDate as date) Date
+select top 520 cast(s.OrderDate as date) Date
 	   , s.OrderType
 	   , s.OrderNbr
        , (
@@ -65,5 +65,7 @@ left join CCPayLink cc on s.CompanyID = cc.CompanyID and si.RefNbr = cc.RefNbr
 inner join JJStatusLookup j on s.Status = j.CStatus and j.tbl = 'SOOrder'
 where s.CompanyID = 2 
 and s.OrderType not in('QT', 'CM', 'ZA')
-and (k.LastChecked <= dateadd(hour, -1, getdate()) or k.LastChecked is null)
-order by s.LastModifiedDatetime desc
+-- and (k.LastChecked <= dateadd(hour, -1, getdate()) or k.LastChecked is null)
+and (k.LastChecked is null
+or k.LastChecked <= getdate() - 30)
+order by k.LastChecked, s.LastModifiedDatetime

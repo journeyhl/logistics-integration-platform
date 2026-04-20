@@ -52,24 +52,29 @@
 
 - **Python 3.13**
 - **pip**
-- Network access and credentials for the following systems:
-  - **CentralStore**: Azure SQL data warehouse (`jhl-dbcentral.database.windows.net`)
-  - **AcumaticaDb**: VM-hosted SQL Server (`10.101.20.5`)
-  - **Acumatica ERP API** (`erp.journeyhl.com`)
-  - **RMI/BackTrackSRL**: REST API (`api.backtracksrl.com`) and SOAP service (`jhl.returnsmanagement.com`)
-  - **RedStag**: JSON-RPC API (`wms.redstagfulfillment.com`)
-  - **Avalara AVS**: Address validation REST API (`rest.avatax.com`)
-  - **Criteo**: OAuth2 ad-statistics API (`api.criteo.com`)
-  - **HubSpot**: Order data sync (CRM)
-- A `.env` file with valid credentials (see [Configuration](#configuration))
-- **For Azure deployment only:** an Azure Function App named `logistics-integration-platform` and an `AZURE_CREDENTIALS` secret configured in the GitHub repository
+- Network access and credentials provided internally
 
 ## Setup
+
+### Option A: Install as a package
+
+```bash
+py -3.13 -m pip install git+https://github.com/journeyhl/integration-platform.git
+```
+
+Then import directly in any Python project:
+
+```python
+from connectors import sql
+from pipelines import kustomer
+```
+
+### Option B: Clone and run locally
 
 1. Clone the repository:
 
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/journeyhl/logistics-integration-platform.git
    cd logistics-integration-platform
    ```
 

@@ -52,9 +52,9 @@ except Exception as e:
     db_input = input('Enter db name or at least first 2 characters: ').lower()
     
 input_len = len(db_input)
-if db_input == dbc[0:input_len]:
+if db_input.lower() == dbc[0:input_len].lower():
     db = dbc
-elif db_input == acudb[0:input_len]:
+elif db_input.lower() == acudb[0:input_len].lower():
     db = acudb
 
 db = SQLConnector('config-generator', db)

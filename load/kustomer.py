@@ -24,22 +24,33 @@ class Load:
     def landing(self, data_transformed: list[dict]):
         data_filtered = []
         self.logger.info(f'Filtering {len(data_transformed)} orders...')
+        excluding = 0
         for order in data_transformed:
             json_order = json.dumps(order, default=str)
             order['payload'] = json.loads(json_order)
             json_order_escaped = json_order.replace("'", "''")
             check_query = f'''
 select *
-from json.K_OrderIngest k
+from K_OrderIngest k
 where k.OrderNbr = %s and k.AcuStatus = %s and k.jsonData != cast(%s as nvarchar(max))
 '''
-            last_sent_payload = self.pipeline.centralstore.query_db(
+            last_sent_check = self.pipeline.acudb.query_db(
                 check_query, 
-                params=(order['OrderNbr'], order['OrderStatus'], json_order),
-                log_str= order['OrderNbr'])
-            if last_sent_payload.height > 0:
+                params=(order['OrderNbr'], order['OrderStatus'], json_order), log_str='Log here not there'
+            )
+            if last_sent_check.height > 0:
                 data_filtered.append(order)
-        self.logger.info(f'Filtered {len(data_transformed)} orders to {len(data_filtered)}')
+                log_str = f'Will send {order['OrderNbr']}.         To send: {len(data_filtered)}'
+
+            else:
+                excluding += 1
+                log_str = f'Excluding {order['OrderNbr']}.         Exclude: {excluding}'
+            self.logger.info(log_str)
+    
+        self.logger.info(f'Total: {len(data_transformed)}')
+        self.logger.info(f'Sending: {len(data_filtered)}')
+        self.logger.info(f'Excluded: {excluding}')
+        
 
         sql_log = self.send_payloads(data_filtered)
         return sql_log
@@ -49,12 +60,12 @@ where k.OrderNbr = %s and k.AcuStatus = %s and k.jsonData != cast(%s as nvarchar
 
     def send_payloads(self, data_filtered: list[dict]):
         sql_log = []
-        for order in data_filtered:
+        for i, order in enumerate(data_filtered):
             payload_with_data ={
                 'OrderNbr': order['OrderNbr'],
                 'execution_payload': order['payload'],
-                'log_update_success': f'{order['OrderNbr']} sent successfully!',
-                'log_update_error': f'Failed to send {order['OrderNbr']}'
+                'log_update_success': f'{order['OrderNbr']} sent successfully! {len(data_filtered) - i - 1} orders remain',
+                'log_update_error': f'Failed to send {order['OrderNbr']}. {len(data_filtered) - i - 1} orders remain'
             }
             order['DatetimeSent'] = datetime.now(ZoneInfo('America/New_York'))
             response = self.pipeline.api.target_api(payload_data = payload_with_data, operation = 'post', descr = 'Send Order data to Kustomer')
@@ -69,6 +80,8 @@ where k.OrderNbr = %s and k.AcuStatus = %s and k.jsonData != cast(%s as nvarchar
             'jsonData': order['payload'],
             'AcuStatus': order['OrderStatus'],
             'DatetimeSent': order['DatetimeSent'],
-            'ResponseText': order['ResponseText']
+            'ResponseText': order['ResponseText'],
+            'Status': order['Status'],
+            'LastChecked': datetime.now(ZoneInfo('America/New_York'))
         }
         return sql_row

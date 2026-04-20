@@ -24,20 +24,37 @@ class SendOrderDetailsToKustomer(Pipeline):
         return data_transformed
     
     def load(self, data_transformed):
-        data_loaded = self.loader.landing(data_transformed)
-        
+        data_loaded = self.loader.landing(data_transformed)        
         return data_loaded
     
     def log_results(self, data_loaded):
         self.logger.info(f'Logging Kustomer api interactions...')
         for entry in data_loaded:
             entry['jsonData'] = json.dumps(entry['jsonData'])
-        self.centralstore.checked_upsert('json.K_OrderIngest', data_loaded)
+        self.acudb.checked_upsert('K_OrderIngest', data_loaded)
         pass
 
 
     def _re_init(self, type: Literal['ingest', 'backfill'] = 'ingest'):
+        '''`_re_init`(self, type: *str* = 'ingest' | 'backfill')
+        ---
+        <hr>
+        
+        Method to re initialize the Kustomer pipeline with the specified configuration ***and then run it***
+        
+        **If no type value is passed, defaults to *'ingest'***
+
+            
+        <hr>
+        
+        Parameters
+        ---
+        :param (*str = 'ingest' | 'backfill'*) `type`: Defaults to 'ingest'. Accepted values are 'ingest' or 'backfill'. 
+        
+            - Depeding on which, the pipeline's self.:attr:`~order_query` value is set to either :attr:`~connectors.sql.AcumaticaDbQueries.Kustomer_OrderIngest` or :attr:`~connectors.sql.AcumaticaDbQueries.Kustomer_OrderIngestBackfill`
+        '''
         if type == 'ingest':
             self.order_query = self.acudb.queries.Kustomer_OrderIngest
         elif type == 'backfill':
             self.order_query = self.acudb.queries.Kustomer_OrderIngestBackfill
+        self.run()
