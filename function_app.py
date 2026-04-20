@@ -486,11 +486,11 @@ def acu_to_dbc_quotes(timer: af.TimerRequest):
 
 
 
-#region 
-#     Acu to dbc - Quotes
-#         2x/hour (0, 30)
+#region kustomer_order_ingest
+#      Order data to Kustomer
+#10x/hour (0 6, 12, 18,...54)
 @app.timer_trigger(
-    schedule = '*/30 * * * *',
+    schedule = '*/6 * * * *',
     arg_name = 'timer',
     run_on_startup = False
 )
@@ -499,16 +499,18 @@ def kustomer_order_ingest(timer: af.TimerRequest):
     ---
     <hr>
 
-    AcuToDbcQuotes
+    kustomer_order_ingest
     ===
     
-    Loads Quotes from *AcumaticaDb* to **acu.Quotes** in *db_CentralStore*
+    Runs both the *ingest* and *backfill* variations of the SendOrderDetailsToKustomer Pipeline
+
+
 
     <hr>
 
     Schedule
     ===
-     *Runs at :00 and :30 every hour*
+        Currently runs every 6 minutes while I am testing, will change later.
     '''
     from pipelines import SendOrderDetailsToKustomer
     kustomer_pipeline = SendOrderDetailsToKustomer()

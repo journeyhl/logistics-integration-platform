@@ -1,4 +1,4 @@
-select top 520 cast(s.OrderDate as date) Date
+select top 20 cast(s.OrderDate as date) Date
 	   , s.OrderType
 	   , s.OrderNbr
        , (
@@ -67,5 +67,5 @@ where s.CompanyID = 2
 and s.OrderType not in('QT', 'CM', 'ZA')
 -- and (k.LastChecked <= dateadd(hour, -1, getdate()) or k.LastChecked is null)
 and (k.LastChecked is null
-or k.LastChecked <= getdate() - 30)
+or k.LastChecked <= getdate() - 14)
 order by k.LastChecked, s.LastModifiedDatetime

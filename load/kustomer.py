@@ -71,6 +71,9 @@ where k.OrderNbr = %s and k.AcuStatus = %s and k.jsonData != cast(%s as nvarchar
             response = self.pipeline.api.target_api(payload_data = payload_with_data, operation = 'post', descr = 'Send Order data to Kustomer')
             order['ResponseText'] = response.text
             sql_log.append(self.format_db_row(order))
+            if i % 10 == 0:
+                self.pipeline.acudb.checked_upsert(f'K_OrderIngest', sql_log)
+                sql_log.clear()
         return sql_log
 
 
