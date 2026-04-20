@@ -627,7 +627,6 @@ TABLES = {
     'K_OrderIngest': {
         'keys': [
             'OrderNbr',
-            'AcuStatus',
             'Status',
         ],
         'columns': [

@@ -19,6 +19,7 @@ class Load:
     def __init__(self, pipeline: SendOrderDetailsToKustomer):
         self.pipeline = pipeline
         self.logger = logging.getLogger(f'{pipeline.pipeline_name}.load')
+        self.full_sql_log = []
 
 
     def landing(self, data_transformed: list[dict]):
@@ -71,20 +72,23 @@ where k.OrderNbr = %s and k.AcuStatus = %s and k.jsonData != cast(%s as nvarchar
             response = self.pipeline.api.target_api(payload_data = payload_with_data, operation = 'post', descr = 'Send Order data to Kustomer')
             order['ResponseText'] = response.text
             sql_log.append(self.format_db_row(order))
-            if i % 10 == 0:
+            if i % 25 == 0 and i != 0:
                 self.pipeline.acudb.checked_upsert(f'K_OrderIngest', sql_log)
                 sql_log.clear()
-        return sql_log
+        if len(sql_log) > 0 :
+            self.pipeline.acudb.checked_upsert(f'K_OrderIngest', sql_log)
+        return self.full_sql_log
 
 
     def format_db_row(self, order):
         sql_row = {
             'OrderNbr': order['OrderNbr'],
-            'jsonData': order['payload'],
+            'jsonData': json.dumps(order['payload']),
             'AcuStatus': order['OrderStatus'],
             'DatetimeSent': order['DatetimeSent'],
             'ResponseText': order['ResponseText'],
             'Status': order['Status'],
             'LastChecked': datetime.now(ZoneInfo('America/New_York'))
         }
+        self.full_sql_log.append(sql_row)
         return sql_row

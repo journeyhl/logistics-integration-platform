@@ -1,4 +1,4 @@
-select top 200 cast(s.OrderDate as date) Date
+select top 250 cast(s.OrderDate as date) Date
 	   , s.OrderType
 	   , s.OrderNbr
        , (

@@ -24,14 +24,15 @@ class SendOrderDetailsToKustomer(Pipeline):
         return data_transformed
     
     def load(self, data_transformed):
-        data_loaded = self.loader.landing(data_transformed)        
+        data_loaded = self.loader.landing(data_transformed)
+        self.logger.info(f'Upserted {len(data_loaded)} total rows')
         return data_loaded
     
     def log_results(self, data_loaded):
         self.logger.info(f'Logging Kustomer api interactions...')
-        for entry in data_loaded:
-            entry['jsonData'] = json.dumps(entry['jsonData'])
-        self.acudb.checked_upsert('K_OrderIngest', data_loaded)
+        # for entry in data_loaded:
+        #     entry['jsonData'] = json.dumps(entry['jsonData'])
+        # self.acudb.checked_upsert('K_OrderIngest', data_loaded)
         pass
 
 
