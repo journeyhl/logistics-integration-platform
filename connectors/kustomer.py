@@ -48,19 +48,25 @@ class Kustomer:
             try:
                 response = self.session.post(
                     url = self.webhook,
-                    json='',
+                    json=payload_data['execution_payload'],
                     headers={"Content-Type": "application/json"}
                 )
                 bp = 'here'
             except Exception as e:
-                logging.error(f'Error! {e}')
+                logging.error(f'Error! {payload_data['log_update_error']}')
+                bp = 'here'
         printStr = ''
 
         if response.ok:
-            # printStr = f'{order['OrderNbr']} sent successfully'
-            logging.info(f'{printStr}')
-        else:
-            logging.error(f'')
-            # printStr = f'{order['OrderNbr']} failed: {response.status_code} - {response.text}'
+            self.logger.info(payload_data['log_update_success'])
+            bp = 'here'
 
-        return printStr, response
+        else:
+            logging.error(f'Error! {payload_data['log_update_error']}')
+            bp = 'here'
+
+        return response
+
+
+
+    

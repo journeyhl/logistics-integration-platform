@@ -198,11 +198,11 @@ class Transform:
         for i, line in enumerate(matched_shipment_data):
             if self.package_contents.get((line['ShipmentNbr'], line['TrackingNbr_3pl'])) == None:
                 distinct_items = len({line['InventoryCD'] for line in matched_shipment_data})
-                qty_value = line['Qty_3pl'] if distinct_items == len(matched_shipment_data) else line['ShipQty']
+                lines = len(matched_shipment_data)
                 
                 self.package_contents[(line['ShipmentNbr'], line['TrackingNbr_3pl'])] = [{
                         "InventoryID": { "value": pkg_line_data['InventoryCD'] },
-                        "Quantity": { "value": qty_value },
+                        "Quantity": { "value": pkg_line_data['Qty_3pl'] },
                         "UOM": { "value": "EA" },
                         "ShipmentSplitLineNbr": { "value": pkg_line_data['SplitLineNbr']}
                     }

@@ -15,11 +15,8 @@ class Transform:
         self.order_extract = data_extract
         shipment_where = self.format_data_extract(data_extract)
         detail_query = self.pipeline.acudb.queries.Kustomer_ShipmentData.query + shipment_where
-        self.order_detail_extract = self.pipeline.acudb.query_db(query = detail_query)
-        
+        self.order_detail_extract = self.pipeline.acudb.query_db(query = detail_query)        
         data_transformed = self.add_shipments_to_orders()
-
-        bp = 'here'
         return data_transformed
     
     def format_data_extract(self, data_extract: pl.DataFrame) -> str:

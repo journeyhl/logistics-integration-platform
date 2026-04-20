@@ -266,7 +266,7 @@ class SQLConnector(Generic[QT]):
         return create_engine(connection_string, connect_args={"tds_version": "7.3", "login_timeout": 30})
     
 
-    def query_db(self, query: str):
+    def query_db(self, query: str, params=None, log_str=None):
         '''`query_db`(self, query: *str*)
         ---
         <hr>
@@ -279,7 +279,8 @@ class SQLConnector(Generic[QT]):
         -------------
 
         :param (*str*) `query`: SQL query to execute
-        :type query: *str*
+        :param (*dict*) `params`: Parameters to pass to query if neccessary
+        :param (*dict*) `log_str`: String to pass to log output if neccessary
 
         <hr>
 
@@ -288,8 +289,15 @@ class SQLConnector(Generic[QT]):
 
         :return `data_extract` (*pl.DataFrame*): polars DataFrame with results of query
         '''
-        data_extract = pl.read_database(query, self.engine)
-        self.logger.info(f'Extracted {data_extract.height} rows')
+        execute_options = {'parameters': params} if params else {}
+        log_str = log_str if log_str else ''
+        data_extract = pl.read_database(query, self.engine, execute_options=execute_options)
+        if log_str == '':
+            self.logger.info(f'Extracted {data_extract.height} rows')
+        else:
+            action = 'Will send' if data_extract.height > 0 else 'Excluding'
+            self.logger.info(f'{action} {log_str}')
+            
         return data_extract
     
 

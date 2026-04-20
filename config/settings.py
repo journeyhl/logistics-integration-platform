@@ -571,6 +571,7 @@ TABLES = {
             'Quantity',
             'LinePrice',
             'OrderTotal',
+            'Status',
             'CustOrderNumber',
             'D2CSalesperson',
             'SalespersonEmail',
@@ -603,6 +604,24 @@ TABLES = {
             'CreatedBy',
             'LastModifiedBy',
             'LastChecked'
+        ],
+    },
+        'json.K_OrderIngest': {
+        'keys': [
+            'OrderNbr',
+            'AcuStatus',
+        ],
+        'columns': [
+            'OrderNbr',
+            'jsonData',
+            'AcuStatus',
+            'DatetimeSent',
+            'ResponseText',
+        ],
+        'update_columns': [
+            'jsonData',
+            'DatetimeSent',
+            'ResponseText',
         ],
     },
 }

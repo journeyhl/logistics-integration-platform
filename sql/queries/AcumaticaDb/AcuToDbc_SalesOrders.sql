@@ -79,7 +79,7 @@ left join SalesPerson sp on s.CompanyID = sp.CompanyID and csp.SalesPersonID = s
 left join Users uc on s.CompanyID = uc.CompanyID and s.CreatedByID = uc.PKID
 left join Users um on s.CompanyID = um.CompanyID and s.LastModifiedByID = um.PKID
 inner join JJStatusLookup js on s.Status = js.CStatus and js.Tbl = 'SOOrder'
-inner join JJStatusLookup jsh on s.Status = jsh.CStatus and jsh.Tbl = 'SOShipment'
+left join JJStatusLookup jsh on s.Status = jsh.CStatus and jsh.Tbl = 'SOShipment'
 where s.CompanyID = 2 
 and s.OrderType not in('QT', 'RA', 'RC', 'RR', 'RM')
 --and s.OrderNbr in('')
@@ -92,8 +92,10 @@ and s.OrderType not in('QT', 'RA', 'RC', 'RR', 'RM')
 --and b.AcctCD in('')
 --and b.AcctName like '%%'
 --and c.CustomerClassID in('')
-and s.LastModifiedDateTime >= cast(getdate()-3 as date)
+and s.LastModifiedDateTime >= cast(getdate()-5 as date)
+-- and s.LastModifiedDateTime <= cast(getdate()-30 as date)
 and b.AcctCD != 'C0008267'
-order by DatePlaced desc
+-- and s.OrderNbr = 'WB109936'
+order by LastModifiedDT desc
 
 

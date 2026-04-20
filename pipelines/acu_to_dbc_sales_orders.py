@@ -13,10 +13,10 @@ class AcuToDbcSalesOrders(Pipeline):
 
     def extract(self) -> dict[str, pl.DataFrame]:
         acu_extract = self.acudb.query_to_dataframe(self.acudb.queries.AcuToDbc_SalesOrders)
-        dbc_extract = self.centralstore.query_db('select distinct OrderNumber from acu.SalesOrders where LastChecked is not null')
+        # dbc_extract = self.centralstore.query_db('select distinct OrderNumber from acu.SalesOrders where LastChecked is not null')
         data_extract = {
             'acu_extract': acu_extract,
-            'dbc_extract': dbc_extract
+            'dbc_extract': '' #dbc_extract 
         }
         return data_extract
 
