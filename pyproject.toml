@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "integration-platform"
+version = "0.1.0"
+requires-python = ">=3.13"
+dependencies = [
+    "colorlog==6.10.1",
+    "pandas==3.0.1",
+    "polars==1.38.0",
+    "pyarrow>=8.0.0",
+    "pymssql==2.3.4",
+    "python-dotenv==1.2.2",
+    "Requests==2.32.5",
+    "SQLAlchemy==2.0.48",
+    "xmltodict==1.0.4",
+]
+
+[tool.setuptools.packages.find]
+include = ["config*", "connectors*", "load*", "pipelines*", "transforms*", "sql*", "docs*"]
