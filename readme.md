@@ -1,4 +1,4 @@
-# **Logistics Integration Platform**
+# **Integration Platform**
 
 ## Table of Contents
 
