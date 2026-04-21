@@ -94,21 +94,10 @@ from pipelines import kustomer
 
 2. [`config/settings.py`](config/settings.py) loads all credentials from `.env` via `python-dotenv` and exposes them as module-level dictionaries imported throughout the connectors:
 
-   | Dictionary | Keys | Used By |
-   |---|---|---|
-   | `DATABASES['db_CentralStore']` | `server`, `database`, `username`, `password` | [`connectors/sql.py`](connectors/sql.py) |
-   | `DATABASES['AcumaticaDb']` | `server`, `database`, `username`, `password` | [`connectors/sql.py`](connectors/sql.py) |
-   | `RMI` | `username`, `password` | [`connectors/rmi_api.py`](connectors/rmi_api.py), [`connectors/rmi_xml.py`](connectors/rmi_xml.py) |
-   | `REDSTAG` | `username`, `password` | [`connectors/redstag_api.py`](connectors/redstag_api.py) |
-   | `ACUMATICA_API` | `username`, `password` | [`connectors/acu_api.py`](connectors/acu_api.py) |
-   | `AVS` | `account`, `license` | [`connectors/avs.py`](connectors/avs.py) |
-   | `CRITEO` | `client_id`, `client_secret`, `ad_id` | [`connectors/criteo_api.py`](connectors/criteo_api.py) |
 
-3. For **local development**, [`local.settings.json`](local.settings.json) is read by the Azure Functions Core Tools runtime and sets `FUNCTIONS_WORKER_RUNTIME` to `python`. Credentials are not stored here: they come exclusively from `.env`.
+3. For **Azure deployment**, all environment variables listed above must be set as Application Settings on the `logistics-integration-platform` Function App in Azure. The GitHub Actions workflow ([`.github/workflows/deploy.yml`](.github/workflows/deploy.yml)) deploys only the code package: it does not inject secrets at runtime.
 
-4. For **Azure deployment**, all environment variables listed above must be set as Application Settings on the `logistics-integration-platform` Function App in Azure. The GitHub Actions workflow ([`.github/workflows/deploy.yml`](.github/workflows/deploy.yml)) deploys only the code package: it does not inject secrets at runtime.
-
-5. The `TABLES` dictionary in [`config/settings.py`](config/settings.py) defines the upsert schema (primary keys, column lists, and update columns) consumed by [`SQLConnector.checked_upsert`](connectors/sql.py). It currently covers the following CentralStore tables:
+4. The `TABLES` dictionary in [`config/settings.py`](config/settings.py) defines the upsert schema (primary keys, column lists, and update columns) consumed by [`SQLConnector.checked_upsert`](connectors/sql.py). It currently covers the following CentralStore tables:
    - `rmi_Receipts`, `rmi_ClosedShipments`, `rmi_RMAStatus`
    - `RedstagInventorySummary`, `RedstagInventoryDetail`
    - `_util.acu_api_log`
