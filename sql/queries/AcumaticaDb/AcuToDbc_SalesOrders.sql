@@ -10,7 +10,7 @@ select s.OrderType									OrderType
 	 , rtrim(i.InventoryCD) 						InventoryCD
      , rtrim(i.Descr) 								Description
      , cast(l.OrderQty as int) as 					Quantity
-	 , cast(l.LineAmt  as decimal(18,2))			LinePrice
+	 , cast(l.LineAmt + l.DiscAmt  as decimal(18,2)) LinePrice
 	 , cast(s.OrderTotal as decimal(18,2)) 			OrderTotal
 	 , js.Status 									Status
 	 , s.CustomerOrderNbr 							CustOrderNumber
