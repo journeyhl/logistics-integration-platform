@@ -85,39 +85,10 @@ class RMIAPI():
             raise
 
 
-    def closed_shipments(self):
-        url = f'{self.base_uri}api/ClosedShipmentsV1'
-        from_date = datetime.today() - timedelta(days=21)
-        from_date = from_date.date().strftime('%Y-%m-%dT%H:%M:%SZ')
-        to_date = (datetime.now(ZoneInfo('America/New_York')) + timedelta(days=2)).strftime('%Y-%m-%dT%H:%M:%SZ')
-        headers = {
-            **self.headers, 
-            "Accept": "application/json",
-            "authorization": f"Bearer {self.token}",
-            "User-Agent": "axios/1.12.2",
-            "Content-Length": "71",
-            "Accept-Encoding": "gzip, compress, deflate, br",
-        }
-        body = {
-            "fromDate": from_date,
-            "toDate": to_date
-        }
-        try:
-            response = self.session.post(
-                url = url,
-                headers = headers,
-                json = body
-            )
-            json_response = json.loads(response.text)
-            return json_response
-        except Exception as e:
-            bp = 'here'
-
-
-
-    def get_receipts(self):
-        url = f'{self.base_uri}api/Receipts'
-        from_date = datetime.today() - timedelta(days=21)
+    def target_api(self, endpoint: str, payload: list, lookback_window_days: int = 21):
+        bp = 'here'
+        url = f'{self.base_uri}api/{endpoint}'
+        from_date = datetime.today() - timedelta(days=lookback_window_days)
         from_date = from_date.date().strftime('%Y-%m-%dT%H:%M:%SZ')
         to_date = datetime.now(ZoneInfo('America/New_York')).strftime('%Y-%m-%dT%H:%M:%SZ')
         headers = {
@@ -129,8 +100,8 @@ class RMIAPI():
             "Accept-Encoding": "gzip, compress, deflate, br",
         }
         body = {
-            "fromDate": from_date,
-            "toDate": to_date
+            payload[0]: from_date,
+            payload[1]: to_date
         }
         try:
             response = self.session.post(

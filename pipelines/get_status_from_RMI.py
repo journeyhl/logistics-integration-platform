@@ -40,7 +40,7 @@ class GetStatusFromRMI(Pipeline):
     def transform(self, data_extract):
         if data_extract == {'message': 'Bad Request', 'status': 400}:
             return data_extract
-        data_transformed = self.transformer.transform_status_records(data_extract)
+        data_transformed = self.transformer.transform_status_records([data_extract])
         return data_transformed
     
     def load(self, data_transformed):

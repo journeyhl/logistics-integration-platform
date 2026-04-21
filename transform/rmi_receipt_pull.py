@@ -64,8 +64,14 @@ class Transform:
 
     def transform_status_records(self, data_extract):
         table_rows = []
-        for item in [data_extract]:
+        for item in data_extract:
             for line in item['rmaLines']:
+                if item['rmaTypeName'] == 'W':
+                    prefix = 'rp'
+                elif item['rmaTypeName'] == '3':
+                    prefix = 'df'
+                else:
+                    bp = 'here'
                 row = {
                     'RMANumber': item['rmaNumber'],
                     'RMAID': item['rmaId'],
@@ -74,11 +80,13 @@ class Transform:
                     'RMAStatus': item['rmaStatus'],
                     'CustomerRef': item['customerRef'],
                     'RMALineNbr': line['rmaLineNumber'],
-                    'DFStatus': line['dfStatus'],
-                    'InventoryCD': line['dfItem'],
-                    'Qty': line['dfQuantityExp'],
-                    'Descr': line['dfModelNum'],
+                    'LineStatus': line[f'{prefix}Status'],
+                    'InventoryCD': line[f'{prefix}Item'],
+                    'Qty': line[f'{prefix}QuantityExp'],
+                    'Descr': line['dfModelNum'] if item['rmaTypeName'] == '3' else None,
                     'RMATypeName': item['rmaTypeDescription'],
+                    'Carrier': item['inboundShipCarrier'] if item['rmaTypeName'] == 'W' else None,
+                    'Priority': item['inboundShipPriority'] if item['rmaTypeName'] == 'W' else None,
                     'CreateDate': datetime.strptime(item['rmaCreateDate'], '%Y-%m-%dT%H:%M:%SZ'),
                     'RMILastModifiedDate': datetime.strptime(item['rmaLastModifiedDate'], '%Y-%m-%dT%H:%M:%SZ'),
                     'LastChecked': datetime.now(ZoneInfo('America/New_York'))

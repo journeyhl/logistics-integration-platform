@@ -73,27 +73,31 @@ TABLES = {
             'RMAStatus',
             'CustomerRef',
             'RMALineNbr',
-            'DFStatus',
+            'LineStatus',
             'InventoryCD',
             'Qty',
             'Descr',
             'RMATypeName',
             'CreateDate',
             'RMILastModifiedDate',
-            'LastChecked'
+            'LastChecked',
+            'Carrier',
+            'Priority'
         ],
         'update_columns':[
             'RMAStatus',
             'CustomerRef',
             'RMALineNbr',
-            'DFStatus',
+            'LineStatus',
             'InventoryCD',
             'Qty',
             'Descr',
             'RMATypeName',
             'CreateDate',
             'RMILastModifiedDate',
-            'LastChecked'
+            'LastChecked',
+            'Carrier',
+            'Priority'
         ]
     }, 
     'RedstagInventorySummary':{

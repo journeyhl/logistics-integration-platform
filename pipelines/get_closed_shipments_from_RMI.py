@@ -13,7 +13,7 @@ class GetClosedShipmentsFromRMI(Pipeline):
     Hits RMI's *ClosedShipmentsV1* endpoint, retrieves all Closed Shipments and upsert to **rmi_ClosedShipments** in db_CentralStore
 
     # Extraction
-     - Extract ClosedShipments data via :class:`~connectors.rmi_api.RMIAPI`.:meth:`~connectors.rmi_api.RMIAPI.closed_shipments`
+     - Extract ClosedShipments data via :class:`~connectors.rmi_api.RMIAPI`.:meth:`~connectors.rmi_api.RMIAPI.target_api`
 
     # Transformation
      - Transforms extracted data into format needed for upsert to **rmi_ClosedShipments**
@@ -25,7 +25,7 @@ class GetClosedShipmentsFromRMI(Pipeline):
      - None needed
     '''
     def __init__(self):
-        '''`__init__`(self)
+        '''`init`(self)
         ---
         <hr>
         
@@ -34,15 +34,17 @@ class GetClosedShipmentsFromRMI(Pipeline):
         Sets
         ---
         >>> self.rmi = RMIAPI(self)
-        >>> self.transformer = Transform(self)  
+        >>> self.transformer = Transform(self)
+        >>> self.payload_template = ["fromDate", "toDate"]
         '''
         super().__init__('rmi-shipments')
         self.rmi = RMIAPI(self)
         self.transformer = Transform(self)
+        self.payload_template = ["fromDate", "toDate"]
 
 
     def extract(self):
-        data_extract = self.rmi.closed_shipments()
+        data_extract = self.rmi.target_api('ClosedShipmentsV1', self.payload_template)
         return data_extract
     
     def transform(self, data_extract):

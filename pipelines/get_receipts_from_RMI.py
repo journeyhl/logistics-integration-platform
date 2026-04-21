@@ -10,7 +10,7 @@ class GetReceiptsFromRMI(Pipeline):
     Hits RMI's *Receipts* endpoint, retrieves all Receipts and upsert to **rmi_Receipts** in db_CentralStore
 
     # Extraction
-     - Extract ClosedShipments data via :class:`~connectors.rmi_api.RMIAPI`.:meth:`~connectors.rmi_api.RMIAPI.get_receipts`
+     - Extract ClosedShipments data via :class:`~connectors.rmi_api.RMIAPI`.:meth:`~connectors.rmi_api.RMIAPI.target_api`
 
     # Transformation
      - Transforms extracted data into format needed for upsert to **rmi_Receipts**
@@ -22,13 +22,27 @@ class GetReceiptsFromRMI(Pipeline):
      - None needed
     '''
     def __init__(self):
+        '''`init`(self)
+        ---
+        <hr>
+        
+        Initializes GetReceiptsFromRMI Pipeline 
+        
+        Sets
+        ---
+        >>> self.rmi = RMIAPI(self)
+        >>> self.transformer = Transform(self)
+        >>> self.payload_template = ["fromDate", "toDate"]
+        '''
         super().__init__('rmi-receipts')
         self.rmi = RMIAPI(self)
         self.transformer = Transform(self)
+        self.payload_template = ["fromDate", "toDate"]
+        
 
 
     def extract(self):
-        data_extract = self.rmi.get_receipts()
+        data_extract = self.rmi.target_api('Receipts', self.payload_template)
         return data_extract
 
     def transform(self, data_extract):

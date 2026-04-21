@@ -6,3 +6,4 @@ from pipelines import SendOrderDetailsToKustomer
 kustomer = SendOrderDetailsToKustomer()
 kustomer._re_init()
 bp = 'here'
+kustomer._re_init('backfill')

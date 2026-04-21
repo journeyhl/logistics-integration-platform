@@ -14,7 +14,7 @@ where right(RMI_Response, 19) != 'Item does not exist'
 select distinct RMANumber
 from AllItemsApart 
 )
-select distinct a.RMANumber, s.LastChecked, s.RMAStatus, s.DFStatus
+select distinct a.RMANumber, s.LastChecked, s.RMAStatus, s.LineStatus
 from AllItems a
 left join rmi_RMAStatus s on a.RMANumber = s.RMANumber
 where (s.RMAStatus not in('CLOSED', '') or s.RMAStatus is null)
