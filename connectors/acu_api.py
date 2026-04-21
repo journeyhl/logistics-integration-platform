@@ -239,6 +239,9 @@ class AcumaticaAPI:
                 "Document": {
                     "AttributeRCSHP2WH": {
                         "value": True
+                    },
+                    "AttributeRCSHP2WH": {
+                        "value": True
                     }
                 }
             } 
@@ -754,6 +757,71 @@ class AcumaticaAPI:
         })
         return self.status_description, body
 
+    def rc_send_to_wh_v2(self, OrderNbr: str, OrderType: str, CustomerID: str, attribute_payload: dict = {}):
+        '''`rc_send_to_wh_v2`(self, OrderNbr, OrderType, CustomerID)
+        ---
+        <hr>
+        
+        * Marks an *Order*'s **RC Ship to Warehouse** attribute to true. (**AttributeRCSHP2WH**)
+        - Additionally, sends the payload included in **attribute_payload**
+            - If none, only **AttributeRCSHP2H** is updated
+
+        * API Method: **PUT**
+        
+        <hr>
+        
+        Parameters
+        ---
+        :param (*str*) `OrderNbr`: OrderNbr of Order to update (AR078365)
+        :param (*str*) `OrderType`: OrderType of Order to update (RC)
+        :param (*str*) `CustomerID`: CustomerID or AcctCD of Customer on Order (C0090306, C0067451)
+        
+        <hr>
+
+        Returns
+        ---
+
+            __self.status_description__ (str): Details of interaction with Acumatica API
+            __body__ (dict): Dictionary of what was sent to Acumatica API
+
+        '''
+        body = {
+            "CustomerID": { "value": f"{CustomerID}" },
+            "OrderType": {"value": f"{OrderType}"},
+            "OrderNbr": { "value": f"{OrderNbr}"},
+            "custom": {
+                "Document": {
+                    "AttributeRCSHP2WH": {
+                        "value": True
+                    },
+                    **attribute_payload
+                }
+            } 
+        }
+        
+        self.logger.info(f'Sending attribute_payload to Acumatica for Order {OrderNbr}')
+        try:
+            response = self.session.put(f'{self.base_uri}/SalesOrder', json=body)
+            self.parse_response(response, {'type': 'Order', 'attribute': 'AttributeRCSHP2WH'})
+        except Exception as e:
+            try:                    
+                self._logout()
+                self._auth()
+                response = self.session.put(f'{self.base_uri}/SalesOrder', json=body)
+                self.parse_response(response, {'type': 'Order', 'attribute': 'AttributeRCSHP2WH'})
+            except Exception as e:
+                self.status_description = 'FAILURE'
+                bp = 'here'
+        self.data_log.append({
+            'Entity': 'SalesOrder',
+            'KeyValue': OrderNbr,
+            'Operation': 'PUT - Mark RC Order as Sent To WH',
+            'Payload': body,
+            'Response': self.status_description,
+            'Timestamp': datetime.now(ZoneInfo('America/New_York'))
+        })
+        return self.status_description, body
+    
 
     def send_to_wh_v2(self, ShipmentNbr: str, CustomerID: str, attribute_payload: dict = {}):
         '''`sent_to_wh_v2`(self, ShipmentNbr: *str*, CustomerID: *str*, attribute_payload: *dict*)

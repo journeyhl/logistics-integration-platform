@@ -252,6 +252,9 @@ class Transform:
             'AttributeSHP2WHDT': {
                 'value': datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
             },
+            'AttributeLINK3PL': {
+                'value': f"https://wms.redstagfulfillment.com/client/sales_order/view/order_id/{data['data_3pl']['order_id']}"
+            }
         }
         return attribute_payload
 

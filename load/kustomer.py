@@ -31,13 +31,30 @@ class Load:
             order['payload'] = json.loads(json_order)
             json_order_escaped = json_order.replace("'", "''")
             check_query = f'''
-select *
-from K_OrderIngest k
-where k.OrderNbr = %s and k.AcuStatus = %s and k.jsonData != cast(%s as nvarchar(max))
+if exists(select 1 from K_OrderIngest k
+where k.OrderNbr = %s and k.AcuStatus = %s and k.jsonData != cast(%s as nvarchar(max)))
+begin
+    select * from K_OrderIngest k
+    where k.OrderNbr = %s and k.AcuStatus = %s and k.jsonData != cast(%s as nvarchar(max))
+end
+else if exists(select 1 from K_OrderIngest k
+where k.OrderNbr = %s and k.AcuStatus = %s)
+begin
+    select top 0 * from K_OrderIngest k
+    where k.OrderNbr = %s and k.AcuStatus = %s
+end
+else
+begin
+    select top 1 * from K_OrderIngest --Rows that need to be inserted
+end
+
 '''
             last_sent_check = self.pipeline.acudb.query_db(
                 check_query, 
-                params=(order['OrderNbr'], order['OrderStatus'], json_order), log_str='Log here not there'
+                params=(order['OrderNbr'], order['OrderStatus'], json_order,
+                        order['OrderNbr'], order['OrderStatus'], json_order,
+                        order['OrderNbr'], order['OrderStatus'],
+                        order['OrderNbr'], order['OrderStatus']), log_str='Log here not there'
             )
             if last_sent_check.height > 0:
                 data_filtered.append(order)

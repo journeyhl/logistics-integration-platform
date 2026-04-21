@@ -161,7 +161,8 @@ class RMIXML:
               self.logger.warning(acu_response)
               acu_payload = ''
           else:
-              acu_response, acu_payload = self.pipeline.acu_api.send_to_wh(shipment[0]['RMANumber'], shipment[0]['CustomerID'])
+              attribute_payload = self.format_attribute_payload('AttributeSHP2WHDT')
+              acu_response, acu_payload = self.pipeline.acu_api.send_to_wh_v2(shipment[0]['RMANumber'], shipment[0]['CustomerID'], attribute_payload)
           info = {
               'key': shipment[0]['RMANumber'],
               'lines': len(shipment),
@@ -260,9 +261,10 @@ class RMIXML:
               self.logger.warning(acu_response)
               acu_payload = ''
           else:
-              acu_response, acu_payload = self.pipeline.acu_api.rc_send_to_wh(return_order[0]['ReturnNbr'],
+              attribute_payload = self.format_attribute_payload('AttributeRCSHP2WHDT')
+              acu_response, acu_payload = self.pipeline.acu_api.rc_send_to_wh_v2(return_order[0]['ReturnNbr'],
                                                                           return_order[0]['OrderType'], 
-                                                                          return_order[0]['CustomerID'])
+                                                                          return_order[0]['CustomerID'], attribute_payload)
           info = {
               'key': return_order[0]['ReturnNbr'],
               'lines': len(return_order),
@@ -315,3 +317,20 @@ class RMIXML:
               <DFComments></DFComments>
             </RMALine>"""
         return ship_str
+    
+
+    def format_w_attribute_payload(self, shipment):
+        attribute_payload = {
+            'AttributeSHP2WHDT': {
+                'value': datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+            },
+        }
+        return attribute_payload
+
+    def format_attribute_payload(self, attribute: str):
+        attribute_payload = {
+            attribute: {
+                'value': datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+            },
+        }
+        return attribute_payload

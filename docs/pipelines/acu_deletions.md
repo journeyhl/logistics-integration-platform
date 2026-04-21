@@ -5,7 +5,8 @@ flowchart TD
     B --> B1[init SQLConnector: CentralStore]
     B --> B2[init SQLConnector: AcumaticaDb]
     B --> B3[init Logger]
-    B --> RUN[Pipeline.run]
+    
+    A --> RUN[Pipeline.run]
 
     RUN --> EX[extract]
     EX --> D1[(AcuDB: SOOrderDeletions)]
@@ -27,6 +28,5 @@ flowchart TD
     CL --> CL2[DELETE acu.SalesOrders lines joined on SOLineDeletions]
     CL --> CL3[DELETE acu.Shipments joined on SOShipmentDeletions]
 
-    RUN --> LR[log_results]
-    LR --> LO[pass]
+    RUN --> LR[log_results<br/>*Do nothing]
 ```

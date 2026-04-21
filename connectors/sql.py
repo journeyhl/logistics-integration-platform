@@ -460,7 +460,7 @@ end
     def raw_execute(self, query: str):
         '''`raw_execute`(self, query)
         ===
-        Given an Insert, Update or Delete command, will return number of rows affected
+        Given an Insert, Update or Delete command, execute on db
 
         Parameters
         ---
