@@ -95,20 +95,22 @@ def rmi_data_retrieval_pipeline(timer: af.TimerRequest):
     ===
      *Runs at :25 every hour from 4am-11pm*
     '''
-    from pipelines import GetClosedShipmentsFromRMI, GetReceiptsFromRMI, GetStatusFromRMI, StageRMIStatusRetrieval
+    from pipelines import GetClosedShipmentsFromRMI, GetReceiptsFromRMI, GetRMAsFromRMI, GetStatusFromRMI, StageRMIStatusRetrieval
     closed_shipment_pipeline = GetClosedShipmentsFromRMI()
     closed_shipment_pipeline.run()
 
     receipt_pipeline = GetReceiptsFromRMI()
     receipt_pipeline.run()
 
-    rma_status_staging_pipeline = StageRMIStatusRetrieval()
-    rmi_statuses = rma_status_staging_pipeline.run()
-    rma_numbers = rmi_statuses['loaded']    
-    status_retrieval_pipeline = GetStatusFromRMI()
-    for rma_number in rma_numbers:
-        status_retrieval_pipeline._re_init(rma_number = rma_number)
-        status_retrieval_pipeline.run()
+    rma_pipeline = GetRMAsFromRMI()
+    rma_pipeline.run()
+    # rma_status_staging_pipeline = StageRMIStatusRetrieval()
+    # rmi_statuses = rma_status_staging_pipeline.run()
+    # rma_numbers = rmi_statuses['loaded']    
+    # status_retrieval_pipeline = GetStatusFromRMI()
+    # for rma_number in rma_numbers:
+    #     status_retrieval_pipeline._re_init(rma_number = rma_number)
+    #     status_retrieval_pipeline.run()
 #endregion rmi_data_retrieval_pipeline
 
 

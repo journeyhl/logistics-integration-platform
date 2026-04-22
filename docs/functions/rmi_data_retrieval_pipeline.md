@@ -16,14 +16,11 @@ flowchart TD
 
     TRIGGER --> GCS[GetClosedShipmentsFromRMI.run<br/>ClosedShipmentsV1 — last 21 days]
     TRIGGER --> GR[GetReceiptsFromRMI.run<br/>Receipts — last 21 days]
-    TRIGGER --> STAGE[StageRMIStatusRetrieval.run<br/>build list of RMA numbers<br/>needing status refresh]
+    TRIGGER --> GRMA[GetRMAsFromRMI.run<br/>RMAs — last 120 days]
 
     GCS --> GCS_DB[(CentralStore: rmi_ClosedShipments)]
     GR --> GR_DB[(CentralStore: rmi_Receipts)]
-
-    STAGE --> LOOP{for each<br/>RMA number}
-    LOOP --> GS[GetStatusFromRMI._re_init + run<br/>RMAs endpoint per RMA]
-    GS --> GS_DB[(CentralStore: rmi_RMAStatus)]
+    GRMA --> GRMA_DB[(CentralStore: rmi_RMAStatus)]
 ```
 
 ---

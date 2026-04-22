@@ -20,9 +20,30 @@ class MillisecondFormatter(colorlog.ColoredFormatter):
 
 class Pipeline(ABC):
     def __init__(self, pipeline_name):
+        '''`init`(self, pipeline_name: *str*)
+        ---
+        <hr>
+        
+        Pipeline superclass initialization
+            
+        <hr>
+        
+        Parameters
+        ---
+        :param (*str*) `pipeline_name`: Name of Pipeline, passed from subclass
+        
+        <hr>
+        
+        Sets
+        ---
+        >>> self.pipeline_name = pipeline_name
+        >>> self.centralstore =SQLConnector[CentralStoreQueries] = SQLConnector(self, 'db_CentralStore')
+        >>> self.acudb = SQLConnector[AcumaticaDbQueries] = SQLConnector(self, 'AcumaticaDb')
+        >>> self.logger = logging.getLogger(pipeline_name)
+        '''
         self.pipeline_name = pipeline_name
         self.centralstore: SQLConnector[CentralStoreQueries] = SQLConnector(self, 'db_CentralStore')
-        self.acudb: SQLConnector[AcumaticaDbQueries] = SQLConnector(self, 'AcumaticaDb')
+        # self.acudb: SQLConnector[AcumaticaDbQueries] = SQLConnector(self, 'AcumaticaDb')
         self.logger = logging.getLogger(pipeline_name)
 
         
