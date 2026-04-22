@@ -43,7 +43,7 @@ class Pipeline(ABC):
         '''
         self.pipeline_name = pipeline_name
         self.centralstore: SQLConnector[CentralStoreQueries] = SQLConnector(self, 'db_CentralStore')
-        # self.acudb: SQLConnector[AcumaticaDbQueries] = SQLConnector(self, 'AcumaticaDb')
+        self.acudb: SQLConnector[AcumaticaDbQueries] = SQLConnector(self, 'AcumaticaDb')
         self.logger = logging.getLogger(pipeline_name)
 
         
