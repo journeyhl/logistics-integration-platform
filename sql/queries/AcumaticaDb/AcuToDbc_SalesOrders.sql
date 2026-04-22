@@ -102,4 +102,4 @@ order by LastModifiedDT desc
 /*
 Updated Query to only pull sales orders from the last two hours.
 s.LastModifiedDateTime
-
+*/

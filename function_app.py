@@ -522,9 +522,9 @@ def kustomer_order_ingest(timer: af.TimerRequest):
 
 #region kustomer_order_backfill
 #        Order data to Kustomer
-#           3x/hour (0, 24, 48)
+#           3x/hour (0, 29, 58)
 @app.timer_trigger(
-    schedule = '*/24 * * * *',
+    schedule = '5/24 * * * *',
     arg_name = 'timer',
     run_on_startup = False
 )
@@ -544,7 +544,7 @@ def kustomer_order_backfill(timer: af.TimerRequest):
 
     Schedule
     ===
-        Runs every 24 minutes
+        Runs every 29 minutes
     '''
     from pipelines import SendOrderDetailsToKustomer
     kustomer_pipeline = SendOrderDetailsToKustomer()

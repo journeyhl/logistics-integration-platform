@@ -125,8 +125,10 @@ class Load:
         ---
         :return `qty_match` (*bool*): Returns **True** if all Items and Quantities match, **False** if not
         '''
+        shipment_nbr = receipt_response['ShipmentNbr']
         lines = receipt_response['line_count']
         packages = receipt_response['package_count']
+        self.logger.info(f'Checking Packages for Shipment {shipment_nbr}: {lines} line(s) across {packages} package(s)')
 
         line_detail = {}
         for line in receipt_response['details']:
@@ -134,7 +136,7 @@ class Load:
                 same_item = line_detail[line['InventoryCD']]
                 line_detail[line['InventoryCD']] = {
                     'Qty': int(same_item['Qty'] + line['Qty'])
-                }                
+                }
             else:
                 line_detail[line['InventoryCD']] = {
                     'Qty': int(line['Qty'])
@@ -155,15 +157,26 @@ class Load:
                         'Qty': qty
                     }
 
-        qty_match = False
+        qty_match = True
         for key, line_qty in line_detail.items():
             self.logger.info(f'Line: {key} - {line_qty['Qty']} units')
             if pkg_detail.get(key):
-                qty_match = line_qty['Qty'] == pkg_detail[key]['Qty']
+                item_qty_match = line_qty['Qty'] == pkg_detail[key]['Qty']
                 self.logger.info(f'On Package: {key} - {pkg_detail[key]['Qty']} units')
+                if item_qty_match:
+                    self.logger.info(f'Qty match for {key}')
+                else:
+                    self.logger.error(f'Qty mismatch for {key}: line has {line_qty['Qty']}, package has {pkg_detail[key]['Qty']}')
+                    qty_match = False
             else:
+                self.logger.error(f'{key} is on the Shipment but missing from Packages')
                 qty_match = False
-        
+
+        if qty_match:
+            self.logger.info(f'Package check passed for Shipment {shipment_nbr}')
+        else:
+            self.logger.error(f'Package check failed for Shipment {shipment_nbr}')
+
         bp = 'here'
         return qty_match
 
