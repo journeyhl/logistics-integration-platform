@@ -30,6 +30,5 @@ flowchart TD
     LS2 --> LS3[format_db_row + batch upsert<br/>every 25 orders]
     LS3 --> D6[(AcuDB: K_OrderIngest<br/>upsert on OrderNbr + Status)]
 
-    RUN --> LR[log_results]
-    LR --> LO[pass]
+    RUN --> LR[log_results<br/>*Do nothing]
 ```

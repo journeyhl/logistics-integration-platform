@@ -5,7 +5,7 @@ flowchart TD
     B --> B1[init Transform]
     B --> B2[init RMIXML]
     B --> B3[init AcumaticaAPI]
-    B --> RUN[Pipeline.run]
+    A --> RUN[Pipeline.run]
 
     RUN --> EX[extract]
     EX --> D1[(AcuDB: SOOrder + SOLine + SOContact + SOAddress<br/>via SendRMIReturns.sql<br/>RC orders, Status=Open, SiteCD=RMI,<br/>AttributeRCSHP2WH null or != 1)]

@@ -8,7 +8,7 @@ flowchart TD
     B --> B4[init AcumaticaAPI]
     B --> B5[init Transform]
     B --> B6[init Load]
-    B --> RUN[Pipeline.run]
+    A --> RUN[Pipeline.run]
 
     RUN --> EX[extract]
     EX --> D1[(CentralStore: rmi_RMAStatus<br/>RMAType=3, status CLOSED or RECEIVED)]

@@ -5,7 +5,7 @@ flowchart TD
     B --> B1[init SQLConnector: CentralStore]
     B --> B2[init SQLConnector: AcumaticaDb]
     B --> B3[init Logger]
-    B --> RUN[Pipeline.run]
+    A --> RUN[Pipeline.run]
 
     RUN --> EX[extract]
     EX --> D1[(AcuDB: AcuToDbc_SalesOrders<br/>non-quote/return orders modified in last day)]

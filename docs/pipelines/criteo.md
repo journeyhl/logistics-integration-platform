@@ -7,7 +7,7 @@ flowchart TD
     B --> B3[init Logger]
     B --> B4[init CriteoAPI: OAuth2 auth on init]
     B --> B5[init Transform]
-    B --> RI[_re_init: set start_date, end_date, mode]
+    A --> RI[_re_init: set start_date, end_date, mode]
     RI --> RUN[Pipeline.run]
 
     RUN --> EX[extract]
@@ -29,6 +29,5 @@ flowchart TD
     LD --> LS2[upsert campaign performance]
     LS2 --> CS2[(CentralStore: criteo.campaign_performance_daily)]
 
-    RUN --> LR[log_results]
-    LR --> LO[pass]
+    RUN --> LR[log_results<br/>*Do nothing]
 ```

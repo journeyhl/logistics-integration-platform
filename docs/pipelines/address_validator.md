@@ -9,7 +9,7 @@ flowchart TD
     B --> B5[init AcumaticaAPI]
     B --> B6[init Transform]
     B --> B7[init Load]
-    B --> RUN[Pipeline.run]
+    A --> RUN[Pipeline.run]
 
     RUN --> EX[extract]
     EX --> D1[(AcuDB: ValidateAddresses<br/>WB orders on hold with unvalidated addresses)]

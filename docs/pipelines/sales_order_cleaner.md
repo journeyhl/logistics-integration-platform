@@ -3,7 +3,7 @@
 flowchart TD
     A([run_sales_order_cleaner]) --> B[SalesOrderCleaner.__init__]
     B --> B1[init Transform]
-    B --> RUN[Pipeline.run]
+    A --> RUN[Pipeline.run]
 
     RUN --> EX[extract]
     EX --> D1[(CentralStore: acu.SalesOrders<br/>find OrderNumbers with duplicate statuses<br/>via SalesOrderCleaner.sql)]
@@ -20,6 +20,5 @@ flowchart TD
     LD1 -->|yes, per status group| LD2[(CentralStore: raw DELETE<br/>acu.SalesOrders rows<br/>not matching AcuDB status)]
     LD1 -->|no| SKIP[skip]
 
-    RUN --> LR[log_results]
-    LR --> LO[pass]
+    RUN --> LR[log_results<br/>*Do nothing]
 ```

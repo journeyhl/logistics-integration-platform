@@ -6,7 +6,7 @@ flowchart TD
     B --> B2[init RedStagAPI]
     B --> B3[init AcumaticaAPI]
     B --> B4[init Load]
-    B --> RUN[Pipeline.run]
+    A --> RUN[Pipeline.run]
 
     RUN --> EX[extract]
     EX --> D1[(AcuDB: SOShipment + SOShipLine<br/>SiteCD=RedStag%, AttributeSHP2WH=0,<br/>Status not in C/L/F/I, OrigOrderType != RC)]

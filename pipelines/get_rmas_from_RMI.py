@@ -44,7 +44,7 @@ class GetRMAsFromRMI(Pipeline):
 
 
     def extract(self):
-        data_extract = self.rmi.target_api('RMAs', self.payload_template, 120)
+        data_extract = self.rmi.target_api(endpoint='RMAs', payload=self.payload_template, lookback_window_days=21)
         return data_extract
     
     def transform(self, data_extract):

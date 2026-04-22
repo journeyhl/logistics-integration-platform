@@ -6,7 +6,7 @@ flowchart TD
     B --> B2[init SQLConnector: AcumaticaDb]
     B --> B3[init Logger]
     B --> B4[init AcumaticaAPI]
-    B --> RUN[Pipeline.run]
+    A --> RUN[Pipeline.run]
 
     RUN --> EX[extract]
     EX --> D1[(AcuDB: ShipmentsReadyToConfirm<br/>open shipments with tracking<br/>where shipped qty = packed qty)]

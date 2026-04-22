@@ -5,7 +5,7 @@ flowchart TD
     B --> B1[init AcumaticaAPI]
     B --> B2[init Transform]
     B --> B3[init Load]
-    B --> RUN[Pipeline.run]
+    A --> RUN[Pipeline.run]
 
     RUN --> EX[extract]
     EX --> D1[(CentralStore: PackShipmentRedStag)]
