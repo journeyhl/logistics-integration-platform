@@ -149,9 +149,7 @@ def redstag_send_shipment_pipeline(timer: af.TimerRequest):
 #endregion redstag_send_shipment_pipeline
 
 
-#                      +‾‾‾-__-‾‾‾+
-##                    { --- JJ --- }
-#                      +___-‾‾-___+
+
 
 
 #region redstag_inventory_retrieval

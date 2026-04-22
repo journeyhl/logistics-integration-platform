@@ -1,7 +1,7 @@
 ```mermaid
 %%{init: {"flowchart": {"wrappingWidth": 400}}}%%
 flowchart TD
-    A([run_redstag]) --> B[SendRedStagShipments.__init__]
+    A([redstag_send_shipments]) --> B[SendRedStagShipments.__init__]
     B --> B1[init Transform]
     B --> B2[init RedStagAPI]
     B --> B3[init AcumaticaAPI]

@@ -22,8 +22,6 @@ flowchart TD
     SRR --> SRR_ACU[(AcuAPI: PUT SalesOrder<br/>AttributeRCSHP2WH = True)]
 ```
 
----
-
 ## Pipelines
 
 ### SendRMIShipments

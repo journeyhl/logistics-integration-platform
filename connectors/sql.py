@@ -409,6 +409,105 @@ end
 
 
 
+
+    def checked_upsert_paginated(self, table_name: str, data: list, page_size: int = 100):
+        '''
+        `checked_upsert`(self, table_name: *str*, data: *list*)
+        ---
+        <hr>
+
+        Given a table name and a list of rows (dicts) to insert, performs a paginated upsert to database.
+
+        #### USE :meth:`~connectors.sql.SQLConnector.checked_upsert` FOR UPSERTS OF LESS THAN 100 ROWS!!
+    
+        ### Downstream Calls 
+         #### :meth:`~_dict_to_params`
+            - Utility function to format table keys, columns and update_columns with their respective values to parameters
+
+        <hr>
+        
+        Parameters
+        ---
+        :param (*str*) `table_name`: The name of the table to update (schema qualified)
+
+         - **'_util.acu_api_log'** or **'AdDetails'**
+
+          - ***AdDetails** doesn't need the schema since it belongs to the **dbo** schema, but you could pass **'dbo.AdDetails'** if you wanted*
+
+        :param (*list*) `data`: A list of dictionaries that correspond to the values in :data:`~config.settings.TABLES`
+        
+            * Each dictionary should be formatted to contain the values that were mapped in the table configuration in :data:`~config.settings.TABLES`
+
+                * Take **_util.SOOrderDeletions** for example. Its definition looks as follows:
+                >>> '_util.SOOrderDeletions':{
+                    'keys': ['OrderType', 'OrderNbr'],
+                    'columns': [
+                        'OrderType',
+                        'OrderNbr',
+                        'DeletedBy',
+                        'DeletedDatetime'
+                    ],
+                    'update_columns':[
+                        'DeletedBy',
+                        'DeletedDatetime'
+                    ]
+                },
+
+                * Using these values, we'll create **upsert_string**. Starting with the check first:
+
+                >>> if not exists(
+                select 1 
+                from {table_name}
+                where {' = %s and '.join(sql_table['keys'])} = %s
+                )
+
+                * Alrighty, replace `{table_name}` with `table_name`, or **_util.SOOrderDeletions** here. Then for each **key** in `keys`, we'll format the *where*
+                
+                >>> if not exists(
+                select 1 
+                from _util.SOOrderDeletions
+                where OrderType = %s and OrderNbr = %s
+                )
+
+                * That pattern continues on for the full execution statement.
+        '''
+        self.tables = TABLES
+        sql_table = self.tables[table_name]
+        upsert_string = f'''
+if not exists(
+select 1 
+from {table_name}
+where {' = %s and '.join(sql_table['keys'])} = %s
+)
+begin
+insert into {table_name}({', '.join(sql_table['columns'])}  )
+values({', '.join(['%s'] * len(sql_table['columns']))})
+end
+else
+begin
+update {table_name} set {' = %s, '.join(col for col in sql_table['update_columns'])} = %s
+where {' = %s and '.join(sql_table['keys'])} = %s
+end
+'''
+        total = len(data)
+        self.logger.info(f'{total} rows to upsert')
+        upserts = 0
+        total_upserts = int(total/page_size)
+        for start in range(0, total, page_size):
+            page = data[start:start + page_size]
+            params = [self._dict_to_params(data_dict, sql_table['keys'] + sql_table['columns'] + sql_table['update_columns'] + sql_table['keys']) for data_dict in page]
+            cursor = self.raw_connection.cursor()
+            self.logger.info(f'Beginning upsert of {page_size} rows to {table_name}...')
+            cursor.executemany(upsert_string, params)
+            self.raw_connection.commit()
+            done = min(start + page_size, total)
+            self.logger.info(f'{done}/{total} rows upserted, {len(data) - done} remain. {upserts} Upserts complete, {total_upserts - upserts} to go')
+            upserts += 1
+
+
+
+
+
     
     def _dict_to_params(self, d: dict, keys: list) -> tuple:
         '''_dict_to_params

@@ -92,7 +92,7 @@ and s.OrderType not in('QT', 'RA', 'RC', 'RR', 'RM')
 --and b.AcctCD in('')
 --and b.AcctName like '%%'
 --and c.CustomerClassID in('')
-and s.LastModifiedDateTime >= cast(getdate()-60 as date)
+and s.LastModifiedDateTime >= cast(getdate()-2 as date)
 -- and s.LastModifiedDateTime <= cast(getdate()-30 as date)
 and b.AcctCD != 'C0008267'
 -- and s.OrderNbr = 'WB109936'

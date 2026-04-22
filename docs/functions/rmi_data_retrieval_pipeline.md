@@ -23,8 +23,6 @@ flowchart TD
     GRMA --> GRMA_DB[(CentralStore: rmi_RMAStatus)]
 ```
 
----
-
 ## Pipelines
 
 ### GetClosedShipmentsFromRMI

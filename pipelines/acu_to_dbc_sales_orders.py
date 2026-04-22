@@ -35,33 +35,13 @@ class AcuToDbcSalesOrders(Pipeline):
         return data_transformed
     
     def load(self, data_transformed):
-        rows_remaining = len(data_transformed)
-        upserts = 0
-        self.logger.info(f'{rows_remaining} rows to upsert')
-        if len(data_transformed) >= 100:
-            start = 0
-            end = 100
-            while end < len(data_transformed):
-                for item in data_transformed[start:end]:
-                    item['LastChecked'] = datetime.now(ZoneInfo('America/New_York'))
-                self.centralstore.checked_upsert('acu.SalesOrders', data_transformed[start:end])
-                start += 100
-                end += 100
-                rows_remaining -= 100
-                upserts += 1
-                self.logger.info(f'{len(data_transformed) - rows_remaining} rows complete, {rows_remaining} remain. {upserts} Upserts complete, {int(rows_remaining/100)} to go')
-            if len(data_transformed) - start <= 100:
-                for item in data_transformed[start:]:
-                    item['LastChecked'] = datetime.now(ZoneInfo('America/New_York'))
-                self.centralstore.checked_upsert('acu.SalesOrders', data_transformed[start:])
-                bp = 'here'
-            bp = 'here'
-        else:
-            for item in data_transformed:
-                item['LastChecked'] = datetime.now(ZoneInfo('America/New_York'))
-            self.centralstore.checked_upsert('acu.SalesOrders', data_transformed)
-        data_loaded = data_transformed
-        return data_loaded
+        total = len(data_transformed)
+        for item in data_transformed:
+            item['LastChecked'] = datetime.now(ZoneInfo('America/New_York'))
+        batch_size = 100
+        self.logger.info(f'{total} rows to upsert')
+        self.centralstore.checked_upsert_paginated('acu.SalesOrders', data_transformed, page_size= 100)
+        return data_transformed
     
     def log_results(self, data_loaded):
         pass
