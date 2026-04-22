@@ -488,9 +488,9 @@ def acu_to_dbc_quotes(timer: af.TimerRequest):
 
 #region kustomer_order_ingest
 #      Order data to Kustomer
-#10x/hour (0 6, 12, 18,...54)
+#5x/hour (0 ,12, 24, 36, 48)
 @app.timer_trigger(
-    schedule = '*/6 * * * *',
+    schedule = '*/12 * * * *',
     arg_name = 'timer',
     run_on_startup = False
 )
@@ -510,13 +510,45 @@ def kustomer_order_ingest(timer: af.TimerRequest):
 
     Schedule
     ===
-        Currently runs every 6 minutes while I am testing, will change later.
+        Currently runs every 12 minutes
     '''
     from pipelines import SendOrderDetailsToKustomer
     kustomer_pipeline = SendOrderDetailsToKustomer()
     kustomer_pipeline.logger.info(f'Starting ingest pipeline execution')
     kustomer_pipeline._re_init()
-    kustomer_pipeline.logger.info(f'Starting backfill pipeline execution')
-    kustomer_pipeline._re_init('backfill')
+#endregion kustomer_order_ingest
 
-#endregion acu_to_dbc_quotes
+
+
+#region kustomer_order_backfill
+#        Order data to Kustomer
+#           3x/hour (0, 24, 48)
+@app.timer_trigger(
+    schedule = '*/24 * * * *',
+    arg_name = 'timer',
+    run_on_startup = False
+)
+def kustomer_order_backfill(timer: af.TimerRequest):
+    '''`kustomer_order_ingest`
+    ---
+    <hr>
+
+    kustomer_order_ingest
+    ===
+    
+    Runs both the *ingest* and *backfill* variations of the SendOrderDetailsToKustomer Pipeline
+
+
+
+    <hr>
+
+    Schedule
+    ===
+        Runs every 24 minutes
+    '''
+    from pipelines import SendOrderDetailsToKustomer
+    kustomer_pipeline = SendOrderDetailsToKustomer()
+    kustomer_pipeline.logger.info(f'Starting backfill pipeline execution')
+    kustomer_pipeline._re_init('backfill') 
+
+#endregion kustomer_order_ingest
