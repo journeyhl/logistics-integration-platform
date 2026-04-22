@@ -28,5 +28,6 @@ class Transform:
                     'Qty_3pl': match['Qty'] 
                 }
                 data_transformed.append(order_formatted)
+        test = set(order['OrderNbr'] for order in data_transformed)
         self.logger.info(f'Matched {len(data_transformed)} rows')
         return data_transformed

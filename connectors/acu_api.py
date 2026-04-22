@@ -511,7 +511,7 @@ class AcumaticaAPI:
         self.logger.info(f'Adding package to {shipment_data['ShipmentNbr']}')
         now = datetime.now(ZoneInfo('America/New_York')).strftime('%m/%d/%Y %H:%M:%S')
         descr = f'Package added via API @ {now}'
-        tracking_nbr = shipment_data['ExtRefNbr'] if shipment_data.get('ExtRefNbr') else shipment_data['TrackingNbr']
+        tracking_nbr = shipment_data['ExtRefNbr'] if shipment_data.get('ExtRefNbr') else shipment_data['TrackingNbr'] if shipment_data.get('TrackingNbr') else 'No ExtRefNbr for tracking'
         body = {
             "ShipmentNbr": { "value": f"{shipment_data['ShipmentNbr']}" },
             "Packages": [

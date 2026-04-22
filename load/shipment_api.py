@@ -101,6 +101,74 @@ class Load:
         return line
     
 
+
+    def check_package(self, receipt_response: dict):
+        '''`check_package`(self, receipt_response: *dict*, )
+        ---
+        <hr>
+        
+        Iterates through each Line on the Shipment and aggregates the Qty per item
+
+        Iterates through each Package, and each line on each package, and aggregates the Qty per item
+
+        Compares the Line Items and their respective Qty value against the Package Items
+            
+        <hr>
+        
+        Parameters
+        ---
+        :param (*dict*) `receipt_response`: Receipt data from Acumatica
+        
+        <hr>
+        
+        Returns
+        ---
+        :return `qty_match` (*bool*): Returns **True** if all Items and Quantities match, **False** if not
+        '''
+        lines = receipt_response['line_count']
+        packages = receipt_response['package_count']
+
+        line_detail = {}
+        for line in receipt_response['details']:
+            if line_detail.get(line['InventoryCD']):
+                same_item = line_detail[line['InventoryCD']]
+                line_detail[line['InventoryCD']] = {
+                    'Qty': int(same_item['Qty'] + line['Qty'])
+                }                
+            else:
+                line_detail[line['InventoryCD']] = {
+                    'Qty': int(line['Qty'])
+                }
+
+        pkg_detail = {}
+        for package in receipt_response['Packages']:
+            for p_line in package['PackageContents']:
+                item = p_line['InventoryID']['value']
+                qty = int(p_line['Quantity']['value'])
+                if pkg_detail.get(item):
+                    same_item = pkg_detail[item]
+                    pkg_detail[item] = {
+                        'Qty': same_item['Qty'] + qty
+                    }                
+                else:
+                    pkg_detail[item] = {
+                        'Qty': qty
+                    }
+
+        qty_match = False
+        for key, line_qty in line_detail.items():
+            self.logger.info(f'Line: {key} - {line_qty['Qty']} units')
+            if pkg_detail.get(key):
+                qty_match = line_qty['Qty'] == pkg_detail[key]['Qty']
+                self.logger.info(f'On Package: {key} - {pkg_detail[key]['Qty']} units')
+            else:
+                qty_match = False
+        
+        bp = 'here'
+        return qty_match
+
+
+
     def check_if_ready_for_confirm(self, receipt_response):
         self.logger.info(f'Checking if Shipment {receipt_response['ShipmentNbr']} is ready to Confirm')
         ready = True
@@ -112,53 +180,10 @@ class Load:
             self.logger.error(f'Check 1 Failed! {receipt_response['ShipmentNbr']} is {receipt_response['Status']}')
             return
 
-        self.logger.info(f'Check 2...Does Package count = Line count?')
-        packages = receipt_response['package_count'] 
-        pkg_str = f'1 pkg line' if packages == 1 else f'{packages} pkg lines'
-        lines = receipt_response['line_count']
-        lines_str = f'1 ship line' if lines == 1 else f'{lines} ship lines'
-        ready = packages == lines
+        self.logger.info(f'Check 2...')
+        ready = self.check_package(receipt_response=receipt_response)
         if ready:
-            self.logger.info(f'Check 2 Passed! {lines_str}, {pkg_str}')
-        else:
-            self.logger.error(f'Check 2 Failed! {lines_str}, {pkg_str}')
-            return
-        details_item_comparison = {}
-        self.logger.info(f'Check 3...Verifying item(s) on shipment and respective Qty values')
-        for d_line in receipt_response['details']:
-            item = d_line['InventoryCD']
-            qty = int(d_line['Qty'])
-            q_string = f'{qty} unit' if qty == 1 else f'{qty} units'
-            self.logger.info(f'Line Details...{receipt_response['ShipmentNbr']}-{d_line['LineNbr']}: {item} - {q_string}')
-            if details_item_comparison.get(item):
-                details_item_comparison[item] = {
-                    'Qty': int(qty + details_item_comparison[item]['Qty'])
-                }
-            else:
-                details_item_comparison[item] = {
-                    'Qty': qty
-                }
-        
-        package_item_comparison = {}
-        for package in receipt_response['Packages']:
-            for p_line in package['PackageContents']:
-                item = p_line['InventoryID']['value']
-                qty = int(p_line['Quantity']['value'])
-                q_string = f'{qty} unit' if qty == 1 else f'{qty} units'
-                self.logger.info(f'Package Details...{receipt_response['ShipmentNbr']}-{p_line['rowNumber']}: {item} - {q_string}')
-                if package_item_comparison.get(item):
-                    package_item_comparison[item] = {
-                        'Qty': int(qty + package_item_comparison[item]['Qty'])
-                    }
-                else:
-                    package_item_comparison[item] = {
-                        'Qty': qty
-                    }
-        
-        bp = 'here'
-        ready = details_item_comparison == package_item_comparison
-        if ready:
-            self.logger.info('Check 3 passed!')
+            self.logger.info('Check 2 passed!')
             self.pipeline.acu_api.confirm_shipment(receipt_response)
             return
         else:
