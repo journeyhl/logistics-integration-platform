@@ -35,29 +35,12 @@ class AcuToDbcQuotes(Pipeline):
         return data_transformed
     
     def load(self, data_transformed):
-        self.logger.info(f'{len(data_transformed)} rows to upsert')
-        if len(data_transformed) >= 500:
-            start = 0
-            end = 500
-            while end < len(data_transformed):
-                for item in data_transformed[start:end]:
-                    item['LastChecked'] = datetime.now(ZoneInfo('America/New_York'))
-                self.centralstore.checked_upsert('acu.Quotes', data_transformed[start:end])
-                start += 500
-                end += 500
-                bp = 'here'
-            if len(data_transformed) - start <= 500:
-                for item in data_transformed[start:]:
-                    item['LastChecked'] = datetime.now(ZoneInfo('America/New_York'))
-                self.centralstore.checked_upsert('acu.Quotes', data_transformed[start:])
-                bp = 'here'
-            bp = 'here'
-        else:
-            for item in data_transformed:
-                item['LastChecked'] = datetime.now(ZoneInfo('America/New_York'))
-            self.centralstore.checked_upsert('acu.Quotes', data_transformed)
-        data_loaded = data_transformed
-        return data_loaded
+        total = len(data_transformed)
+        for item in data_transformed:
+            item['LastChecked'] = datetime.now(ZoneInfo('America/New_York'))
+        self.logger.info(f'{total} rows to upsert')
+        self.centralstore.checked_upsert_paginated('acu.SalesOrders', data_transformed, page_size= 100)
+        return data_transformed
     
     def log_results(self, data_loaded):
         pass

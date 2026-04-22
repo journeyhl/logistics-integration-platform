@@ -38,7 +38,6 @@ class AcuToDbcSalesOrders(Pipeline):
         total = len(data_transformed)
         for item in data_transformed:
             item['LastChecked'] = datetime.now(ZoneInfo('America/New_York'))
-        batch_size = 100
         self.logger.info(f'{total} rows to upsert')
         self.centralstore.checked_upsert_paginated('acu.SalesOrders', data_transformed, page_size= 100)
         return data_transformed

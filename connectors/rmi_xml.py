@@ -96,7 +96,7 @@ class RMIXML:
 
         bp = 'here'
         for shipment in type_w:
-            self.post_W(shipment)
+            self.post_w(shipment)
 
         for return_order in type_3:
             self.post_3(return_order)
@@ -109,7 +109,7 @@ class RMIXML:
 
 
 
-    def post_W(self, shipment):
+    def post_w(self, shipment):
         line_str = f'1 line' if len(shipment) == 1 else f'{len(shipment)} lines'
         self.logger.info(f'Preparing {shipment[0]['RMANumber']} - {line_str}')
         row_text = self._format_w_lines(shipment)

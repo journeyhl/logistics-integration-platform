@@ -53,7 +53,9 @@ class GetClosedShipmentsFromRMI(Pipeline):
 
 
     def load(self, data_transformed):
-        data_loaded = self.centralstore.checked_upsert('rmi_ClosedShipments', data_transformed)
+        total = len(data_transformed)
+        self.logger.info(f'{total} rows to upsert')
+        data_loaded = self.centralstore.checked_upsert_paginated('rmi_ClosedShipments', data_transformed)
         bp = 'here'
         return data_transformed
 

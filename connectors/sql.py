@@ -493,16 +493,24 @@ end
         self.logger.info(f'{total} rows to upsert')
         upserts = 0
         total_upserts = int(total/page_size)
+        self.logger.info(f'Beginning upsert sequence...Upserting {total} rows in {total_upserts + 1} batches to {table_name}...')
         for start in range(0, total, page_size):
             page = data[start:start + page_size]
-            params = [self._dict_to_params(data_dict, sql_table['keys'] + sql_table['columns'] + sql_table['update_columns'] + sql_table['keys']) for data_dict in page]
-            cursor = self.raw_connection.cursor()
-            self.logger.info(f'Beginning upsert of {page_size} rows to {table_name}...')
-            cursor.executemany(upsert_string, params)
-            self.raw_connection.commit()
-            done = min(start + page_size, total)
-            self.logger.info(f'{done}/{total} rows upserted, {len(data) - done} remain. {upserts} Upserts complete, {total_upserts - upserts} to go')
-            upserts += 1
+            try:
+                params = [self._dict_to_params(data_dict, sql_table['keys'] + sql_table['columns'] + sql_table['update_columns'] + sql_table['keys']) for data_dict in page]
+                cursor = self.raw_connection.cursor()
+                cursor.executemany(upsert_string, params)
+                self.raw_connection.commit()
+                done = min(start + page_size, total)
+                self.logger.info(f'{done}/{total} rows upserted, {len(data) - done} remain. {upserts + 1} Upserts complete{f", {total_upserts - upserts} to go" if total_upserts - upserts != 0 else ""}')
+                upserts += 1
+            except Exception as e:
+                self.logger.error({
+                    'Table': table_name,
+                    'err_msg': e
+                })
+                bp = 'here'
+        self.logger.info('Upsert sequence complete!')
 
 
 

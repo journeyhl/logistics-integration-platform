@@ -53,7 +53,9 @@ class GetRMAsFromRMI(Pipeline):
 
 
     def load(self, data_transformed):
-        data_loaded = self.centralstore.checked_upsert('rmi_RMAStatus', data_transformed)
+        total = len(data_transformed)
+        self.logger.info(f'{total} rows to upsert')
+        data_loaded = self.centralstore.checked_upsert_paginated(table_name='rmi_RMAStatus', data=data_transformed, page_size=100)
         bp = 'here'
         return data_transformed
 

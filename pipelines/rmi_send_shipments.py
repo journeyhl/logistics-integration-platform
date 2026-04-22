@@ -27,20 +27,14 @@ class SendRMIShipments(Pipeline):
      - Creates a dictionary with RMANumber as key, then holds a list containing a dict with data for each row (line) that shipment has
         
     # Load
-     - Format the payload we'll send to RMI through :class:`~connectors.rmi_xml.RMIXML`.:meth:`~connectors.rmi_xml.RMIXML.post_w`
+     - Format the payload we'll send to RMI through :class:`~connectors.rmi_xml.RMIXML`.:meth:`~connectors.rmi_xml.RMIXML.post_2`
         - To get the data for each line, we'll do so in :class:`~connectors.rmi_xml.RMIXML`.:meth:`~connectors.rmi_xml.RMIXML._format_w_lines`
-     - Once formatted, post to RMI via :class:`~connectors.rmi_xml.RMIXML`.:meth:`~connectors.rmi_xml.RMIXML.post_w`
+     - Once formatted, post to RMI via :class:`~connectors.rmi_xml.RMIXML`.:meth:`~connectors.rmi_xml.RMIXML.post_2`
 
     # Results Logging
      - Upserts Acumatica API interactions to **_util.acu_api_log** 
      - Inserts RMI XML interactions to **_util.rmi_send_log**
     '''
-    '''SendShipments
-===
-
-Queries *AcumaticaDb* for any **Open Shipments** for RMI that have **NOT** been sent to the warehouse
-
-Sends Shipment payload to RMI and upserts *_util.rmi_send_log*'''
     def __init__(self):
         super().__init__('rmi-send-shipments')
         self.url = 'https://erp.journeyhl.com/ODATA/JHL/JHL RMI Shipment API'
