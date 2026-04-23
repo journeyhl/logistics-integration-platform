@@ -7,6 +7,77 @@ load_dotenv()
 import json
 import pyperclip
 
+
+
+
+
+
+def update_entries(azure_envs, operation: str):
+    for entry in azure_envs:
+        entry_name = entry['name'][:12]
+        if 'AzureWebJobs' != entry_name:
+            continue
+        if operation == 'toggle':
+            entry['value'] = 'true' if entry['value'] == 'false' else 'false' if entry['value'] == 'true' else entry['value']
+        elif operation == 'disable':
+            entry['value'] = 'true'
+        elif operation == 'enable':
+            entry['value'] = 'false'
+    
+    return azure_envs
+
+
+def decide_function_status(azure_envs):
+    changes = []
+    for entry in azure_envs:
+        entry_name = entry['name']
+        if 'AzureWebJobs' != entry_name[:12] or entry_name == 'AzureWebJobsStorage':
+            continue
+        short_name = entry_name.split('.')[1]
+        value = entry['value']
+        status = get_status(value)
+        print(f'\n{short_name}: {status}')
+        
+        new_status = input(f'Confirm status? (y/n): ').lower()
+        if new_status[0] in['y', 'c']:
+            print('status confirmed')
+        elif new_status[0] in ['n', 'u']:
+            old = entry['value']
+            new = 'true' if old == 'false' else 'true'
+            entry['value'] = new
+            changes.append({
+                'func': short_name,
+                'old': get_status(old),
+                'new': get_status(new)
+            })
+            print(f'{short_name} changed from {get_status(old)} to {get_status(new)}')
+    print()
+    for change in changes:
+        func_len = 25 - len(change['func'])
+        old_len  = 9 - len(change['old'])
+        new_len  = 9 - len(change['new'])
+
+        print(f'{change['func']}:{' ' * func_len}{change['old']}{' ' * old_len}-> {change['new']}{' ' * new_len}')
+    return azure_envs
+
+
+
+
+
+
+
+
+
+
+def get_status(disabled: str):
+    if disabled == 'true':
+        return 'disabled'
+    elif disabled == 'false':
+        return 'enabled'
+
+
+
+
 while True:
     try:
         azure_envs = json.loads(pyperclip.paste())
@@ -54,7 +125,35 @@ for entry in current_env:
         bp = 'here'
         azure_envs.append(entry)
 
+function_option_selection = input('''
+Would you like to disable/enable functions?
+press 1 to disable all functions
+press 2 to enable all functions
+press 3 to toggle all functions
+press 4 to iterate and decide for each
+press any other key to do nothing: ''')[0]
+
+option_map = {
+    '1': 'disable',
+    '2': 'enable',
+    '3': 'toggle'
+}
+
+if function_option_selection in['1', '2', '3']:
+    azure_envs = update_entries(azure_envs, option_map[function_option_selection])
+elif function_option_selection == '4':
+    azure_envs = decide_function_status(azure_envs)
+else:
+    bp = 'here'
+
+
+
+
+
+for entry in azure_envs:
+    bp = 'here'
+
 pyperclip.copy(json.dumps(azure_envs, indent=2))
-print(f'New env json ready for paste to azure! {len(azure_env_backup) - len(azure_envs)} variables added')
+print(f'New env json ready for paste to azure! {len(azure_envs) - len(azure_env_backup)} variables added')
 
 bp = 'here'

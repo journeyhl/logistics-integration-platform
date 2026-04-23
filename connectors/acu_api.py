@@ -586,17 +586,19 @@ class AcumaticaAPI:
             - Required: **ShipmentNbr**
             '''
         verb = 'added to'
+        now = ' now '
         if body == None:
             verb = 'retrieved from'
+            now = ' '
             body = {
                 "ShipmentNbr": { "value": f"{shipment_data['ShipmentNbr']}" },
             }
         response = self.session.put(url=f'{self.base_uri}/Shipment?$expand=Packages/PackageContents', json=body)
         json_response = response.json()
         if response.ok:            
-            self.logger.info(f'Package {verb} {shipment_data['ShipmentNbr']}!')
+            self.logger.info(f'Package data {verb} {shipment_data['ShipmentNbr']}!')
             shipment_data = {**shipment_data, 'Packages': json_response['Packages'], 'package_count': json_response['PackageCount']['value']}
-            response_str = f'{response.status_code} {response.reason}. {shipment_data['ShipmentNbr']} now has {json_response['PackageCount']['value']} packages.'
+            response_str = f'{response.status_code} {response.reason}. {shipment_data['ShipmentNbr']}{now}has {json_response['PackageCount']['value']} packages.'
             self.logger.info(response_str)
         if not response.ok:
             self.logger.error(f'get_package_details failed ({response.status_code}): {json_response.get('error')}')

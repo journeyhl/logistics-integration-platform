@@ -41,12 +41,22 @@ class Load:
         for shipment, data in data_transformed.items():
             shipment_data = self.pipeline.acu_api.shipment_details(data)
             
-            package_match = self.check_package(shipment_response=shipment_data, shipment_or_receipt = 'Shipment')
-            if (package_match):
+            full_match, line_match = self.check_package(shipment_response=shipment_data, shipment_or_receipt = 'Shipment')
+
+            if(full_match):
                 shipment_data = self.pipeline.acu_api.add_package_v2(shipment_data)
                 self.pipeline.acu_api.confirm_shipment(shipment_data)
             else:
-                shipment_data = self.pipeline.acu_api.get_package_details(shipment_data, 'put')
+                shipment_data = self.pipeline.acu_api.get_package_details(shipment_data)
+            #TODO Finish implementing matching logic below
+            #region matching logic work in progress            
+            # if(line_match):
+            #     shipment_data = self.pipeline.acu_api.add_package_v2(shipment_data)
+            # if(full_match):
+            #     self.pipeline.acu_api.confirm_shipment(shipment_data)
+            # else:
+            #     shipment_data = self.pipeline.acu_api.get_package_details(shipment_data, 'put')
+            #endregion
             bp = 'here'
 
 
@@ -169,28 +179,34 @@ class Load:
                         'Qty': qty
                     }
 
-        qty_match = True
+        full_match = True
+        line_match = False
+        
         for key, line_qty in line_detail.items():
             self.logger.info(f'Line: {key} - {line_qty['Qty']} units')
             if pkg_detail.get(key):
-                item_qty_match = line_qty['Qty'] == pkg_detail[key]['Qty']
+                line_qty_match = line_qty['Qty'] == pkg_detail[key]['Qty']
                 self.logger.info(f'On Package: {key} - {pkg_detail[key]['Qty']} units')
-                if item_qty_match:
+                if line_qty_match:
                     self.logger.info(f'Qty match for {key}')
+                    line_match = True
                 else:
                     self.logger.error(f'Qty mismatch for {key}: line has {line_qty['Qty']}, package has {pkg_detail[key]['Qty']}')
-                    qty_match = False
+                    full_match = False
             else:
                 self.logger.error(f'{key} is on the Shipment but missing from Packages')
-                qty_match = False
+                full_match = False
 
-        if qty_match:
+
+        if full_match:
             self.logger.info(f'Package check passed for Shipment {shipment_nbr}')
+        elif line_match and not full_match:
+            self.logger.info(f'Package check partially passed for Shipment {shipment_nbr}')
         else:
             self.logger.error(f'Package check failed for Shipment {shipment_nbr}')
 
         bp = 'here'
-        return qty_match
+        return full_match, line_match
 
 
 
@@ -206,8 +222,8 @@ class Load:
             return
 
         self.logger.info(f'Check 2...')
-        ready = self.check_package(shipment_response=receipt_response, shipment_or_receipt='Receipt')
-        if ready:
+        qty_match, item_qty_match = self.check_package(shipment_response=receipt_response, shipment_or_receipt='Receipt')
+        if qty_match:
             self.logger.info('Check 2 passed!')
             self.pipeline.acu_api.confirm_shipment(receipt_response)
             return

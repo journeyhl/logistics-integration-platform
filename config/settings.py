@@ -827,7 +827,10 @@ CRITEO = {
     'ad_id': os.getenv('CRITEO_ADVERTISER_ID')
 }
 
-
 KUSTOMER = {
     'webhook': os.getenv('KUSTOMER_WEBHOOK')
+}
+
+HUBSPOT = {
+    'access_token': os.getenv('HUBSPOT_ACCESS_TOKEN')
 }

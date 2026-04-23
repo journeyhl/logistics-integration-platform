@@ -11,8 +11,8 @@ select s.ShipmentNbr
 	 
 from SOShipment s 
 inner join SOShipLine sl on s.CompanyID = sl.CompanyID and s.ShipmentNbr = sl.ShipmentNbr
-inner join SOShipLineSplitPackage spl on s.CompanyID = spl.CompanyID and s.ShipmentNbr = spl.ShipmentNbr and sl.LineNbr = spl.ShipmentLineNbr and sl.InventoryID = spl.InventoryID
-inner join SOPackageDetail p on s.CompanyID = p.CompanyID and s.ShipmentNbr = p.ShipmentNbr and spl.PackageLineNbr = p.LineNbr
+left join SOShipLineSplitPackage spl on s.CompanyID = spl.CompanyID and s.ShipmentNbr = spl.ShipmentNbr and sl.LineNbr = spl.ShipmentLineNbr and sl.InventoryID = spl.InventoryID
+left join SOPackageDetail p on s.CompanyID = p.CompanyID and s.ShipmentNbr = p.ShipmentNbr and spl.PackageLineNbr = p.LineNbr
 where s.companyid = 2 
 and s.Status = 'N'
 and p.TrackNumber is not null
