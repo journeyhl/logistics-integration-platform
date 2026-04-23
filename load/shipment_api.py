@@ -40,12 +40,11 @@ class Load:
         '''
         for shipment, data in data_transformed.items():
             shipment_data = self.pipeline.acu_api.shipment_details(data)
-            if (shipment_data['package_count'] == 0
-            or shipment_data['package_count'] != shipment_data['line_count']
-            # or len(shipment_data['PackageLines']) != shipment_data['package_count']
-            # or len(shipment_data['PackageLines']) != shipment_data['line_count']
-            ):
+            
+            package_match = self.check_package(shipment_response=shipment_data, shipment_or_receipt = 'Shipment')
+            if (package_match):
                 shipment_data = self.pipeline.acu_api.add_package_v2(shipment_data)
+                self.pipeline.acu_api.confirm_shipment(shipment_data)
             else:
                 shipment_data = self.pipeline.acu_api.get_package_details(shipment_data, 'put')
             bp = 'here'
@@ -102,8 +101,8 @@ class Load:
     
 
 
-    def check_package(self, receipt_response: dict):
-        '''`check_package`(self, receipt_response: *dict*, )
+    def check_package(self, shipment_response: dict, shipment_or_receipt: str):
+        '''`check_package`(self, shipment_response: *dict*, shipment_or_receipt: *str*)
         ---
         <hr>
         
@@ -117,7 +116,8 @@ class Load:
         
         Parameters
         ---
-        :param (*dict*) `receipt_response`: Receipt data from Acumatica
+        :param (*dict*) `receipt_response`: Shipment/Receipt data from Acumatica
+        :param (*dict*) `shipment_or_receipt`: If we are checking for a Shipment or a Receipt. **'Shipment' | 'Receipt'**
         
         <hr>
         
@@ -125,13 +125,25 @@ class Load:
         ---
         :return `qty_match` (*bool*): Returns **True** if all Items and Quantities match, **False** if not
         '''
-        shipment_nbr = receipt_response['ShipmentNbr']
-        lines = receipt_response['line_count']
-        packages = receipt_response['package_count']
-        self.logger.info(f'Checking Packages for Shipment {shipment_nbr}: {lines} line(s) across {packages} package(s)')
+        #TODO Add functionality for shipments
+        shipment_nbr = shipment_response['ShipmentNbr']
+        lines = shipment_response['line_count']
+        packages = shipment_response['package_count']
+        log_str = f'Checking Packages for Shipment {shipment_nbr}: {lines} line(s) across {packages} package(s)'
+        if shipment_or_receipt.lower() == 'shipment':
+            self.logger.info(f'Checking PackagePayload for Shipment {shipment_nbr}: {lines} line(s) across {packages} package(s) is payload')
+            packages = shipment_response['PackagePayload']['Packages']
+        elif shipment_or_receipt.lower() == 'receipt':
+            self.logger.info(f'Checking Packages for Shipment {shipment_nbr}: {lines} line(s) across {packages} package(s)')
+            packages = shipment_response['Packages']
+        else:
+            self.logger.info(f"Invalid shipment_or_receipt value! Only pass 'Shipment' or 'Receipt'")
+            packages = []
+
+
 
         line_detail = {}
-        for line in receipt_response['details']:
+        for line in shipment_response['details']:
             if line_detail.get(line['InventoryCD']):
                 same_item = line_detail[line['InventoryCD']]
                 line_detail[line['InventoryCD']] = {
@@ -143,7 +155,7 @@ class Load:
                 }
 
         pkg_detail = {}
-        for package in receipt_response['Packages']:
+        for package in packages:
             for p_line in package['PackageContents']:
                 item = p_line['InventoryID']['value']
                 qty = int(p_line['Quantity']['value'])
@@ -194,7 +206,7 @@ class Load:
             return
 
         self.logger.info(f'Check 2...')
-        ready = self.check_package(receipt_response=receipt_response)
+        ready = self.check_package(shipment_response=receipt_response, shipment_or_receipt='Receipt')
         if ready:
             self.logger.info('Check 2 passed!')
             self.pipeline.acu_api.confirm_shipment(receipt_response)

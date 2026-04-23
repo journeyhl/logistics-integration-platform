@@ -560,6 +560,7 @@ class AcumaticaAPI:
         self.logger.info(f'Adding package to {shipment_data['ShipmentNbr']}')
         shipment_data = self.get_package_details(shipment_data, shipment_data['PackagePayload'])
         bp = 'here'
+        return shipment_data
 
     def get_package_details(self, shipment_data, body=None):
         '''`get_package_details`(self, shipment_data)

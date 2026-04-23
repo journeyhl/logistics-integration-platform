@@ -1,6 +1,7 @@
 from config.settings import REDSTAG
 import requests
 import logging
+import time
 
 class RedStagAPI:
     def __init__(self, pipeline):
@@ -135,6 +136,7 @@ class RedStagAPI:
             ]
 
         '''
+        time.sleep(1)
         payload = {
             "jsonrpc": self.jsonrpc,
             "id": self.id,

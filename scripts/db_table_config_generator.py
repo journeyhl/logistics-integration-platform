@@ -78,7 +78,7 @@ if type(db) != str:
         bp = 'here'
 
         def format_entry(table_name, cfg):
-            lines = [f"    '{table_name}': {{"]
+            lines = [f"'{table_name}': {{"]
             for section in ('keys', 'columns', 'update_columns'):
                 lines.append(f"        '{section}': [")
                 for item in cfg[section]:

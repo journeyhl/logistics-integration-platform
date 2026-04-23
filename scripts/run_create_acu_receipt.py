@@ -6,3 +6,4 @@ from pipelines import CreateAcuReceipt
 
 acu_receipt_creation = CreateAcuReceipt()
 acu_receipt_creation_result = acu_receipt_creation.run()
+
