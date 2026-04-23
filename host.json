@@ -15,8 +15,11 @@
       "Microsoft.Azure.WebJobs.Host": "None",
       "Microsoft.Azure.WebJobs.Host.Executors": "None",
       "Microsoft.Azure.WebJobs.Script": "Information",
-      "Host.Results": "Information",
-      "Host.Aggregator": "Information"
+      "Host.Aggregator": "Information",
+      "Host.Results": "Warning",
+      "Host.Executor": "Warning",
+      "Function": "Warning"
+   
     },
     "applicationInsights": {
       "samplingSettings": {
