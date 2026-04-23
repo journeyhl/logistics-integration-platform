@@ -13,17 +13,45 @@ import pyperclip
 
 
 def update_entries(azure_envs, operation: str):
+    strs = []
+    enabled = []
+    disabled = []
     for entry in azure_envs:
-        entry_name = entry['name'][:12]
-        if 'AzureWebJobs' != entry_name:
+        entry_name = entry['name']
+        if 'AzureWebJobs' != entry_name[:12] or entry_name == 'AzureWebJobsStorage':
             continue
+        short_name = entry_name.split('.')[1]
+        value = entry['value']
+        status = get_status(value)
+        func_len = 35 - len(short_name)
+        if status == 'enabled':
+            enabled.append(short_name)
+        elif status == 'disabled':
+            disabled.append(short_name)
+
         if operation == 'toggle':
             entry['value'] = 'true' if entry['value'] == 'false' else 'false' if entry['value'] == 'true' else entry['value']
         elif operation == 'disable':
             entry['value'] = 'true'
+            if value != 'true':
+                strs.append(f'{short_name}{' ' * func_len}enabled              disabled')
         elif operation == 'enable':
             entry['value'] = 'false'
+            if value != 'false':
+                strs.append(f'{short_name}{' ' * func_len}disabled             enabled')
     
+    print('\nDisabled\n------------')
+    for s in disabled:
+        print(s)
+    print('\nEnabled\n------------')
+    for s in enabled:
+        print(s)    
+    print()
+    print('Function                           Old Status           New Status')
+    print('------------------------------------------------------------------')
+    for s in strs:
+        print(s)
+
     return azure_envs
 
 
