@@ -7,13 +7,31 @@ from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
 class AcuToDbcSalesOrders(Pipeline):
+    '''`AcuToDbcSalesOrders`(Pipeline)
+    ---
+    <hr>
+
+    Gets all Sales Orders from AcumaticaDb that were modified within the last few hours and loads them to **acu.SalesOrders**
+
+    # Extraction
+     - Gets all Sales Orders from AcumaticaDb that were modified within the last few hours
+        - OrderType not in('QT', 'RA', 'RC', 'RR', 'RM')
+
+    # Transformation
+     - Transforms extracted data into a format needed for acu.SalesOrders
+
+    # Load
+     - Upsert to **acu.SalesOrders** via :class:`~connectors.sql.SQLConnector`.:meth:`~connectors.sql.SQLConnector.checked_upsert_paginated`
+
+    # Results Logging
+     - None needed
+    '''
     def __init__(self):
         super().__init__('acu-to-dbc-sales-orders')
 
 
     def extract(self) -> dict[str, pl.DataFrame]:
         acu_extract = self.acudb.query_to_dataframe(self.acudb.queries.AcuToDbc_SalesOrders)
-        # dbc_extract = self.centralstore.query_db('select distinct OrderNumber from acu.SalesOrders where LastChecked is not null')
         data_extract = {
             'acu_extract': acu_extract,
             'dbc_extract': '' #dbc_extract 
@@ -23,9 +41,6 @@ class AcuToDbcSalesOrders(Pipeline):
     def transform(self, data_extract: dict[str, pl.DataFrame]):
         dbc_extract = data_extract['dbc_extract']
         acu_extract = data_extract['acu_extract']
-        # acu_extract = data_extract['acu_extract'].join(
-        #     dbc_extract, on='OrderNumber', how='anti'
-        # )
         acu_extract = acu_extract.with_columns(
             pl.col('LineNbr').fill_null(99).alias('LineNbr')
         ).to_dicts()

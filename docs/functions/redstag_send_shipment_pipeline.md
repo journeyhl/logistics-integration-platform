@@ -49,3 +49,6 @@ flowchart TD
     LR --> UPS[(CentralStore: upsert _util.acu_api_log)]
 ```
 
+## Queries
+### AcumaticaDb
+ - #### [SendRedStagShipments.sql](../../sql/queries/AcumaticaDb/SendRedStagShipments.sql)

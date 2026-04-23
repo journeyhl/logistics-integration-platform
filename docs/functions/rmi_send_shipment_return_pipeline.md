@@ -93,3 +93,8 @@ flowchart TD
     LR --> LO[AcumaticaAPI._logout]
     LR --> UPS[(CentralStore: upsert _util.acu_api_log)]
 ```
+
+## Queries
+### AcumaticaDb
+ - #### [SendRMIShipments.sql](../../sql/queries/AcumaticaDb/SendRMIShipments.sql)
+ - #### [SendRMIReturns.sql](../../sql/queries/AcumaticaDb/SendRMIReturns.sql)

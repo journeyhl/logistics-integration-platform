@@ -7,6 +7,26 @@ from typing import Literal
 import json
 
 class SendOrderDetailsToKustomer(Pipeline):
+    '''`SendOrderDetailsToKustomer`(Pipeline)
+    ---
+    <hr>
+
+    Gets all recent orders from AcumaticaDb/orders that haven't been sent to Kustomer
+
+    Pulls shipment details & tracking, formats, then sends to Kustomer
+
+    # Extraction
+     - Gets all recent orders from AcumaticaDb/orders that haven't been sent to Kustomer
+
+    # Transformation
+     - Transforms extracted data into a format needed for Kustomer Webhook
+
+    # Load
+     - Send formatted payload to Kustomer Webhook and upsert to **K_OrderIngest** in *AcumaticaDb* every 25 rows
+
+    # Results Logging
+     - None needed
+    '''    
     def __init__(self):
         super().__init__('kustomer-orders')
         self.transformer = Transform(self)
@@ -29,10 +49,6 @@ class SendOrderDetailsToKustomer(Pipeline):
         return data_loaded
     
     def log_results(self, data_loaded):
-        self.logger.info(f'Logging Kustomer api interactions...')
-        # for entry in data_loaded:
-        #     entry['jsonData'] = json.dumps(entry['jsonData'])
-        # self.acudb.checked_upsert('K_OrderIngest', data_loaded)
         pass
 
 

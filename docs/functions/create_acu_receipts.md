@@ -77,5 +77,7 @@ flowchart TD
     LR --> UPS[(CentralStore: upsert _util.acu_api_log)]
 ```
 
-
-
+## Queries
+### AcumaticaDb
+ - #### [ReturnsPendingReciept.sql](../../sql/queries/AcumaticaDb/ReturnsPendingReciept.sql)
+ - #### [OpenRCsNoReceipt.sql](../../sql/queries/AcumaticaDb/OpenRCsNoReceipt.sql)

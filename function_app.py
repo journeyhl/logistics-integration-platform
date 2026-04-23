@@ -488,7 +488,7 @@ def acu_to_dbc_quotes(timer: af.TimerRequest):
 
 #region kustomer_order_ingest
 #      Order data to Kustomer
-#5x/hour (0 ,12, 24, 36, 48)
+# 5x/hour (0, 12, 24, 36, 48)
 @app.timer_trigger(
     schedule = '*/12 * * * *',
     arg_name = 'timer',
@@ -502,7 +502,7 @@ def kustomer_order_ingest(timer: af.TimerRequest):
     kustomer_order_ingest
     ===
     
-    Runs both the *ingest* and *backfill* variations of the SendOrderDetailsToKustomer Pipeline
+    Runs the *ingest* variation of the SendOrderDetailsToKustomer Pipeline
 
 
 
@@ -524,19 +524,19 @@ def kustomer_order_ingest(timer: af.TimerRequest):
 #        Order data to Kustomer
 #           3x/hour (0, 29, 58)
 @app.timer_trigger(
-    schedule = '5/24 * * * *',
+    schedule = '*/29 * * * *',
     arg_name = 'timer',
     run_on_startup = False
 )
 def kustomer_order_backfill(timer: af.TimerRequest):
-    '''`kustomer_order_ingest`
+    '''`kustomer_order_backfill`
     ---
     <hr>
 
-    kustomer_order_ingest
+    kustomer_order_backfill
     ===
     
-    Runs both the *ingest* and *backfill* variations of the SendOrderDetailsToKustomer Pipeline
+    Runs both the  *backfill* variation of the SendOrderDetailsToKustomer Pipeline
 
 
 
@@ -544,7 +544,7 @@ def kustomer_order_backfill(timer: af.TimerRequest):
 
     Schedule
     ===
-        Runs every 29 minutes
+        Runs every 24 minutes
     '''
     from pipelines import SendOrderDetailsToKustomer
     kustomer_pipeline = SendOrderDetailsToKustomer()

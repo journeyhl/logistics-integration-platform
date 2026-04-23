@@ -11,16 +11,16 @@ class AcuToDbcQuotes(Pipeline):
     ---
     <hr>
 
-    Gets all recently sent Shipments & Returns and recently retrieved ClosedShipments and Receipts
+    Gets all QT type Sales Orders from AcumaticaDb that were modified within the last day and loads them to **acu.Quotes**
 
     # Extraction
-     - Gets all recently sent Shipments & Returns and recently retrieved ClosedShipments and Receipts from db_CentralStore
+     - Gets all QT type Sales Orders from AcumaticaDb that were modified within the last day and loads them to **acu.Quotes**
 
     # Transformation
-     - Transforms extracted data into a list of distinct RMANumbers
+     - Transforms extracted data into a format needed for acu.Quotes
 
     # Load
-     - Skipped
+     - Upsert to **acu.Quotes** via :class:`~connectors.sql.SQLConnector`.:meth:`~connectors.sql.SQLConnector.checked_upsert_paginated`
 
     # Results Logging
      - None needed
@@ -31,10 +31,10 @@ class AcuToDbcQuotes(Pipeline):
 
     def extract(self) -> dict[str, pl.DataFrame]:
         acu_extract = self.acudb.query_to_dataframe(self.acudb.queries.AcuToDbc_Quotes)
-        dbc_extract = self.centralstore.query_db('select distinct QuoteNbr from acu.Quotes where LastChecked is not null')
+        # dbc_extract = self.centralstore.query_db('select distinct QuoteNbr from acu.Quotes where LastChecked is not null')
         data_extract = {
             'acu_extract': acu_extract,
-            'dbc_extract': dbc_extract
+            'dbc_extract': '' #dbc_extract
         }
         return data_extract
 

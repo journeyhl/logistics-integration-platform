@@ -12,7 +12,6 @@ class Transform:
 
 
     def transform(self, data_extract: dict[str, pl.DataFrame]):
-
         central_transformed = data_extract['central_extract']
         redstag_transformed = self.transform_redstag_events(data_extract['redstag_event_extract'])
         rmi_extract = data_extract['rmi_extract']
@@ -218,17 +217,6 @@ class Transform:
                 }
                 packages.append(package)
                 bp = 'here'
-                
-        # if self.package_contents.get((shipment_line_data['ShipmentNbr'], shipment_line_data['TrackingNbr_3pl'])) == None:
-        #     self.package_contents[(shipment_line_data['ShipmentNbr'], shipment_line_data['TrackingNbr_3pl'])] = [{
-        #             "InventoryID": { "value": pkg_line_data['InventoryCD'] },
-        #             "Quantity": { "value": pkg_line_data['Qty_3pl'] },
-        #             "UOM": { "value": "EA" },
-        #             "ShipmentSplitLineNbr": { "value": pkg_line_data['SplitLineNbr']}
-        #         }
-        #         for pkg_line_data in shipment_data if shipment_line_data['TrackingNbr_3pl'] == pkg_line_data['TrackingNbr_3pl'] and shipment_line_data['ShipmentNbr'] == pkg_line_data['ShipmentNbr']
-        #     ]
-
         package_payload = {
             "ShipmentNbr": { "value": f"{shipment_line_data['ShipmentNbr']}" },
             "Packages": packages
@@ -304,4 +292,3 @@ class Transform:
         bp = 'here'
         return redstag_events
     
-    # def get_redstag_row(self)

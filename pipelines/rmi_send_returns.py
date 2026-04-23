@@ -4,7 +4,7 @@ from transform.rmi_send import Transform
 import polars as pl
 import json
 class SendRMIReturns(Pipeline):
-    '''`SendRMIReturns`(Pipeline:)
+    '''`SendRMIReturns`(Pipeline)
     ---
     <hr>
 

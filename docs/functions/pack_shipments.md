@@ -22,8 +22,6 @@ acu_extract = self.acudb.query_db(self.acudb.queries.PackShipment.query)
 ## Execution Behavior
 Executes single pipeline, **PackShipments**
 
----
-
 ## Pipelines
 
 ### PackShipments
@@ -59,7 +57,7 @@ flowchart TD
     RUN --> LD[load]
     LD --> LS[load_shipments]
     LS --> SD[acu_api.shipment_details]
-    SD --> PKG{package_count == 0 or != line_count?}
+    SD --> PKG{Packages contents = Lines contents?}
     PKG -->|Yes| AP[acu_api.add_package_v2]
     PKG -->|No| GP[acu_api.get_package_details]
 
@@ -68,4 +66,10 @@ flowchart TD
     LR --> UPS[(CentralStore: upsert _util.acu_api_log)]
 ```
 
-
+## Queries
+### AcumaticaDb
+ - #### [PackShipment.sql](../../sql/queries/AcumaticaDb/PackShipment.sql)
+### db_CentralStore
+ - #### [PackShipmentRedStag.sql](../../sql/queries/db_CentralStore/PackShipmentRedStag.sql)
+ - #### [RedStagEvents.sql](../../sql/queries/db_CentralStore/RedStagEvents.sql)
+ - #### [PackShipmentRMI.sql](../../sql/queries/db_CentralStore/PackShipmentRMI.sql)
