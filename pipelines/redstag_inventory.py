@@ -8,7 +8,7 @@ from transform.redstag_inventory import Transform
 
 
 class RedStagInventory(Pipeline):
-    '''`RedStagInventory`(Pipeline:)
+    '''`RedStagInventory`(Pipeline)
     ---
     <hr>
 

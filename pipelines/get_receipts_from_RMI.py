@@ -18,7 +18,7 @@ class GetReceiptsFromRMI(Pipeline):
     # Load
      - Upserts data to **rmi_Receipts** via :meth:`~connectors.sql.SQLConnector.checked_upsert`
 
-    # Logging
+    # Results Logging
      - None needed
     '''
     def __init__(self):

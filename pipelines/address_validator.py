@@ -6,7 +6,7 @@ from load.address_validator import Load
 import json
 import time
 class AddressValidator(Pipeline):
-    '''`AddressValidator(Pipeline)`
+    '''`AddressValidator`(Pipeline)
     ---
     <hr>
     

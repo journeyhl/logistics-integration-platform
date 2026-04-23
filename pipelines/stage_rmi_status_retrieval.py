@@ -4,7 +4,7 @@ import polars as pl
 
 
 class StageRMIStatusRetrieval(Pipeline):
-    '''`GetStatusFromRMI`(Pipeline)
+    '''`StageRMIStatusRetrieval`(Pipeline)
     ---
     <hr>
 
@@ -19,7 +19,7 @@ class StageRMIStatusRetrieval(Pipeline):
     # Load
      - Skipped
 
-    # Logging
+    # Results Logging
      - None needed
     '''
 

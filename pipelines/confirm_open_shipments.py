@@ -4,7 +4,7 @@ from connectors import AcumaticaAPI
 import json
 import time
 class ShipmentsReadyToConfirm(Pipeline):
-    '''`ShipmentsReadyToConfirm`(Pipeline:)
+    '''`ShipmentsReadyToConfirm`(Pipeline)
     ---
     <hr>
 

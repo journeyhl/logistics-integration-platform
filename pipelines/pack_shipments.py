@@ -5,7 +5,7 @@ from load.shipment_api import Load
 import json
 
 class PackShipments(Pipeline):
-    '''`PackShipments`(Pipeline:)
+    '''`PackShipments`(Pipeline)
     ---
     <hr>
 

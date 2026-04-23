@@ -5,7 +5,7 @@ from load.load_redstag_send import Load
 import json
 
 class SendRedStagShipments(Pipeline):
-    '''`SendRedStagShipments`(Pipeline:)
+    '''`SendRedStagShipments`(Pipeline)
     ---
     <hr>
 

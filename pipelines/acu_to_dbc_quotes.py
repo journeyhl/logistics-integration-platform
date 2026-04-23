@@ -7,6 +7,24 @@ from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
 class AcuToDbcQuotes(Pipeline):
+    '''`AcuToDbcQuotes`(Pipeline)
+    ---
+    <hr>
+
+    Gets all recently sent Shipments & Returns and recently retrieved ClosedShipments and Receipts
+
+    # Extraction
+     - Gets all recently sent Shipments & Returns and recently retrieved ClosedShipments and Receipts from db_CentralStore
+
+    # Transformation
+     - Transforms extracted data into a list of distinct RMANumbers
+
+    # Load
+     - Skipped
+
+    # Results Logging
+     - None needed
+    '''
     def __init__(self):
         super().__init__('acu-to-dbc-quotes')
 

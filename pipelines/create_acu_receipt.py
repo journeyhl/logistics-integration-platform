@@ -11,7 +11,7 @@ from connectors import AcumaticaAPI
 import json
 
 class CreateAcuReceipt(Pipeline):
-    '''`CreateAcuReceipt`(Pipeline:)
+    '''`CreateAcuReceipt`(Pipeline)
     ---
     <hr>
 

@@ -24,7 +24,7 @@ class GetStatusFromRMI(Pipeline):
     # Load
      - Upserts data to **rmi_RMAStatus** via :meth:`~connectors.sql.SQLConnector.checked_upsert`
 
-    # Logging
+    # Results Logging
      - None needed
     '''
     def __init__(self):
