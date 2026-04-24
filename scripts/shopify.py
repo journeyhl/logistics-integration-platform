@@ -9,4 +9,5 @@ shop = ShopifyGraphQL()
 
 response = shop.extract()
 
+
 bp = 'here'
