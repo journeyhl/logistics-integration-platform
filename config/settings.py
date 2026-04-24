@@ -834,3 +834,11 @@ KUSTOMER = {
 HUBSPOT = {
     'access_token': os.getenv('HUBSPOT_ACCESS_TOKEN')
 }
+
+SHOPIFY = {
+    'domain': 'journey-health-lifestyle.myshopify.com',
+    'version': "2024-07",
+    'token': os.getenv('API_TOKEN'),
+    'key': os.getenv('API_KEY'),
+    'secret': os.getenv('API_SECRET')
+}

@@ -7,3 +7,4 @@ from .redstag_api import RedStagAPI
 from .avs import AddressVerificationSystem
 from .criteo_api import CriteoAPI
 from .kustomer import Kustomer
+from .shopify import ShopifyAPI

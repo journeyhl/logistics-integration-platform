@@ -21,3 +21,4 @@ from .sales_order_cleaner import SalesOrderCleaner
 from .kustomer import SendOrderDetailsToKustomer
 from .acu_to_dbc_quotes import AcuToDbcQuotes
 from .acu_to_dbc_sales_orders import AcuToDbcSalesOrders
+from .shopify import ShopifyGraphQL

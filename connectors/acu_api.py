@@ -37,7 +37,7 @@ class AcumaticaAPI:
         >>> self._auth() #logs into Acumatica API
         
         **self._auth** Authenticates using creds from :data:`~config.settings.ACUMATICA_API`
-        """    
+        """
         self.pipeline = pipeline    
         if type(pipeline) == str:            
             self.logger = logging.getLogger(f'{pipeline}.acu_api')
