@@ -48,7 +48,7 @@ class ShopifyAPI:
         FROM sales
         SHOW gross_sales, net_sales
         WHERE is_canceled_order = false
-        GROUP BY order_name, day, order_utm_source, utm_source, ...
+        GROUP BY order_name, day, order_utm_source, utm_source,
         TIMESERIES day
         HAVING gross_sales__last_click != 0
         SINCE {self.since} UNTIL {self.until}
