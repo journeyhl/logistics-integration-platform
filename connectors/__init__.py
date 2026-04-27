@@ -8,3 +8,5 @@ from .avs import AddressVerificationSystem
 from .criteo_api import CriteoAPI
 from .kustomer import Kustomer
 from .shopify import ShopifyAPI
+from .hubspot_api import HubSpotAPI
+from .teams import Teams

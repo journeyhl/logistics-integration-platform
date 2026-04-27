@@ -1,19 +1,21 @@
 
 import requests
 import logging
-import json
-from datetime import datetime, timedelta
-from zoneinfo import ZoneInfo
-import time
+from config.settings import TEAMS
+
 class Teams:
     def __init__(self, pipeline):
         self.pipeline = pipeline
-        if type(pipeline) == str:
+        if isinstance(pipeline, str):
             self.logger = logging.getLogger(f'{pipeline}.teams')
         else:
             self.logger = logging.getLogger(f'{pipeline.pipeline_name}.teams')
-        pass
+        self.webhook_url = TEAMS['webhook_url'] or ''
+        if not self.webhook_url:
+            raise ValueError('TEAMS_WEBHOOK_URL is not set')
 
-
-    def _auth(self):
-        bp = 'here'
+    def send_message(self, message: str):
+        self.logger.info('Sending Teams message...')
+        resp = requests.post(self.webhook_url, json={'text': message})
+        resp.raise_for_status()
+        self.logger.info('Teams message sent')

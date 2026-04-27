@@ -846,3 +846,12 @@ SHOPIFY = {
     'key': os.getenv('SHOP_API_KEY'),
     'secret': os.getenv('SHOP_API_SECRET')
 }
+
+TEAMS = {
+    'tenant_id':        os.getenv('TEAMS_TENANT_ID'),
+    'client_id':        os.getenv('TEAMS_CLIENT_ID'),
+    'client_secret':    os.getenv('TEAMS_CLIENT_SECRET'),
+    'user_id':          os.getenv('TEAMS_USER_ID'),
+    'sp_object_id':     os.getenv('TEAMS_SP_OBJECT_ID'),
+    'webhook_url':      os.getenv('TEAMS_WEBHOOK_URL'),
+}
