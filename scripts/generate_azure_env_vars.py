@@ -177,11 +177,15 @@ else:
 
 
 
-
+new = []
 for entry in azure_envs:
-    bp = 'here'
+    match = next((be for be in azure_env_backup if entry == be), None)
+    if not match:
+        new.append(f'{entry['name']}: {entry['value']}')
 
 pyperclip.copy(json.dumps(azure_envs, indent=2))
 print(f'New env json ready for paste to azure! {len(azure_envs) - len(azure_env_backup)} variables added')
-
+print(f'\n\nAdditions:\n----')
+for new_item in new:
+    print(new_item)
 bp = 'here'

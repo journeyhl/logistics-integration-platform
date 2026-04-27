@@ -4,6 +4,7 @@ import logging
 import json
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
+import time
 class AcumaticaAPI:
     def __init__(self, pipeline):
         """`init`(self, pipeline: *Pipeline | str*)
@@ -38,8 +39,8 @@ class AcumaticaAPI:
         
         **self._auth** Authenticates using creds from :data:`~config.settings.ACUMATICA_API`
         """
-        self.pipeline = pipeline    
-        if type(pipeline) == str:            
+        self.pipeline = pipeline
+        if type(pipeline) == str:
             self.logger = logging.getLogger(f'{pipeline}.acu_api')
         else:
             self.logger = logging.getLogger(f'{pipeline.pipeline_name}.acu_api')
@@ -50,9 +51,14 @@ class AcumaticaAPI:
         self.base_uri = f'{self.uri}/{self.endpoint_name}/{self.version}'
         self.username = ACUMATICA_API['username']
         self.password = ACUMATICA_API['password']
+        self.username2 = ACUMATICA_API['username2'] #backup
+        self.password2 = ACUMATICA_API['password2'] #backup
+        self.username3 = ACUMATICA_API['username3'] #alternate backup
+        self.password3 = ACUMATICA_API['password3'] #alternate backup
         self.company = 'JHL'
         self.data_log = []
         self.session = requests.Session()
+        self.login_attempts = 0
         self._auth()
 
 #region SalesOrder
@@ -1077,7 +1083,27 @@ class AcumaticaAPI:
             response.raise_for_status()
             self.logger.info('Acumatica API is online. Logged into Acumatica and authenticated successfully')
         except Exception as e:
+            self.login_attempts += 1
+            sleep = 15
             self._logout()
+            if self.login_attempts == 1:
+                self.username = self.username2
+                self.password = self.password2
+                self.logger.warning(f'Failed to login on first attempt with default credentials, retrying with backup creds...')
+            elif self.login_attempts <= 5:
+                self.logger.warning(f'Failed to login with backup credentials...Waiting {sleep} seconds and trying again...Attempt {self.login_attempts - 1}/4' )
+                time.sleep(sleep)
+            elif self.login_attempts == 6:
+                self.logger.error(f"Couldn't login to Acumatica after one attempt with default creds and four attempts with backup creds... Now trying alternate backup credentials.")
+                self.username = self.username3
+                self.password = self.password3
+            elif self.login_attempts < 10:
+                self.logger.warning(f'Failed to login with alt backup credentials...Waiting {sleep} seconds and trying again...Attempt {self.login_attempts - 1}/4' )
+                self.logger.info(f'Sleeping {sleep}')
+                time.sleep(sleep)
+            else:
+                raise e
+            self._auth()
 
     def _logout(self):
         self.session.post('https://erp.journeyhl.com/entity/auth/logout')

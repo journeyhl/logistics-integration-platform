@@ -818,7 +818,11 @@ REDSTAG = {
 
 ACUMATICA_API = {
     'username': os.getenv('ACUMATICA_API_USERNAME'),
-    'password': os.getenv('ACUMATICA_API_PASSWORD')
+    'password': os.getenv('ACUMATICA_API_PASSWORD'),
+    'username2': os.getenv('ACUMATICA_API_USERNAME2'),
+    'password2': os.getenv('ACUMATICA_API_PASSWORD2'),
+    'username3': os.getenv('ACUMATICA_API_USERNAME3'),
+    'password3': os.getenv('ACUMATICA_API_PASSWORD3'),
 }
 
 CRITEO = {
@@ -838,7 +842,7 @@ HUBSPOT = {
 SHOPIFY = {
     'domain': 'journey-health-lifestyle.myshopify.com',
     'version': "2024-07",
-    'token': os.getenv('API_TOKEN'),
-    'key': os.getenv('API_KEY'),
-    'secret': os.getenv('API_SECRET')
+    'token': os.getenv('SHOP_API_TOKEN'),
+    'key': os.getenv('SHOP_API_KEY'),
+    'secret': os.getenv('SHOP_API_SECRET')
 }

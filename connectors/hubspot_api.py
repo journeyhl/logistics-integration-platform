@@ -47,13 +47,7 @@ class HubSpotAPI:
             f'HubSpot {method} {path} failed after 5 retries (last status {last_status}).'
         )
 
-    def search(
-        self,
-        object_type: str,
-        filter_groups: list[dict],
-        properties: list[str],
-        limit: int = 100,
-    ) -> Iterator[dict]:
+    def search(self, object_type: str, filter_groups: list[dict], properties: list[str], limit: int = 100) -> Iterator[dict]:
         path = f'/crm/v3/objects/{object_type}/search'
         after: str | None = None
         total = 0
