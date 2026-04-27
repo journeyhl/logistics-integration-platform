@@ -34,12 +34,14 @@ class Load:
         '''
         data_transformed_copy = data_transformed
         data_loaded = []
-        for shipment, data in data_transformed.items():
+        for i, (shipment, data) in enumerate(data_transformed.items()):
             self.logger.info(f'Sending execution payload for {shipment} to RedStag')
             self.create_response = self.pipeline.redstag.target_api(payload_target=data['execution_payload'], operation=data['execution_operation'])
             if self.create_response.get('results'):
                 self.create_response = self.create_response['results'][0]
-            
+            if i % 10 == 0 and i != 0:
+                self.logger.info('Sleeping 3 seconds...')
+                time.sleep(3)
             if self.create_response['status'] == 'unable_to_process':
                 self.logger.warning(f'{self.create_response['status']} {shipment}!')                
             if self.create_response['status'] == 'new' or self.create_response['status'] == 'unable_to_process':
