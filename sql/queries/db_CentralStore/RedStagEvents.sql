@@ -27,4 +27,4 @@ select t.Topic
 	 , t.msg
 from TopLevel t
 inner join acuShipments a on t.ShipmentNbr_3pl = a.ShipmentNbr
-where t.ShipmentNbr_3pl = '080584'
+-- where t.ShipmentNbr_3pl = '080584'

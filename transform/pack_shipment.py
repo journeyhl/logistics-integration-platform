@@ -18,79 +18,125 @@ class Transform:
         acu_transformed = data_extract['acu_extract']
         data_transformed = []
         for acu_shipment in acu_transformed.iter_rows(named=True):
-            match = next((
-                cs_shipment for cs_shipment in central_transformed.iter_rows(named=True)
+            matches = [cs_shipment for cs_shipment in central_transformed.iter_rows(named=True)
                     if acu_shipment['ShipmentNbr'] == cs_shipment['ShipmentNbr'].replace('-1', '').replace('-2', '').replace('-3', '')
                     and acu_shipment['ShipmentLineNbr'] == cs_shipment['ShipLineNbr']
                     and acu_shipment['SplitLineNbr'] == cs_shipment['SplitLineNbr']
                     and acu_shipment['InventoryCD'] == cs_shipment['InventoryCD']
-                )
-            , None)
-            match_redstag = next((
-                rs_shipment for rs_shipment in redstag_transformed
+            ]
+            matches_redstag = [rs_shipment for rs_shipment in redstag_transformed
                     if acu_shipment['ShipmentNbr'] == rs_shipment['ShipmentNbr'].replace('-1', '').replace('-2', '').replace('-3', '')
-                    and acu_shipment['InventoryCD'] == rs_shipment['InventoryCD']
-                )
-            , None)
-            match_rmi = next((
-                rmi_shipment for rmi_shipment in rmi_extract.iter_rows(named=True)
+                    and acu_shipment['InventoryCD'] == rs_shipment['InventoryCD']                
+            ]
+            matches_rmi = [rmi_shipment for rmi_shipment in rmi_extract.iter_rows(named=True)
                     if acu_shipment['ShipmentNbr'] == rmi_shipment['RMANumber']
-                    and acu_shipment['InventoryCD'] == rmi_shipment['InventoryCD']
-                )
-            , None)
+                    and acu_shipment['InventoryCD'] == rmi_shipment['InventoryCD']                
+            ]
+            self.shipment_formatted = {
+                    'ShipmentNbr': acu_shipment['ShipmentNbr'],
+                    'InventoryCD': acu_shipment['InventoryCD'],
+                    'OrderQty': acu_shipment['OrderQty'],
+                    'ShipQty': acu_shipment['ShipQty'],
+                    'SplitLineNbr': acu_shipment['SplitLineNbr']
+            }
+            if matches_redstag != []:
+                shipment_formatted = self.smash_rs_matches(acu_shipment, matches_redstag)
+                data_transformed.extend(shipment_formatted)
+                
+            elif matches != []:
+                shipment_formatted = self.smash_def_matches(acu_shipment, matches = matches)                
+                data_transformed.extend(shipment_formatted)
 
-            if match != None:
-                shipment_formatted = {
-                    'ShipmentNbr': acu_shipment['ShipmentNbr'],
-                    'InventoryCD': acu_shipment['InventoryCD'],
-                    'OrderQty': acu_shipment['OrderQty'],
-                    'ShipQty': acu_shipment['ShipQty'],
-                    'SplitLineNbr': acu_shipment['SplitLineNbr'],
-                    'InventoryCD_3pl': match['InventoryCD'],
-                    'Qty_3pl': match['rsQty'],
-                    'TrackingNbr_3pl': match['TrackingNbr'],
-                    'ItemsOnPackage_3pl': match['ItemsOnPackage'],
-                    'MaxPackageNum_3pl': match['MaxPackageNum'],
-                    'Courier_3pl': match['CourierName'],
-                    'Instructions_3pl': match['Complete'],
-                }
-                data_transformed.append(shipment_formatted)
-            elif match_redstag != None:
-                shipment_formatted = {
-                    'ShipmentNbr': acu_shipment['ShipmentNbr'],
-                    'InventoryCD': acu_shipment['InventoryCD'],
-                    'OrderQty': acu_shipment['OrderQty'],
-                    'ShipQty': acu_shipment['ShipQty'],
-                    'SplitLineNbr': acu_shipment['SplitLineNbr'],
-                    'InventoryCD_3pl': match_redstag['InventoryCD'],
-                    'Qty_3pl': match_redstag['Qty'],
-                    'TrackingNbr_3pl': match_redstag['TrackingNbr'],
-                    'ItemsOnPackage_3pl': match_redstag['order_item_qty'],
-                    'Courier_3pl': match_redstag['Courier'],
-                }
-                data_transformed.append(shipment_formatted)
-            elif match_rmi != None:
-                shipment_formatted = {
-                    'ShipmentNbr': acu_shipment['ShipmentNbr'],
-                    'InventoryCD': acu_shipment['InventoryCD'],
-                    'OrderQty': acu_shipment['OrderQty'],
-                    'ShipQty': acu_shipment['ShipQty'],
-                    'SplitLineNbr': acu_shipment['SplitLineNbr'],
-                    'InventoryCD_3pl': match_rmi['InventoryCD'],
-                    'Qty_3pl': match_rmi['QtyShipped'],
-                    'TrackingNbr_3pl': match_rmi['Tracking'],
-                    'ItemsOnPackage_3pl': match_rmi['Lines'],
-                    'Courier_3pl': match_rmi['CarrierCode'],
-                }
-                if match_rmi['Lines'] > 1:
-                    bp = 'here'
-                data_transformed.append(shipment_formatted)
+            elif matches_rmi != []:
+                shipment_formatted = self.smash_rmi_matches(acu_shipment, matches_rmi)
+                data_transformed.extend(shipment_formatted)
 
 
         self.logger.info(f'Matched {len(data_transformed)} rows')
         shipments = self.group_tracking(data_transformed)
         return shipments
     
+
+    def smash_def_matches(self, acu_shipment: dict, matches: list):
+        if len(matches) == 1:
+            match = matches[0]
+            shipment_formatted = [{
+                **self.shipment_formatted,
+                'InventoryCD_3pl': match['InventoryCD'],
+                'Qty_3pl': match['rsQty'],
+                'TrackingNbr_3pl': match['TrackingNbr'],
+                'ItemsOnPackage_3pl': match['ItemsOnPackage'],
+                'MaxPackageNum_3pl': match['MaxPackageNum'],
+                'Courier_3pl': match['CourierName'],
+                'Instructions_3pl': match['Complete'],
+            }]
+            return shipment_formatted
+        
+        formatted_matches = []
+        for match in matches:
+            formatted_matches.append({
+                **self.shipment_formatted,
+                'InventoryCD_3pl': match['InventoryCD'],
+                'Qty_3pl': match['rsQty'],
+                'TrackingNbr_3pl': match['TrackingNbr'],
+                'ItemsOnPackage_3pl': match['ItemsOnPackage'],
+                'MaxPackageNum_3pl': match['MaxPackageNum'],
+                'Courier_3pl': match['CourierName'],
+                'Instructions_3pl': match['Complete'],
+            })
+            bp = 'here'
+        return formatted_matches
+
+    def smash_rs_matches(self, acu_shipment: dict, matches: list):
+        if len(matches) == 1:
+            match = matches[0]
+            shipment_formatted = [{
+                **self.shipment_formatted,
+                'InventoryCD_3pl': match['InventoryCD'],
+                'Qty_3pl': match['Qty'],
+                'TrackingNbr_3pl': match['TrackingNbr'],
+                'ItemsOnPackage_3pl': match['order_item_qty'],
+                'Courier_3pl': match['Courier'],
+            }]
+            return shipment_formatted
+        formatted_matches = []
+        for match in matches:
+            formatted_matches.append({
+                **self.shipment_formatted,
+                'InventoryCD_3pl': match['InventoryCD'],
+                'Qty_3pl': match['Qty'],
+                'TrackingNbr_3pl': match['TrackingNbr'],
+                'ItemsOnPackage_3pl': match['order_item_qty'],
+                'Courier_3pl': match['Courier'],
+            })
+            bp = 'here'
+        return formatted_matches
+
+    def smash_rmi_matches(self, acu_shipment: dict, matches: list):
+        if len(matches) == 1:
+            match = matches[0]
+            shipment_formatted = [{
+                **self.shipment_formatted,
+                'InventoryCD_3pl': match['InventoryCD'],
+                'Qty_3pl': match['QtyShipped'],
+                'TrackingNbr_3pl': match['Tracking'],
+                'ItemsOnPackage_3pl': match['Lines'],
+                'Courier_3pl': match['CarrierCode'],
+            }]
+            return shipment_formatted
+        formatted_matches = []
+        for match in matches:
+            formatted_matches.append({
+                **self.shipment_formatted,
+                'InventoryCD_3pl': match['InventoryCD'],
+                'Qty_3pl': match['QtyShipped'],
+                'TrackingNbr_3pl': match['Tracking'],
+                'ItemsOnPackage_3pl': match['Lines'],
+                'Courier_3pl': match['CarrierCode'],
+            })
+            bp = 'here'
+        return formatted_matches
+
 
     def group_tracking(self, data_transformed: list):
         '''`group_tracking`(self, data_transformed: *list*))

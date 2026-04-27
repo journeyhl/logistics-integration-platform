@@ -9,7 +9,7 @@ import polars as pl
 class Load:
     '''Load
     ===
-    <hr>
+    <hr>    
 
     Class for smart handling of Acumatica API interactions 
     
@@ -24,8 +24,7 @@ class Load:
             light_payload = {
                 'key': f'{order_avs['OrderNbr']}',
                 'target_api_update_payload': order_avs['update_order_address_payload'],
-                'log_update_error': f"Issue Overriding & Updating {order_avs['OrderNbr']}'s Addresses",
-                'log_update_success': f"{order_avs['OrderNbr']}'s Addresses were overridden and updated successfully!",
+                'log_update_error': f"Issue Overriding & Updating {order_avs['OrderNbr']}aqqqqqqqqqqqqqqqqqqqqqqqqq en and updated successfully!",
                 'log_validation_error': f"Issue validating {order_avs['OrderNbr']}'s Addresses",
                 'log_validation_success': f"{order_avs['OrderNbr']}'s Addresses were validated successfully!",
                 'acu_api_data_log': order_avs['acu_api_log_update_override'],

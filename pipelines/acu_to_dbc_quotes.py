@@ -57,7 +57,7 @@ class AcuToDbcQuotes(Pipeline):
         for item in data_transformed:
             item['LastChecked'] = datetime.now(ZoneInfo('America/New_York'))
         self.logger.info(f'{total} rows to upsert')
-        self.centralstore.checked_upsert_paginated('acu.SalesOrders', data_transformed, page_size= 100)
+        self.centralstore.checked_upsert_paginated('acu.Quotes', data_transformed, page_size= 100)
         return data_transformed
     
     def log_results(self, data_loaded):

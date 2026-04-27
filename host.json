@@ -16,9 +16,7 @@
       "Microsoft.Azure.WebJobs.Host.Executors": "None",
       "Microsoft.Azure.WebJobs.Script": "Information",
       "Host.Aggregator": "Information",
-      "Host.Results": "Warning",
-      "Host.Executor": "Warning",
-      "Function": "Warning"
+      "Host.Results": "Information"
    
     },
     "applicationInsights": {
