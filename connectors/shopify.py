@@ -46,13 +46,13 @@ class ShopifyAPI:
     def _set_shopql(self):        
         self.shopifyql = f"""
         FROM sales
-        SHOW gross_sales, net_sales
-        WHERE is_canceled_order = false
-        GROUP BY order_name, day, order_utm_source, utm_source, ...
-        TIMESERIES day
-        HAVING gross_sales__last_click != 0
-        SINCE {self.since} UNTIL {self.until}
-        ORDER BY day ASC
+          SHOW gross_sales, net_sales
+          WHERE is_canceled_order = false
+          GROUP BY order_name, day, order_utm_source, utm_source
+          TIMESERIES day
+          HAVING gross_sales__last_click != 0
+          SINCE '2026-01-01' UNTIL '2026-04-23'
+          ORDER BY day ASC
         """.strip()
 
         self.graphql_query = """
