@@ -22,3 +22,5 @@ from .kustomer import SendOrderDetailsToKustomer
 from .acu_to_dbc_quotes import AcuToDbcQuotes
 from .acu_to_dbc_sales_orders import AcuToDbcSalesOrders
 from .shopify import ShopifyGraphQL
+from .aftership_send import SendToAfterShip
+from .hubspot_snapshot import HubSpotSnapshot

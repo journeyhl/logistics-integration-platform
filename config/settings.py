@@ -855,3 +855,8 @@ TEAMS = {
     'sp_object_id':     os.getenv('TEAMS_SP_OBJECT_ID'),
     'webhook_url':      os.getenv('TEAMS_WEBHOOK_URL'),
 }
+
+
+AFTERSHIP = {
+    'api_key': os.getenv('AFTERSHI_API_KEY')
+}

@@ -10,3 +10,4 @@ from .kustomer import Kustomer
 from .shopify import ShopifyAPI
 from .hubspot_api import HubSpotAPI
 from .teams import Teams
+from .aftership import AfterShip

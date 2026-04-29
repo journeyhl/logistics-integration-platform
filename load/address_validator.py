@@ -20,13 +20,17 @@ class Load:
 
     def landing(self, data_transformed: list):
         for order_avs in data_transformed:
+            if order_avs.get('update_order_address_payload') == None:
+                self.logger.warning(f'{order_avs['OrderNbr']}: No response from AVS, skipping...')
+                continue
             self.logger.info(f'{order_avs['OrderNbr']}: Beginning target run')
             light_payload = {
                 'key': f'{order_avs['OrderNbr']}',
                 'target_api_update_payload': order_avs['update_order_address_payload'],
-                'log_update_error': f"Issue Overriding & Updating {order_avs['OrderNbr']}aqqqqqqqqqqqqqqqqqqqqqqqqq en and updated successfully!",
-                'log_validation_error': f"Issue validating {order_avs['OrderNbr']}'s Addresses",
-                'log_validation_success': f"{order_avs['OrderNbr']}'s Addresses were validated successfully!",
+                'log_update_error': f"Issue overriding & updating {order_avs['OrderNbr']}'s addresses!",
+                'log_update_success': f"{order_avs['OrderNbr']}'s addresses were overriden & updated successfully!",
+                'log_validation_error': f"Issue validating {order_avs['OrderNbr']}'s addresses",
+                'log_validation_success': f"{order_avs['OrderNbr']}'s addresses were validated successfully!",
                 'acu_api_data_log': order_avs['acu_api_log_update_override'],
             }
             order_avs['validate_address'] = self.pipeline.acu_api.target_api(endpoint='/SalesOrder', payload_data=light_payload, operation='put', descr='Override & Update')

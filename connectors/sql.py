@@ -189,16 +189,19 @@ class AcumaticaDbQueries(Queries):
     '''Pulls records from SOShipment that have been deleted in Acumatica for transfer to db_CentralStore'''
     SOOrderShipmentDeletions: Query
     '''Pulls records from SOOrderShipment that have been deleted in Acumatica for transfer to db_CentralStore'''
-    AcuToDbc_Quotes: Query
-    '''Pulls Orders of QT Order Type for upsert to acu.Quotes'''
     Kustomer_OrderIngest : Query
     """Pulls top level Order, Line and Customer data to be sent to Kustomer when **'ingest' *or* no params** are passed to :class:`~pipelines.kustomer.SendOrderDetailsToKustomer`.:meth:`~pipelines.kustomer.SendOrderDetailsToKustomer._re_init`"""
     Kustomer_OrderIngestBackfill : Query
     '''Pulls top level Order, Line and Customer data to be sent to Kustomer when **'backfill'** is passed as a param to :class:`~pipelines.kustomer.SendOrderDetailsToKustomer`.:meth:`~pipelines.kustomer.SendOrderDetailsToKustomer._re_init`'''
     Kustomer_ShipmentData : Query
     '''Pulls Shipments associated with the orders found in the Kustomer_OrderIngest (or Backfill) extract'''
-    AcuToDbc_SalesOrders: Query    
+    AcuToDbc_Quotes: Query
+    '''Pulls Orders of QT Order Type for upsert to acu.Quotes'''
+    AcuToDbc_SalesOrders: Query
+    '''Pulls Sales Orders for upsert to acu.SalesOrders'''
     AcuToDbc_Shipments: Query
+    Aftership_Shipments: Query
+    '''Pulls Shipments that have tracking data to be sent to Aftership'''
 
 _QUERY_CLASSES: dict[str, type[Queries]] = {
     'db_CentralStore': CentralStoreQueries,
