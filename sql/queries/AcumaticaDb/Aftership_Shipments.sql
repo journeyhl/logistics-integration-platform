@@ -43,6 +43,8 @@ select sh.ShipmentNbr
      , kc.ValueString CourierCode
      , kn.ValueString CourierName
      , kr.ValueString CarrierName
+     , cast(so.OrderDate as date) OrderDate
+     , rtrim(cu.CustomerClassID) CustomerClass
 from SOShipment sh 
 inner join SOShipLine sl            on sh.CompanyID = sl.CompanyID and sh.ShipmentNbr = sl.ShipmentNbr and sh.ShipmentType = sl.ShipmentType
 inner join SOLine ll                on sh.CompanyID = ll.CompanyID and sl.OrigOrderNbr = ll.OrderNbr and sl.OrigOrderNbr = ll.OrderNbr and sl.InventoryID = ll.InventoryID and sl.OrigOrderType = ll.OrderType
@@ -51,6 +53,7 @@ left join SOShipLineSplitPackage sp on sh.CompanyID = sp.CompanyID and sh.Shipme
 left join SOPackageDetail        pd on sh.CompanyID = pd.CompanyID and sh.ShipmentNbr = pd.ShipmentNbr and sp.PackageLineNbr = pd.LineNbr
 inner join InventoryItem         ii on sh.CompanyID = ii.CompanyID and sl.InventoryID = ii.InventoryID
 inner join BAccount              ba on sh.CompanyID = ba.CompanyID and sh.CustomerID = ba.BAccountID
+inner join Customer              cu on sh.CompanyID = cu.CompanyID and sh.CustomerID = cu.BAccountID
 inner join SOContact             sc on sh.CompanyID = sc.CompanyID and sh.ShipContactID = sc.ContactID and sh.CustomerID = sc.CustomerID
 inner join SOAddress             sa on sh.CompanyID = sa.CompanyID and sh.ShipAddressID = sa.AddressID and sh.CustomerID = sa.CustomerID
 inner join INsite                si on sh.CompanyID = si.CompanyID and sl.SiteID = si.SiteID
@@ -86,6 +89,12 @@ select s.ShipmentNbr
      , s.ShipDate
      , s.CustomerID
      , s.Customer
+     , case when charindex(' ', s.Customer) > 0
+            then stuff(s.Customer, charindex(' ', s.Customer), len(s.Customer), '')
+            else s.Customer end first_name
+     , case when charindex(' ', s.Customer) > 0
+            then stuff(s.Customer, 1, charindex(' ', s.Customer), '')
+            else null end last_name
      , s.phone_number
      , s.Email
      , s.DestinationLine1
@@ -113,9 +122,11 @@ select s.ShipmentNbr
                 then 'fedex'
             when left(Tracking2ndPass, 2) = '1Z'
                 then 'ups'
-        else null end slug
+        else null end Slug
      , s.CourierCode
      , s.CourierName
      , s.CarrierName
+     , s.OrderDate
+     , s.CustomerClass
 from SecondLevel s
 order by ShipmentNbr desc, ShipLineNbr, OrderNbr, OrderLineNbr

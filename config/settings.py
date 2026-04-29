@@ -729,7 +729,26 @@ TABLES = {
             'CreatedDatetime',
         ],
     },
+    '_util.AfterShipLog': {
+        'keys': [
+            'ShipmentNbr',
+            'OrderNbr',
+            'Tracking',
+        ],
+        'columns': [
+            'ShipmentNbr',
+            'OrderNbr',
+            'Tracking',
+            'ResponseCode',
+            'Message'
+        ],
+        'update_columns': [
+            'ResponseCode',
+            'Message'
+        ],
+    },
 }
+
 '''# Tables
 
 Tables is used to drive the SQLConnector's checked_upsert functionality
