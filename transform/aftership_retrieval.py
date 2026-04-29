@@ -1,18 +1,30 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from pipelines.aftership_send import SendToAfterShip
+    from pipelines import AfterShipRetrieval
 import logging
 import polars as pl
 from datetime import datetime
 class Transform:
-    def __init__(self, pipeline: SendToAfterShip):
+    def __init__(self, pipeline: AfterShipRetrieval):
         self.pipeline = pipeline
         self.logger = logging.getLogger(f'{pipeline.pipeline_name}.transform')
         self._set_state_map()
         pass
     
-    def transform(self, data_extract: dict[str, pl.DataFrame]):
+
+    def transform(self, data_extract: list):
+        for row in data_extract:
+            formatted_row = {
+
+            }
+            
+        bp = 'here'
+
+
+
+
+    def transform_old(self, data_extract: dict[str, pl.DataFrame]):
         slugs_extract = data_extract['slugs_extract']
         shipment_extract = data_extract['shipment_extract']
         shipment_extract_filtered = shipment_extract.join(data_extract['log_extract'], how='anti', on=['ShipmentNbr', 'OrderNbr', 'Tracking'])

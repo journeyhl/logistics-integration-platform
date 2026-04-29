@@ -14,8 +14,8 @@ from pipelines import HubSpotSnapshot
 #     print(owner_id, name)
 
 
-hubsnap = HubSpotSnapshot()
-hubsnap.run()
+# hubsnap = HubSpotSnapshot()
+# hubsnap.run()
 
 teams = Teams('script')
 bp = teams.send_message('test')

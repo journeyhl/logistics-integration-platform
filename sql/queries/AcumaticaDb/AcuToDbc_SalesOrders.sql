@@ -92,10 +92,9 @@ and s.OrderType not in('QT', 'RA', 'RC', 'RR', 'RM')
 --and b.AcctCD in('')
 --and b.AcctName like '%%'
 --and c.CustomerClassID in('')
-and dateadd(hour, -4, s.LastModifiedDateTime) >=  dateadd(hour, -2, getdate())
--- and s.LastModifiedDateTime >= cast(getdate()-6 as date)
-and b.AcctCD != 'C0008267'
--- and s.OrderNbr = 'WB109936'
+-- and dateadd(hour, -4, s.LastModifiedDateTime) >=  dateadd(hour, -2, getdate())
+-- and s.OrderNbr = 'PH145626'
+and s.LastModifiedDateTime >= cast(getdate()-30 as date)
 order by LastModifiedDT desc
 
 

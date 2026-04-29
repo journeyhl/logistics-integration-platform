@@ -45,6 +45,8 @@ select sh.ShipmentNbr
      , kr.ValueString CarrierName
      , cast(so.OrderDate as date) OrderDate
      , rtrim(cu.CustomerClassID) CustomerClass
+     , rtrim(ic.ItemClassCD) ItemClassCD
+     , ic.Descr ItemClassDescr
 from SOShipment sh 
 inner join SOShipLine sl            on sh.CompanyID = sl.CompanyID and sh.ShipmentNbr = sl.ShipmentNbr and sh.ShipmentType = sl.ShipmentType
 inner join SOLine ll                on sh.CompanyID = ll.CompanyID and sl.OrigOrderNbr = ll.OrderNbr and sl.OrigOrderNbr = ll.OrderNbr and sl.InventoryID = ll.InventoryID and sl.OrigOrderType = ll.OrderType
@@ -52,6 +54,7 @@ inner join SOOrder so               on sh.CompanyID = so.CompanyID and ll.OrderT
 left join SOShipLineSplitPackage sp on sh.CompanyID = sp.CompanyID and sh.ShipmentNbr = sp.ShipmentNbr and sl.LineNbr = sp.ShipmentLineNbr and sl.InventoryID = sp.InventoryID
 left join SOPackageDetail        pd on sh.CompanyID = pd.CompanyID and sh.ShipmentNbr = pd.ShipmentNbr and sp.PackageLineNbr = pd.LineNbr
 inner join InventoryItem         ii on sh.CompanyID = ii.CompanyID and sl.InventoryID = ii.InventoryID
+inner join INItemClass           ic on sh.CompanyID = ic.CompanyID and ii.ItemClassID = ic.ItemClassID
 inner join BAccount              ba on sh.CompanyID = ba.CompanyID and sh.CustomerID = ba.BAccountID
 inner join Customer              cu on sh.CompanyID = cu.CompanyID and sh.CustomerID = cu.BAccountID
 inner join SOContact             sc on sh.CompanyID = sc.CompanyID and sh.ShipContactID = sc.ContactID and sh.CustomerID = sc.CustomerID
@@ -65,7 +68,7 @@ left join SOShipmentKvExt        kw on sh.CompanyID = kw.CompanyID and sh.NoteID
 inner join jjStatusLookup         j on sh.Status = j.CStatus and j.tbl = 'SOShipment'
 
 where sh.CompanyID = 2
-and sh.ShipDate >= getdate()-60
+and sh.ShipDate >= '20260101'
 and pd.TrackNumber is NOT NULL
 and si.SiteCD != 'RLM NEJ HB'
 )
@@ -128,5 +131,7 @@ select s.ShipmentNbr
      , s.CarrierName
      , s.OrderDate
      , s.CustomerClass
+     , s.ItemClassCD
+     , s.ItemClassDescr
 from SecondLevel s
 order by ShipmentNbr desc, ShipLineNbr, OrderNbr, OrderLineNbr

@@ -578,6 +578,7 @@ TABLES = {
             'Status',
             'CustOrderNumber',
             'D2CSalesperson',
+            'SalespersonName',
             'SalespersonEmail',
             'B2BSalesperson',
             'LastModifiedDT',
@@ -740,11 +741,15 @@ TABLES = {
             'OrderNbr',
             'Tracking',
             'ResponseCode',
-            'Message'
+            'Message',
+            'ID',
+            'Timestamp'
         ],
         'update_columns': [
             'ResponseCode',
-            'Message'
+            'Message',
+            'ID',
+            'Timestamp'
         ],
     },
 }
