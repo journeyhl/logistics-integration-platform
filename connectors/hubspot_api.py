@@ -156,3 +156,18 @@ class HubSpotAPI:
                 seen.add(deal['id'])
                 deals.append(deal)
         return deals
+
+
+    def search_activities(self, object_type: str) -> list[dict]:
+        fiscal_year_start_ms = str(int(self.pipeline.fiscal_year_start.timestamp() * 1000))
+        filter_groups = [
+            {"filters": [{"propertyName": "hs_timestamp", "operator": "GTE", "value": fiscal_year_start_ms}]}
+        ]
+        return list(self.search(object_type, filter_groups=filter_groups, properties=["hs_timestamp", "hubspot_owner_id"]))
+
+    def search_new_contacts(self) -> list[dict]:
+        fiscal_year_start_ms = str(int(self.pipeline.fiscal_year_start.timestamp() * 1000))
+        filter_groups = [
+            {"filters": [{"propertyName": "createdate", "operator": "GTE", "value": fiscal_year_start_ms}]}
+        ]
+        return list(self.search('contacts', filter_groups=filter_groups, properties=["createdate", "hubspot_owner_id"]))
