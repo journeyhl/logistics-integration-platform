@@ -294,7 +294,7 @@ class SQLConnector(Generic[QT]):
         '''
         execute_options = {'parameters': params} if params else {}
         log_str = log_str if log_str else ''
-        data_extract = pl.read_database(query, self.engine, execute_options=execute_options)
+        data_extract = pl.read_database(query, self.engine, execute_options=execute_options, infer_schema_length=None)
         if log_str == '':
             self.logger.info(f'Extracted {data_extract.height} rows')
             

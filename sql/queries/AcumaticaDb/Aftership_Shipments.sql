@@ -47,6 +47,7 @@ select sh.ShipmentNbr
      , rtrim(cu.CustomerClassID) CustomerClass
      , rtrim(ic.ItemClassCD) ItemClassCD
      , ic.Descr ItemClassDescr
+     , cast(sum(ll.LineAmt) over(partition by sh.ShipmentNbr, so.OrderNbr, pd.TrackNumber) as decimal(18,2)) PackageValue
 from SOShipment sh 
 inner join SOShipLine sl            on sh.CompanyID = sl.CompanyID and sh.ShipmentNbr = sl.ShipmentNbr and sh.ShipmentType = sl.ShipmentType
 inner join SOLine ll                on sh.CompanyID = ll.CompanyID and sl.OrigOrderNbr = ll.OrderNbr and sl.OrigOrderNbr = ll.OrderNbr and sl.InventoryID = ll.InventoryID and sl.OrigOrderType = ll.OrderType
@@ -133,5 +134,14 @@ select s.ShipmentNbr
      , s.CustomerClass
      , s.ItemClassCD
      , s.ItemClassDescr
+     , case when PackageValue < 500
+                then '$0-499.99'
+            when PackageValue >= 500 and PackageValue < 1000
+                then '$500-999.99'
+            when PackageValue >= 1000 and PackageValue < 2000
+                then '$1000-1999.99'
+            when PackageValue >= 2000 and PackageValue < 5000
+                then '$2000-4999.99'
+       else '$5000+' end PackageValue
 from SecondLevel s
 order by ShipmentNbr desc, ShipLineNbr, OrderNbr, OrderLineNbr

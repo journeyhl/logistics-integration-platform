@@ -27,12 +27,38 @@ class Transform:
         shipment_extract_old_record_filter = shipment_extract_log_filter.join(old_aftership_records, how='anti', on=['OrderNbr', 'Tracking'])
         self.logger.info(f'{shipment_extract.height} Shipments extracted, {shipment_extract.height - shipment_extract_old_record_filter.height} filtered')
         for i, row in enumerate(shipment_extract_old_record_filter.iter_rows(named=True)):
-            row = self.iterate_rows(i = i, row = row, additional_extract = shipment_extract_old_record_filter)            
+            row = self.iterate_rows(row = row)
             data_transformed.append(row)
         return data_transformed
 
 
     def transform_update(self, data_extract, data_transformed = []):
+        '''`transform_update`(data_extract: *_type_*, )
+        ---
+        <hr>
+        
+        Method that drives the filtering and transformation of :class:`~pipelines.aftership_update.UpdateAfterShip` pipeline
+        
+        ### Downstream Calls 
+         #### :meth:`~folder.file.class.method`
+            - Description
+        
+        ### Upstream Calls 
+         #### :meth:`~folder.file.class.method`
+            - Description
+            
+        <hr>
+        
+        Parameters
+        ---
+        :param (*_type_*) `data_extract`: _description_
+        
+        <hr>
+        
+        Returns
+        ---
+        :return `data_transformed_customers` (_type_): _description_
+        '''
         slugs_extract = data_extract['slugs_extract']
         shipment_extract = data_extract['shipment_extract']
         aftership_extract = pl.DataFrame(data_extract['aftership_extract'], infer_schema_length=None)
@@ -42,8 +68,9 @@ class Transform:
             left_on=['tracking_number', 'order_number'], 
             right_on=['Tracking', 'OrderNbr']
         )
+        self.logger.info(f'Filtered from {aftership_extract.height} records to {aftership_extract_joined.height}')
         for i, row in enumerate(aftership_extract_joined.iter_rows(named=True)):
-            row = self.iterate_rows(i = i, row = row, additional_extract = aftership_extract)            
+            row = self.iterate_rows(row = row)            
             data_transformed.append(row)
         bp = 'here'
         data_transformed_customers = {
@@ -54,19 +81,44 @@ class Transform:
                 'payload': {
                     'customers': dt['formatted']['customers'],
                     "shipment_tags": [
-                        dt['CustomerClass']
+                        dt['CustomerClass'],
+                        dt['ItemClassDescr'],
+                        dt['PackageValue']
                     ],
-
-                }
-                
-            } 
-        for dt in data_transformed}
+                }                
+            }
+        for dt in data_transformed if dt['customers'] != dt['formatted']['customers'] or dt['shipment_tags'] != dt['formatted']['shipment_tags']
+        }
         return data_transformed_customers
 
 
 
 
-    def iterate_rows(self, i: int, row: dict, additional_extract):
+    def iterate_rows(self, row: dict):
+        '''`iterate_rows`(self, i: *int*, row: *dict*)
+        ---
+        <hr>
+        
+        Method to transform each row with an iterative loop.
+        
+        ### Upstream Calls 
+         #### :meth:`~transform_update`
+            - Drives transformation of :class:`~pipelines.aftership_update.UpdateAfterShip`
+         #### :meth:`~transform_send`
+            - Drives transformation of :class:`~pipelines.aftership_update.SendToAfterShip`
+            
+        <hr>
+        
+        Parameters
+        ---
+        :param (*dict*) `row`: a single duct within a list/Dataframe
+        
+        <hr>
+        
+        Returns
+        ---
+        :return `row` (dict): Transformed `row` parameter
+        '''
         cclass = row['CustomerClass']
         row['formatted'] = {
             "tracking_number": row['Tracking'] if row.get('Tracking') else row['tracking_number'],
@@ -104,7 +156,8 @@ class Transform:
             ],
             "shipment_tags": [
                 cclass,
-                    row['ItemClassDescr']
+                row['ItemClassDescr'],
+                row['PackageValue']
             ],
         }
         return row
