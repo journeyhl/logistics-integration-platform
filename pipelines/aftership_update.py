@@ -24,12 +24,21 @@ class UpdateAfterShip(Pipeline):
     def transform(self, data_extract):
         data_transformed = self.transformer.transform_update(data_extract)
         return data_transformed
-    
+    #870900964167
     def load(self, data_transformed):
-        for i, row in enumerate(data_transformed):
+        for i, (id, values) in enumerate(data_transformed.items()):
+            if i < 664:
+                continue
             prefix = f'{i+1}/{len(data_transformed)}, {len(data_transformed)} to go: '
-            self.logger.info(f'{prefix}Posting data to aftership for {row['OrderNbr']}-{row['ShipmentNbr']}-{row['Tracking']}')
-            self.aftership.post_data(self.aftership.tracking_endpoint, row['formatted'])
+            self.logger.info(f'{prefix}Putting data to aftership for {values['tracking']}')
+            self.aftership.put_data(
+                endpoint=f'{self.aftership.tracking_endpoint}/{id}', 
+                params={'id':id}, 
+                payload= values['payload'], 
+                log_prefix=f'{values['order']}-{values['shipment']}-{values['tracking']}',
+                extra={'ShipmentNbr': values['shipment'], 'OrderNbr': values['order'], 'Tracking': values['tracking']}
+            )
+            bp = 'here'
         data_loaded = data_transformed
         return data_loaded
     

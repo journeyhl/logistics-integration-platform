@@ -46,6 +46,22 @@ class Transform:
             row = self.iterate_rows(i = i, row = row, additional_extract = aftership_extract)            
             data_transformed.append(row)
         bp = 'here'
+        data_transformed_customers = {
+            dt['id']: {
+                'order': dt['order_number'],
+                'shipment': dt['ShipmentNbr'],
+                'tracking': dt['tracking_number'], 
+                'payload': {
+                    'customers': dt['formatted']['customers'],
+                    "shipment_tags": [
+                        dt['CustomerClass']
+                    ],
+
+                }
+                
+            } 
+        for dt in data_transformed}
+        return data_transformed_customers
 
 
 
@@ -53,7 +69,7 @@ class Transform:
     def iterate_rows(self, i: int, row: dict, additional_extract):
         cclass = row['CustomerClass']
         row['formatted'] = {
-            "tracking_number": row['tracking_number'],
+            "tracking_number": row['Tracking'] if row.get('Tracking') else row['tracking_number'],
             "slug": row['Slug'],
             "order_id": row['ShipmentNbr'],
             "customer_name": row['Customer'],
@@ -67,7 +83,7 @@ class Transform:
             "destination_city": row['DestinationCity'],
             "destination_postal_code": row['DestinationZip'],
             "destination_raw_location": f'{row['DestinationLine1']} {row['DestinationLine2']}' if row['DestinationLine2'] != None else row['DestinationLine1'],
-            "order_number": row['OrderNbr'],
+            "order_number": row['OrderNbr'] if row.get('OrderNbr') else row['order_number'],
             "order_date": row['OrderDate'].strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
             "custom_fields": {
                 "first_name": row['first_name'],
@@ -78,19 +94,17 @@ class Transform:
                 {
                     "role": "buyer",
                     "name": row['Customer'],
-                    "email": row['Email'],
+                    "email": row['Email'] if row['Email'] != None and ';' not in row['Email'] else None if row['Email'] == None else row['Email'].split(';')[0],
                     "phone_number": row['phone_number'],
                     "language": "en"
                 }
             ],
             "smses": [
                 row['phone_number']
-            ],    
+            ],
             "shipment_tags": [
                 cclass,
-                row['ShipmentNbr'],
-                row['OrderNbr'],
-                row['InventoryCD']
+                    row['ItemClassDescr']
             ],
         }
         return row

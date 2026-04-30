@@ -194,7 +194,7 @@ class AfterShip:
         return {}
     
 
-    def put_data(self, endpoint: str, params: dict, payload: dict, log_prefix: str = ''):
+    def put_data(self, endpoint: str, params: dict, payload: dict, log_prefix: str = '', extra: dict = {}):
         '''`put_data`(self, endpoint: *str*, params: *dict*, payload: *dict*)
         ---
         <hr>
@@ -223,13 +223,28 @@ class AfterShip:
         ---
         :return `variablename` (_type_): _description_
         '''
-        self.logger.info(f'{log_prefix}')
+        self.logger.info(f'Updating {log_prefix}')
         try:
             response = self.session.put(url = endpoint, headers = self.headers, params = params, json = payload)
         except Exception as e:
             self.logger.error(f'Error getting response from Aftership (post_data)')
 
         bp = 'here'
+        self.logger.info(f'Updated {log_prefix} successfully!')
+        if response.status_code == 200:
+            self._parse_good_tracking_response(response.json())
+        else:
+            jresponse = response.json()
+            log_row = {
+                'ShipmentNbr': jresponse['order_id'] if jresponse.get('order_id') else extra['ShipmentNbr'],
+                'OrderNbr': jresponse['order_number'] if jresponse.get('order_number') else extra['OrderNbr'],
+                'Tracking': jresponse['tracking_number'] if jresponse.get('tracking_number') else extra['Tracking'],
+                'ResponseCode': response.status_code,
+                'Message': jresponse['meta'].get('message'),
+                'ID': id,
+                'Timestamp': datetime.now(ZoneInfo('America/New_York'))                
+            }
+
         return response
 
 

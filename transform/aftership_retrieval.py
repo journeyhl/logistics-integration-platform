@@ -68,8 +68,7 @@ class Transform:
                 ],    
                 "shipment_tags": [
                     cclass,
-                    row['OrderNbr'],
-                    row['InventoryCD']
+                    row['ItemClassDescr']
                 ],
             }
             data_transformed.append(row)
