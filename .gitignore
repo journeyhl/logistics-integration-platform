@@ -3,3 +3,4 @@ __pycache__
 .python_packages
 .venv
 docs/pipeline_docstring_analysis.md
+integration_platform.egg-info
