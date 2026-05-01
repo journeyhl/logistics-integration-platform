@@ -73,7 +73,7 @@ class Transform:
             return shipment_formatted
         
         formatted_matches = []
-        for match in matches:
+        for match in matches: 
             formatted_matches.append({
                 **self.shipment_formatted,
                 'InventoryCD_3pl': match['InventoryCD'],
@@ -306,8 +306,11 @@ class Transform:
             except:
                 tracking_nbrs = []
             if len(tracking_nbrs) == 0:
+                alts = None
                 continue
             if len(tracking_nbrs) > 1:
+                self.logger.warning(f'Multiple tracking numbers found! Will only add first to package')
+                alts = ', '.join([tr for tr in tracking_nbrs if tr != tracking_nbrs[0]])
                 bp = 'here'
             packages = json.loads(row['Packages'])
             items = json.loads(row['Items'])
@@ -316,7 +319,7 @@ class Transform:
                 redstag_row = {
                     'ShipmentNbr': row['ShipmentNbr_3pl'],
                     'InventoryCD': items[0]['sku'],
-                    'TrackingNbr': tracking_nbrs[0] if len(tracking_nbrs) == 1 else tracking_nbrs[1],
+                    'TrackingNbr': tracking_nbrs[0],
                     'Qty': items[0]['quantity'],
                     'Courier': packages[0]['manifest_courier'],
                     'order_item_qty': items[0]['order_item_qty']
