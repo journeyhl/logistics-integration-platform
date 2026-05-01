@@ -25,6 +25,11 @@ class HubSpotAPI:
         self._get_deal_pipelines()
         self._get_owners()
 
+
+
+    def _set_endpoints(self):
+        self.lists = f'{self.base_url}/crm/v3/lists/'
+
     def _request(self, method: str, path: str, **kwargs) -> dict[str, Any]:
         url = f'{self.base_url}{path}'
         backoff = [1, 2, 4, 8, 16]

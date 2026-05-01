@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from pipelines import SendToAfterShip, AfterShipRetrieval, UpdateAfterShip
+    from pipelines import SendToAfterShip,  UpdateAfterShip
 import logging
 import requests
 from config.settings import AFTERSHIP
@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
 class AfterShip:
-    def __init__(self, pipeline: SendToAfterShip | AfterShipRetrieval | UpdateAfterShip):
+    def __init__(self, pipeline: SendToAfterShip | UpdateAfterShip):
         self.pipeline = pipeline
         self.logger = logging.getLogger(f'{pipeline.pipeline_name}.aftership_api')
         self.api_key = AFTERSHIP['api_key']

@@ -25,5 +25,4 @@ from .shopify import ShopifyGraphQL
 from .hubspot_snapshot import HubSpotSnapshot
 
 from .aftership_send import SendToAfterShip
-from .aftership_retrieval import AfterShipRetrieval
 from .aftership_update import UpdateAfterShip
