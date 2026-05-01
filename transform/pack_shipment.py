@@ -300,17 +300,15 @@ class Transform:
 
     def transform_redstag_events(self, redstag_extract: pl.DataFrame):
         redstag_events = []
+        multiples = 0
         for row in redstag_extract.iter_rows(named=True):
             try:
                 tracking_nbrs = json.loads(row['TrackingNumbers'])
             except:
                 tracking_nbrs = []
             if len(tracking_nbrs) == 0:
-                alts = None
                 continue
             if len(tracking_nbrs) > 1:
-                self.logger.warning(f'Multiple tracking numbers found! Will only add first to package')
-                alts = ', '.join([tr for tr in tracking_nbrs if tr != tracking_nbrs[0]])
                 bp = 'here'
             packages = json.loads(row['Packages'])
             items = json.loads(row['Items'])
