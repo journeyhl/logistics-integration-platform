@@ -84,12 +84,17 @@ class AfterShip:
         ---
         :return self.:attr:`~trackings` (list): List of tracking results from Aftership api
         '''
-        tracking_response = self.get_data(self.tracking_endpoint)
-        self.paginate_tracking(tracking_response)
+        now_aftership = datetime.now(ZoneInfo('America/New_York')) + timedelta(hours = 5)
+        updated_min = (now_aftership - timedelta(days = 1)).strftime('%Y-%m-%dT%H:%M:%S')
+        params = {
+            'updated_at_min': updated_min
+        }
+        tracking_response = self.get_data(endpoint=self.tracking_endpoint, params = params)
+        self.paginate_tracking(tracking_response=tracking_response, params = params)
         bp = 'here'
         return self.trackings
     
-    def paginate_tracking(self, tracking_response: dict):
+    def paginate_tracking(self, tracking_response: dict, params: dict = {}):
         '''`paginate_tracking`(self, tracking_response: *dict*)
         ---
         <hr>
@@ -141,7 +146,7 @@ class AfterShip:
                 has_next_page = data['pagination']['has_next_page']
                 self.logger.info(f'{total} results, {'continuing' if has_next_page else 'complete'}')
                 if has_next_page:
-                    paged_tracking_response = self.get_data(self.tracking_endpoint, params={"cursor": next_cursor})
+                    paged_tracking_response = self.get_data(self.tracking_endpoint, params={**params, "cursor": next_cursor})
                     self.paginate_tracking(paged_tracking_response)
 
 
