@@ -85,11 +85,13 @@ class AfterShip:
         :return self.:attr:`~trackings` (list): List of tracking results from Aftership api
         '''
         now_aftership = datetime.now(ZoneInfo('America/New_York')) + timedelta(hours = 5)
-        updated_min = (now_aftership - timedelta(hours = 5)).strftime('%Y-%m-%dT%H:%M:%S')
+        updated_min = (now_aftership - timedelta(hours = 2)).strftime('%Y-%m-%dT%H:%M:%S')
         params = {
             'updated_at_min': updated_min
         }
         tracking_response = self.get_data(endpoint=self.tracking_endpoint, params = params)
+        self.total_rows = tracking_response['data']['pagination']['total']
+        self.logger.info(f'{self.total_rows} rows returned from aftership')
         self.paginate_tracking(tracking_response=tracking_response, params = params)
         bp = 'here'
         return self.trackings
@@ -138,16 +140,30 @@ class AfterShip:
             data = tracking_response['data']
             self.logger.info(f'Parsed data')
             if data.get('trackings'):
-                self.trackings.extend(data['trackings'])
-                self.logger.info(f'Parsed {len(self.trackings)} rows in total')
+                rows_left = self.total_rows - len(self.trackings)
+                if rows_left < 50:
+                    self.trackings.extend(data['trackings'][:rows_left])
+                    self.logger.info(f'{rows_left} rows parsed successfully')
+                else:
+                    self.trackings.extend(data['trackings'])
+                    self.logger.info(f'{len(data['trackings'])} rows parsed successfully')
+                self.logger.info(f'{len(self.trackings)} total rows parsed successfully')
             if data.get('pagination'):
                 total = data['pagination']['total']
-                next_cursor = data['pagination']['next_cursor']
-                has_next_page = data['pagination']['has_next_page']
-                self.logger.info(f'{total} results, {'continuing' if has_next_page else 'complete'}')
-                if has_next_page:
-                    paged_tracking_response = self.get_data(self.tracking_endpoint, params={**params, "cursor": next_cursor})
-                    self.paginate_tracking(paged_tracking_response)
+                if total == self.total_rows:                    
+                    next_cursor = data['pagination']['next_cursor']
+                    has_next_page = data['pagination']['has_next_page']
+                    self.logger.info(f'{total} results, {'continuing' if has_next_page else 'complete'}')
+                    if has_next_page:
+                        paged_tracking_response = self.get_data(self.tracking_endpoint, params={**params, "cursor": next_cursor})
+                        self.paginate_tracking(paged_tracking_response)
+                    else:
+                        self.logger.info(f'No more pages. {len(self.trackings)} rows extracted from AfterShip')
+                        bp = 'here'
+                else:
+                    self.logger.info(f'No more pages. {len(self.trackings)} rows extracted from AfterShip')
+                    bp = 'here'
+
 
 
     

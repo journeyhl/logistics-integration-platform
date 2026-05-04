@@ -821,6 +821,8 @@ TABLES = {
             'meeting_count',
             'task_count',
             'new_contact_count',
+            'window_start',
+            'window_end'
         ],
         'update_columns': [
             'team',

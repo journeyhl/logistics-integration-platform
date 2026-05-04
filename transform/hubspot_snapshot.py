@@ -48,11 +48,29 @@ class Transform:
         self.logger.info(f'Transforming {extract_name}')
         now = datetime.now(timezone.utc).replace(tzinfo=None)
         year_start = datetime(now.year, 1, 1)
+        year_end = year_start + timedelta(days = 364)
         month_start = datetime(now.year, now.month, 1)
+        month_end = datetime(now.year, now.month+1, 1) - timedelta(days=1)
         week_start = (now - timedelta(days=now.weekday())).replace(hour=0, minute=0, second=0, microsecond=0)
+        week_end = week_start + timedelta(days = 6)
 
         known_reps = self.inside_reps + self.field_reps
         counts = {w: {rep: 0 for rep in known_reps} for w in ('week', 'month', 'year')}
+
+        self.windows = {
+            'year': {
+                'start': year_start,
+                'end': year_end,
+            },
+            'month': {
+                'start': month_start,
+                'end': month_end,
+            },
+            'week': {
+                'start': week_start,
+                'end': week_end,
+            }            
+        }
 
         for row in extract:
             ts = _parse_hs_date(row['properties'].get('hs_timestamp'))
@@ -90,6 +108,8 @@ class Transform:
                     'meeting_count': self.meeting_counts[window].get(rep, 0),
                     'task_count':    self.task_counts[window].get(rep, 0),
                     'new_contact_count': 0,
+                    'window_start': self.windows[window]['start'],
+                    'window_end': self.windows[window]['end'],
                 })
         return rows
 

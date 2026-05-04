@@ -164,6 +164,7 @@ class HubSpotAPI:
 
 
     def search_activities(self, object_type: str) -> list[dict]:
+        self.logger.info(f'Extracting {object_type}...')
         fiscal_year_start_ms = str(int(self.pipeline.fiscal_year_start.timestamp() * 1000))
         filter_groups = [
             {"filters": [{"propertyName": "hs_timestamp", "operator": "GTE", "value": fiscal_year_start_ms}]}
