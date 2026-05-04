@@ -590,7 +590,7 @@ def aftership_update(timer: af.TimerRequest):
 #            Upsert HubSpot snapshots
 #                       1x/day (11pm)
 @app.timer_trigger(
-    schedule = '10 18 * * *',
+    schedule = '0 23 * * *',
     arg_name = 'timer',
     run_on_startup = False
 )
