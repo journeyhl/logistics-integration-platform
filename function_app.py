@@ -582,3 +582,20 @@ def aftership_update(timer: af.TimerRequest):
     update_aftership = UpdateAfterShip()
     update_aftership.run()
 #endregion      aftership_update
+
+
+
+
+#region             hubspot_snapshots
+#            Upsert HubSpot snapshots
+#                       1x/day (11pm)
+@app.timer_trigger(
+    schedule = '10 18 * * *',
+    arg_name = 'timer',
+    run_on_startup = False
+)
+def hubspot_snapshots(timer: af.TimerRequest):
+    from pipelines import HubSpotSnapshot
+    hubspot_snapshot_upsert = HubSpotSnapshot()
+    hubspot_snapshot_upsert.run()
+#endregion      aftership_update

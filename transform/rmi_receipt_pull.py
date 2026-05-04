@@ -34,6 +34,8 @@ class Transform:
     def transform_closed_shipments(self, data_extract):
         table_rows = []
         for item in data_extract:
+            if item['rmaNumber'] == '081290':
+                bp = 'here'
             for line in item['shipLines']:
                 row = {
                     'RMANumber': item['rmaNumber'],
@@ -55,9 +57,9 @@ class Transform:
                     'FreightCost': item['freightCost'],
                     'OutboundShipMethod': item['outboundShipMethod']                    
                 }
-            if len(item['shipLines']) == 0:
-                bp = 'here'
-            table_rows.append(row)
+                if len(item['shipLines']) == 0:
+                    bp = 'here'
+                table_rows.append(row)
         return table_rows
     
 

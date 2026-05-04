@@ -36,8 +36,9 @@ class HubSpotSnapshot(Pipeline):
     def load(self, data_transformed):
         db_deals = data_transformed['db_deals']
         db_activities = data_transformed['db_activities']
-        self.centralstore.checked_upsert_paginated('hs.activity_snapshots', db_activities)
+        self.centralstore.checked_upsert_paginated('hs.deal_tracking', db_deals)
         self.centralstore.checked_upsert_paginated('hs.deal_snapshots', db_deals)
+        self.centralstore.checked_upsert_paginated('hs.activity_snapshots', db_activities)
         return data_transformed
     
     def log_results(self, data_loaded):

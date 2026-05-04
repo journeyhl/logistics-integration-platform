@@ -46,7 +46,7 @@ class Load:
             if(full_match):
                 shipment_data = self.pipeline.acu_api.add_package_v2(shipment_data)
                 self.pipeline.acu_api.confirm_shipment(shipment_data)
-            elif line_match and shipment_data['ShipmentNbr'] in ['080742']:
+            elif line_match and shipment_data['ShipmentNbr'] in ['081195', '081323']:
                 shipment_data = self.pipeline.acu_api.add_package_v2(shipment_data)
             else:
                 shipment_data = self.pipeline.acu_api.get_package_details(shipment_data)
