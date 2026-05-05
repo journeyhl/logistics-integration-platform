@@ -552,3 +552,50 @@ def kustomer_order_backfill(timer: af.TimerRequest):
     kustomer_pipeline._re_init('backfill') 
 
 #endregion kustomer_order_ingest
+
+#region             aftership_send
+#   New Shipment data to Aftership
+#                     1x/hour (17)
+@app.timer_trigger(
+    schedule = '2/15 * * * * ',
+    arg_name = 'timer',
+    run_on_startup = False
+)
+def aftership_send(timer: af.TimerRequest):
+    from pipelines import SendToAfterShip
+    send_to_aftership = SendToAfterShip()
+    send_to_aftership.run()
+
+#endregion      aftership_send
+
+
+#region             aftership_update
+#Update existing Aftership shipments
+#                       1x/hour (22)
+@app.timer_trigger(
+    schedule = '2/20 * * * *',
+    arg_name = 'timer',
+    run_on_startup = False
+)
+def aftership_update(timer: af.TimerRequest):
+    from pipelines import UpdateAfterShip
+    update_aftership = UpdateAfterShip()
+    update_aftership.run()
+#endregion      aftership_update
+
+
+
+
+#region             hubspot_snapshots
+#            Upsert HubSpot snapshots
+#                       1x/day (11pm)
+@app.timer_trigger(
+    schedule = '0 23 * * *',
+    arg_name = 'timer',
+    run_on_startup = False
+)
+def hubspot_snapshots(timer: af.TimerRequest):
+    from pipelines import HubSpotSnapshot
+    hubspot_snapshot_upsert = HubSpotSnapshot()
+    hubspot_snapshot_upsert.run()
+#endregion      aftership_update

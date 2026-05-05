@@ -1,12 +1,12 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from pipelines import SendToAfterShip, AfterShipRetrieval, UpdateAfterShip
+    from pipelines import SendToAfterShip, UpdateAfterShip
 import logging
 import polars as pl
 from datetime import datetime
 class Transform:
-    def __init__(self, pipeline: SendToAfterShip | AfterShipRetrieval | UpdateAfterShip):
+    def __init__(self, pipeline: SendToAfterShip | UpdateAfterShip):
         self.pipeline = pipeline
         self.logger = logging.getLogger(f'{pipeline.pipeline_name}.transform')
         self._set_state_map()
@@ -15,11 +15,6 @@ class Transform:
     def transform_send(self, data_extract: dict[str, pl.DataFrame], data_transformed = []):
         slugs_extract = data_extract['slugs_extract']
         shipment_extract = data_extract['shipment_extract']
-        shipment_extract2 = shipment_extract.join(
-            other = slugs_extract,
-            how = 'left',
-            on='Slug'
-        )
         log_extract = data_extract['log_extract']
         old_aftership_records = data_extract['old_aftership_records']
 
@@ -73,24 +68,64 @@ class Transform:
             row = self.iterate_rows(row = row)            
             data_transformed.append(row)
         bp = 'here'
-        data_transformed_customers = {
-            dt['id']: {
-                'order': dt['order_number'],
-                'shipment': dt['ShipmentNbr'],
-                'tracking': dt['tracking_number'], 
-                'payload': {
-                    'customers': dt['formatted']['customers'],
-                    "shipment_tags": [
-                        dt['CustomerClass'],
-                        dt['ItemClassDescr'],
-                        dt['PackageValue']
-                    ],
-                }                
-            }
-        for dt in data_transformed if dt['customers'] != dt['formatted']['customers'] or dt['shipment_tags'] != dt['formatted']['shipment_tags']
-        }
+
+
+        data_transformed_customers = {}
+        for dt in data_transformed:
+            customer_diff = False
+            tag_diff = False
+            if dt['formatted']['customers'] == None and dt['formatted']['shipment_tags'] == None:
+                continue
+            if dt['formatted']['customers'] != None:
+                customer_diff = self.compare(aftership_value=dt['customers'], sql_value=dt['formatted']['customers'])
+            if dt['formatted']['shipment_tags'] != None:
+                tag_diff = self.compare(aftership_value=dt['shipment_tags'], sql_value=dt['formatted']['shipment_tags'])
+            if customer_diff or tag_diff:
+                data_transformed_customers[dt['id']] = {
+                    'order': dt['order_number'],
+                    'shipment': dt['ShipmentNbr'],
+                    'tracking': dt['tracking_number'], 
+                    'payload': {}
+                }
+                if customer_diff:
+                    after = dt['customers']
+                    db = dt['formatted']['customers']
+                    data_transformed_customers[dt['id']]['payload']['customers'] = dt['formatted']['customers']
+                if tag_diff:
+                    after = dt['shipment_tags']
+                    db = dt['formatted']['shipment_tags']
+                    data_transformed_customers[dt['id']]['payload']['shipment_tags'] = dt['formatted']['shipment_tags']
+
+        # data_transformed_customers = {
+        #     dt['id']: {
+        #         'order': dt['order_number'],
+        #         'shipment': dt['ShipmentNbr'],
+        #         'tracking': dt['tracking_number'], 
+        #         'payload': {
+        #             'customers': dt['formatted']['customers'],
+        #             "shipment_tags": [
+        #                 dt['CustomerClass'],
+        #                 dt['ItemClassDescr'],
+        #                 dt['PackageValue']
+        #             ],
+        #         }                
+        #     }
+        # for dt in data_transformed if dt['customers'] != dt['formatted']['customers'] or dt['shipment_tags'] != dt['formatted']['shipment_tags']
+        # }
+        self.logger.info(f'Filtered again from {len(data_transformed)} records to {len(data_transformed_customers)}')
         return data_transformed_customers
 
+
+    def compare(self, aftership_value, sql_value):
+        def normalize(v):
+            if isinstance(v, str):
+                return v.lower()
+            if isinstance(v, list):
+                return [normalize(x) for x in v]
+            if isinstance(v, dict):
+                return {k: normalize(val) for k, val in v.items()}
+            return v
+        return normalize(aftership_value) != normalize(sql_value)
 
 
 
@@ -144,11 +179,11 @@ class Transform:
             },
             "customers": [
                 {
-                    "role": "buyer",
-                    "name": row['Customer'],
                     "email": row['Email'] if row['Email'] != None and ';' not in row['Email'] else None if row['Email'] == None else row['Email'].split(';')[0],
+                    "language": "en",
+                    "name": row['Customer'],
                     "phone_number": row['phone_number'],
-                    "language": "en"
+                    "role": "buyer",
                 }
             ],
             "smses": [
@@ -158,7 +193,7 @@ class Transform:
                 cclass,
                 row['ItemClassDescr'],
                 row['PackageValue']
-            ],
+            ].sort(),
         }
         return row
 
