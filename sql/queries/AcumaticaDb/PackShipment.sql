@@ -1,5 +1,5 @@
 
-declare @DateCutoff datetime = dateadd(day, -12, getdate());
+declare @DateCutoff datetime = dateadd(day, -21, getdate());
 
 select s.ShipmentNbr
 	 , sl.LineNbr ShipmentLineNbr

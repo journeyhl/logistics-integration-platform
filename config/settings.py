@@ -826,6 +826,28 @@ TABLES = {
             'team',
         ],
     },
+    'SOShipmentKvExt': {
+        'keys': [
+            'CompanyID',
+            'RecordID',
+            'FieldName',
+        ],
+        'columns': [
+            'CompanyID',
+            'RecordID',
+            'FieldName',
+            'ValueNumeric',
+            'ValueDate',
+            'ValueString',
+            'ValueText',
+        ],
+        'update_columns': [
+            'ValueNumeric',
+            'ValueDate',
+            'ValueString',
+            'ValueText',
+        ],
+    },
 }
 
 '''# Tables

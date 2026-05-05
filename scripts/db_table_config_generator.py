@@ -42,8 +42,8 @@ from TopLevel t
 where rownum = 1
 '''
 
-# db_input = input('Enter db name or at least first 2 characters: ').lower()
-db_input = dbc
+db_input = input('Enter db name or at least first 2 characters: ').lower()
+# db_input = dbc
 
 try:
     is_str = str(db_input)

@@ -40,14 +40,20 @@ class Transform:
                     'SplitLineNbr': acu_shipment['SplitLineNbr']
             }
             if matches_redstag != []:
+                log_str = f'{len(matches_redstag)} matches' if len(matches_redstag) > 1 else f'{len(matches_redstag)} matches'
+                self.logger.info(f'Found {log_str} matches from RedStagEvents')
                 shipment_formatted = self.smash_rs_matches(acu_shipment, matches_redstag)
                 data_transformed.extend(shipment_formatted)
                 
-            elif matches != []:
+            if matches != []:
+                log_str = f'{len(matches)} matches' if len(matches) > 1 else f'{len(matches)} matches'
+                self.logger.info(f'Found {log_str} from PackShipmentRedStag')
                 shipment_formatted = self.smash_def_matches(acu_shipment, matches = matches)                
                 data_transformed.extend(shipment_formatted)
 
-            elif matches_rmi != []:
+            if matches_rmi != []:
+                log_str = f'{len(matches_rmi)} matches' if len(matches_rmi) > 1 else f'{len(matches_rmi)} matches'
+                self.logger.info(f'Found {log_str} from PackShipmentRMI')
                 shipment_formatted = self.smash_rmi_matches(acu_shipment, matches_rmi)
                 data_transformed.extend(shipment_formatted)
 
