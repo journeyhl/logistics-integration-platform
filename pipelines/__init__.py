@@ -26,5 +26,6 @@ from .hubspot_snapshot import HubSpotSnapshot
 
 from .aftership_send import SendToAfterShip
 from .aftership_update import UpdateAfterShip
+from .aftership_to_dbc import AfterShipToDbc
 
 from .rmi_link_to_acu import RMILinkToAcu

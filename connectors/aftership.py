@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from pipelines import SendToAfterShip,  UpdateAfterShip
+    from pipelines import SendToAfterShip,  UpdateAfterShip, AfterShipToDbc
 import logging
 import requests
 from config.settings import AFTERSHIP
@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
 class AfterShip:
-    def __init__(self, pipeline: SendToAfterShip | UpdateAfterShip):
+    def __init__(self, pipeline: SendToAfterShip | UpdateAfterShip | AfterShipToDbc):
         self.pipeline = pipeline
         self.logger = logging.getLogger(f'{pipeline.pipeline_name}.aftership_api')
         self.api_key = AFTERSHIP['api_key']
@@ -59,7 +59,7 @@ class AfterShip:
         return {}
         
 
-    def retrieve_trackings(self):
+    def retrieve_trackings(self, pipeline_name: str, updated_window: timedelta = timedelta(hours = 2)):
         '''`retrieve_trackings`(self)
         ---
         <hr>
@@ -84,19 +84,19 @@ class AfterShip:
         ---
         :return self.:attr:`~trackings` (list): List of tracking results from Aftership api
         '''
-        now_aftership = datetime.now(ZoneInfo('America/New_York')) + timedelta(hours = 5)
-        updated_min = (now_aftership - timedelta(hours = 2)).strftime('%Y-%m-%dT%H:%M:%S')
+        now_aftership = datetime.now(ZoneInfo('America/New_York')) + timedelta(hours = 4)
+        updated_min = (now_aftership - updated_window).strftime('%Y-%m-%dT%H:%M:%S')
         params = {
             'updated_at_min': updated_min
         }
         tracking_response = self.get_data(endpoint=self.tracking_endpoint, params = params)
         self.total_rows = tracking_response['data']['pagination']['total']
         self.logger.info(f'{self.total_rows} rows returned from aftership')
-        self.paginate_tracking(tracking_response=tracking_response, params = params)
+        self.paginate_tracking(tracking_response=tracking_response, pipeline_name = pipeline_name, params = params)
         bp = 'here'
         return self.trackings
     
-    def paginate_tracking(self, tracking_response: dict, params: dict = {}):
+    def paginate_tracking(self, tracking_response: dict, pipeline_name: str, params: dict = {}):
         '''`paginate_tracking`(self, tracking_response: *dict*)
         ---
         <hr>
@@ -150,13 +150,13 @@ class AfterShip:
                 self.logger.info(f'{len(self.trackings)} total rows parsed successfully')
             if data.get('pagination'):
                 total = data['pagination']['total']
-                if total == self.total_rows:                    
+                if total == self.total_rows: #or (abs(total - self.total_rows) < 10 and pipeline_name == 'aftership-to-dbc'):                    
                     next_cursor = data['pagination']['next_cursor']
                     has_next_page = data['pagination']['has_next_page']
                     self.logger.info(f'{total} results, {'continuing' if has_next_page else 'complete'}')
                     if has_next_page:
                         paged_tracking_response = self.get_data(self.tracking_endpoint, params={**params, "cursor": next_cursor})
-                        self.paginate_tracking(paged_tracking_response)
+                        self.paginate_tracking(paged_tracking_response, self.pipeline.pipeline_name)
                     else:
                         self.logger.info(f'No more pages. {len(self.trackings)} rows extracted from AfterShip')
                         bp = 'here'
