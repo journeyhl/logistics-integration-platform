@@ -34,7 +34,7 @@ class AfterShipToDbc(Pipeline):
 
 
     def extract(self):
-        data_extract = self.aftership.retrieve_trackings(updated_window=timedelta(days=90), pipeline_name = self.pipeline_name)
+        data_extract = self.aftership.retrieve_trackings(updated_window=timedelta(days=1), pipeline_name = self.pipeline_name)
         return data_extract
 
     def transform(self, data_extract):

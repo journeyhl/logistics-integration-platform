@@ -584,6 +584,22 @@ def aftership_update(timer: af.TimerRequest):
 #endregion      aftership_update
 
 
+#region             aftership_update
+#Update existing Aftership shipments
+#                       1x/hour (22)
+@app.timer_trigger(
+    schedule = '55 */12 * * *',
+    arg_name = 'timer',
+    run_on_startup = False
+)
+def aftership_to_dbc(timer: af.TimerRequest):
+    from pipelines import AfterShipToDbc
+    aftership_to_dbc = AfterShipToDbc()
+    aftership_to_dbc.run()
+#endregion      aftership_update
+
+
+
 
 
 #region             hubspot_snapshots

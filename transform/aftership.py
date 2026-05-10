@@ -44,11 +44,11 @@ class Transform:
         #### :attr:`~slugs_extract` 
          - Not used at the moment
         '''
-        self.slugs_extract: pl.DataFrame = data_extract['slugs_extract'] if data_extract.get('slugs_extract') else pl.DataFrame()
-        self.shipment_extract:          pl.DataFrame = data_extract['shipment_extract'] if data_extract.get('shipment_extract') else pl.DataFrame()
-        self.log_extract:               pl.DataFrame = data_extract['log_extract'] if data_extract.get('log_extract') else pl.DataFrame()
-        self.old_aftership_records:     pl.DataFrame = data_extract['old_aftership_records'] if data_extract.get('old_aftership_records') else pl.DataFrame()
-        self.aftership_extract:         pl.DataFrame = pl.DataFrame(data_extract['aftership_extract'], infer_schema_length=None) if data_extract.get('aftership_extract') else pl.DataFrame()
+        self.slugs_extract:             pl.DataFrame = data_extract['slugs_extract'] if data_extract.get('slugs_extract') is not None else pl.DataFrame()
+        self.shipment_extract:          pl.DataFrame = data_extract['shipment_extract'] if data_extract.get('shipment_extract') is not None else pl.DataFrame()
+        self.log_extract:               pl.DataFrame = data_extract['log_extract'] if data_extract.get('log_extract') is not None else pl.DataFrame()
+        self.old_aftership_records:     pl.DataFrame = data_extract['old_aftership_records'] if data_extract.get('old_aftership_records') is not None else pl.DataFrame()
+        self.aftership_extract:         pl.DataFrame = pl.DataFrame(data_extract['aftership_extract'], infer_schema_length=None) if data_extract.get('aftership_extract') is not None else pl.DataFrame()
 
 
     def transform_send(self, data_extract: dict[str, pl.DataFrame], data_transformed = []):
@@ -219,6 +219,8 @@ class Transform:
         aftership_export = []
         aftership_export_detail = []
         for row in data_extract:
+            if len(row['customers']) == 0 or not row['customers'][0]['phone_number']:
+                continue
             phone = row['customers'][0]['phone_number'].replace('+', '')
             offset_updated = row['updated_at'][-6:]
             offset_created = row['created_at'][-6:]
@@ -249,12 +251,14 @@ class Transform:
                 for checkpoint in checkpoints:
                     offset_chk = checkpoint['checkpoint_time'][-6:]
                     offset_chk_created = checkpoint['created_at'][-6:]
+                    checkpoint_time = self._parse_date_str(date_str=checkpoint['checkpoint_time'], offset_chk=offset_chk, log_str=checkpoint['checkpoint_time'])
+                    checkpoint_created_time = self._parse_date_str(date_str=checkpoint['checkpoint_time'], offset_chk=offset_chk, log_str=checkpoint['checkpoint_time'])
                     fdetail_row = {
                         'OrderNbr': row['order_number'],
                         'Tracking': row['tracking_number'],
                         'ID': row['id'],
                         'ShipmentNbr': row['order_id'] if row['order_id'] != None else '',
-                        'CheckpointTime': datetime.strptime(checkpoint['checkpoint_time'], f'%Y-%m-%dT%H:%M:%S{offset_chk}').replace(tzinfo=ZoneInfo(self.timezones[offset_chk])).astimezone(ZoneInfo('America/New_York')),
+                        'CheckpointTime': checkpoint_time,
                         'Message': checkpoint['message'],
                         'Tag': checkpoint['tag'],
                         'Subtag': checkpoint['subtag'],
@@ -265,7 +269,7 @@ class Transform:
                         'Slug': checkpoint['slug'],
                         'RawTag': checkpoint['raw_tag'],
                         'Source': checkpoint['source'],
-                        'CheckpointCreatedTime': datetime.strptime(checkpoint['created_at'], f'%Y-%m-%dT%H:%M:%S{offset_chk_created}').replace(tzinfo=ZoneInfo('UTC')).astimezone(ZoneInfo('America/New_York')),
+                        'CheckpointCreatedTime': checkpoint_created_time,
                     }
                     aftership_export_detail.append(fdetail_row)
         data_transformed = {
@@ -345,11 +349,18 @@ class Transform:
 
 
 
-
+    def _parse_date_str(self, date_str: str, offset_chk: str = '', log_str: str = ''):
+        try:
+            dt = datetime.strptime(date_str, f'%Y-%m-%dT%H:%M:%S{offset_chk}').replace(tzinfo=ZoneInfo(self.timezones[offset_chk])).astimezone(ZoneInfo('America/New_York'))
+        except Exception as e: 
+            self.logger.warning(f"Couln't parse {log_str} timezone, using original value")
+            dt = datetime.strptime(date_str, f'%Y-%m-%dT%H:%M:%S')
+        return dt
+            
 
     def _set_tzoffset_map(self):
         self.timezones = {
-            '-10:00': 'America/Honolulu',
+            '-10:00': 'Pacific/Honolulu',
             '-09:30': 'Pacific/Marquesas',
             '-09:00': 'America/Anchorage',
             '-08:00': 'America/Los_Angeles',

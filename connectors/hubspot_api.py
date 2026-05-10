@@ -58,34 +58,7 @@ class HubSpotAPI:
         raise RuntimeError(
             f'HubSpot {method} {path} failed after 5 retries (last status {last_status}).'
         )
-
-    def search(self, object_type: str, filter_groups: list[dict], properties: list[str], limit: int = 100) -> Iterator[dict]:
-        path = f'/crm/v3/objects/{object_type}/search'
-        after: str | None = None
-        total = 0
-        while True:
-            body: dict[str, Any] = {
-                'filterGroups': filter_groups,
-                'properties': properties,
-                'limit': limit,
-            }
-            if after:
-                body['after'] = after
-            data = self._request('POST', path, json=body)
-            for record in data.get('results', []):
-                yield record
-                total += 1
-            after = data.get('paging', {}).get('next', {}).get('after')
-            if not after:
-                break
-            if total >= 10_000:
-                # HubSpot /search caps at 10k results — caller must narrow the filter.
-                self.logger.error(
-                    f'[CAP]   /search on {object_type} reached 10k cap; '
-                    f'narrow the date range and re-query. Stopping pagination.'
-                )
-                break
-
+    
     def _get_owners(self) -> dict[str, str]:
         path = '/crm/v3/owners'
         after: str | None = None
@@ -117,11 +90,39 @@ class HubSpotAPI:
         self.outbound_pipeline = next((result for result in results if result['label'].lower() == 'outbound sales'), {})
         return data.get('results', [])
 
-    def get_properties(self, object_type: str) -> list[dict]:
+    def _get_properties(self, object_type: str) -> list[dict]:
         data = self._request('GET', f'/crm/v3/properties/{object_type}')
         return data.get('results', [])
+    
 
 
+
+    def search(self, object_type: str, filter_groups: list[dict], properties: list[str], limit: int = 100) -> Iterator[dict]:
+        path = f'/crm/v3/objects/{object_type}/search'
+        after: str | None = None
+        total = 0
+        while True:
+            body: dict[str, Any] = {
+                'filterGroups': filter_groups,
+                'properties': properties,
+                'limit': limit,
+            }
+            if after:
+                body['after'] = after
+            data = self._request('POST', path, json=body)
+            for record in data.get('results', []):
+                yield record
+                total += 1
+            after = data.get('paging', {}).get('next', {}).get('after')
+            if not after:
+                break
+            if total >= 10_000:
+                # HubSpot /search caps at 10k results — caller must narrow the filter.
+                self.logger.error(
+                    f'[CAP]   /search on {object_type} reached 10k cap; '
+                    f'narrow the date range and re-query. Stopping pagination.'
+                )
+                break
 
 
     def search_deals(self) -> list[dict]:
@@ -177,3 +178,7 @@ class HubSpotAPI:
             {"filters": [{"propertyName": "createdate", "operator": "GTE", "value": fiscal_year_start_ms}]}
         ]
         return list(self.search('contacts', filter_groups=filter_groups, properties=["createdate", "hubspot_owner_id"]))
+    
+
+
+    

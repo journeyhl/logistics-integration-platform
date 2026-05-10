@@ -84,10 +84,10 @@ class AfterShip:
         ---
         :return self.:attr:`~trackings` (list): List of tracking results from Aftership api
         '''
-        now_aftership = datetime.now(ZoneInfo('America/New_York')) + timedelta(hours = 4)
+        now_aftership = datetime.now(ZoneInfo('America/New_York')) + timedelta(days = 3)
         updated_min = (now_aftership - updated_window).strftime('%Y-%m-%dT%H:%M:%S')
         params = {
-            'updated_at_min': updated_min
+            'created_at_min': updated_min
         }
         tracking_response = self.get_data(endpoint=self.tracking_endpoint, params = params)
         self.total_rows = tracking_response['data']['pagination']['total']
@@ -150,7 +150,7 @@ class AfterShip:
                 self.logger.info(f'{len(self.trackings)} total rows parsed successfully')
             if data.get('pagination'):
                 total = data['pagination']['total']
-                if total == self.total_rows: #or (abs(total - self.total_rows) < 10 and pipeline_name == 'aftership-to-dbc'):                    
+                if len(self.trackings) < self.total_rows:                    
                     next_cursor = data['pagination']['next_cursor']
                     has_next_page = data['pagination']['has_next_page']
                     self.logger.info(f'{total} results, {'continuing' if has_next_page else 'complete'}')
@@ -174,33 +174,29 @@ class AfterShip:
         ---
         <hr>
         
-        put_summary_here
+        Method to ***POST*** data to Aftership API and parse response
         
         ### Downstream Calls 
-         #### :meth:`~folder.file.class.method`
-            - Description
+         #### :meth:`~_parse_good_tracking_response`
+            - If response status code != 400 and we can parse as json, format response as log row and upsert to **_util.acu_api_log**
+         #### :meth:`~_parse_bad_tracking_response`
+            - If response status code == 400, format response as log row and upsert to **_util.acu_api_log**
         
         ### Upstream Calls 
-         #### :meth:`~folder.file.class.method`
-            - Description
+         #### :class:`~pipelines.aftership_send.SendToAfterShip`.:meth:`~pipelines.aftership_send.SendToAfterShip.load`
+            - Sends new tracking data to AfterShip
             
         <hr>
         
         Parameters
         ---
-        :param (*str*) `endpoint`: _description_
-        :param (*dict*) `payload`: _description_
-        
-        <hr>
-        
-        Returns
-        ---
-        :return `variablename` (_type_): _description_
+        :param (*str*) `endpoint`: url of endpoint to which we will drop the payload to
+        :param (*dict*) `params`: parameters to pass to endpoint
         '''
         try:
             response = self.session.post(url = endpoint, headers = self.headers, json = payload)
             if response.status_code == 400:
-                self.parse_bad_tracking_response(response.json(), payload)
+                self._parse_bad_tracking_response(response.json(), payload)
                 return {}
             else:
                 self.logger.info(f'Successfully posted to Aftership')
@@ -220,29 +216,23 @@ class AfterShip:
         ---
         <hr>
         
-        put_summary_here
+        Method to ***PUT*** data to Aftership API and parse response
         
         ### Downstream Calls 
-         #### :meth:`~folder.file.class.method`
-            - Description
-        
+         #### :meth:`~_parse_good_tracking_response`
+            - If response status code != 400 and we can parse as json, format response as log row and upsert to **_util.acu_api_log**
+
         ### Upstream Calls 
-         #### :meth:`~folder.file.class.method`
-            - Description
+         #### :class:`~pipelines.aftership_update.UpdateAfterShip`.:meth:`~pipelines.aftership_update.UpdateAfterShip.load`
+            - Updates Aftership Customers and ShipmentTags data
             
         <hr>
         
         Parameters
         ---
-        :param (*str*) `endpoint`: _description_
-        :param (*dict*) `params`: _description_
-        :param (*dict*) `payload`: _description_
-        
-        <hr>
-        
-        Returns
-        ---
-        :return `variablename` (_type_): _description_
+        :param (*str*) `endpoint`: url of endpoint to which we will drop the payload to
+        :param (*dict*) `params`: parameters to pass to endpoint
+        :param (*dict*) `payload`: dictionary of updated data to send
         '''
         self.logger.info(f'Updating {log_prefix}')
         try:
@@ -263,10 +253,11 @@ class AfterShip:
                 'ResponseCode': response.status_code,
                 'Message': jresponse['meta'].get('message'),
                 'ID': id,
-                'Timestamp': datetime.now(ZoneInfo('America/New_York'))                
+                'Timestamp': datetime.now(ZoneInfo('America/New_York'))     
             }
+            self.pipeline.centralstore.checked_upsert('_util.AfterShipLog', [log_row])           
+            
 
-        return response
 
 
 
@@ -295,7 +286,7 @@ class AfterShip:
 
 
 
-    def parse_bad_tracking_response(self, jresponse: dict, payload: dict):
+    def _parse_bad_tracking_response(self, jresponse: dict, payload: dict):
         response_code = jresponse['meta']['code']
         msg = jresponse['meta']['message']
         id = jresponse['data'].get('id')
