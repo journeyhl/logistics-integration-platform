@@ -5,6 +5,31 @@ from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
 class HubSpotSnapshot(Pipeline):
+    '''`HubSpotSnapshot`(Pipeline)
+    ---
+    <hr>
+    
+    Pipeline that pulls complete snapshots of B2B deal state and rep activity counts from Hubspot each day, posting to *hs* schema in db_CentralStore
+
+    # Extraction
+     - Pulls all data from HubSpot
+        - Owners: :class:`~connectors.hubspot_api.HubSpotAPI`.:meth:`~connectors.hubspot_api.HubSpotAPI._get_owners`
+        - Deals: :class:`~connectors.hubspot_api.HubSpotAPI`.:meth:`~connectors.hubspot_api.HubSpotAPI.search_deals`
+        - Calls: :class:`~connectors.hubspot_api.HubSpotAPI`.:meth:`~connectors.hubspot_api.HubSpotAPI.search_activities` ('calls')
+        - Meetings: :class:`~connectors.hubspot_api.HubSpotAPI`.:meth:`~connectors.hubspot_api.HubSpotAPI.search_activities` ('emails')
+        - Tasks: :class:`~connectors.hubspot_api.HubSpotAPI`.:meth:`~connectors.hubspot_api.HubSpotAPI.search_activities` ('meetings')
+        - Timestamp: :class:`~connectors.hubspot_api.HubSpotAPI`.:meth:`~connectors.hubspot_api.HubSpotAPI.search_activities` ('tasks')
+
+    # Transformation
+     - Inner join the two extracted DataFrames. This leaves us with just the shipments that don't have a Link3PL attribute value in Acu, but have a record in our RMI status tracking table
+     u
+    # Load
+     - Load the Link3PL value from our RMI centralstore query to AcumaticaDB, in the SOShipmentKvExt table
+
+    # Results Logging
+     - None needed
+    '''
+
     def __init__(self):
         super().__init__('hubspot-snapshot')
         self.hubapi = HubSpotAPI(self)
@@ -42,4 +67,4 @@ class HubSpotSnapshot(Pipeline):
         return data_transformed
     
     def log_results(self, data_loaded):
-        pass
+        pass 

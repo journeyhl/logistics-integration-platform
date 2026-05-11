@@ -41,19 +41,19 @@ class Transform:
             }
             prefix = f'{acu_shipment['ShipmentNbr']}-{acu_shipment['ShipmentLineNbr']}-{acu_shipment['InventoryCD']}'
             if matches_redstag != []:
-                log_str = f'{len(matches_redstag)} matches' if len(matches_redstag) > 1 else f'{len(matches_redstag)} matches'
-                self.logger.info(f'{prefix}: Found {log_str} matches from RedStagEvents')
+                log_str = f'{len(matches_redstag)} matches' if len(matches_redstag) > 1 else f'{len(matches_redstag)} match'
+                self.logger.info(f'{prefix}: Found {log_str} from RedStagEvents')
                 shipment_formatted = self.smash_rs_matches(acu_shipment, matches_redstag)
                 data_transformed.extend(shipment_formatted)
                 
             elif matches != []:
-                log_str = f'{len(matches)} matches' if len(matches) > 1 else f'{len(matches)} matches'
+                log_str = f'{len(matches)} matches' if len(matches) > 1 else f'{len(matches)} match'
                 self.logger.info(f'{prefix}: Found {log_str} from PackShipmentRedStag')
                 shipment_formatted = self.smash_def_matches(acu_shipment, matches = matches)                
                 data_transformed.extend(shipment_formatted)
 
             if matches_rmi != []:
-                log_str = f'{prefix}: {len(matches_rmi)} matches' if len(matches_rmi) > 1 else f'{len(matches_rmi)} matches'
+                log_str = f'{prefix}: {len(matches_rmi)} matches' if len(matches_rmi) > 1 else f'{len(matches_rmi)} match'
                 self.logger.info(f'{prefix}: Found {log_str} from PackShipmentRMI')
                 shipment_formatted = self.smash_rmi_matches(acu_shipment, matches_rmi)
                 data_transformed.extend(shipment_formatted)
