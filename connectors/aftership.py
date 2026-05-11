@@ -87,7 +87,7 @@ class AfterShip:
         now_aftership = datetime.now(ZoneInfo('America/New_York')) + timedelta(days = 3)
         updated_min = (now_aftership - updated_window).strftime('%Y-%m-%dT%H:%M:%S')
         params = {
-            'updated_at_min': updated_min
+            'created_at_min': updated_min
         }
         tracking_response = self.get_data(endpoint=self.tracking_endpoint, params = params)
         self.total_rows = tracking_response['data']['pagination']['total']

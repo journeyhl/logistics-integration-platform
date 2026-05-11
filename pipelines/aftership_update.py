@@ -2,7 +2,7 @@
 from pipelines.base import Pipeline
 from connectors import AfterShip, AcumaticaAPI
 from transform.aftership import Transform
-
+from datetime import timedelta
 class UpdateAfterShip(Pipeline):
     '''`UpdateAfterShip`(Pipeline)
     ---
@@ -42,7 +42,7 @@ class UpdateAfterShip(Pipeline):
         data_extract = {
             'slugs_extract': self.centralstore.query_db('select * from SlugsAfterShip'),
             'shipment_extract': self.acudb.query_to_dataframe(self.acudb.queries.Aftership_Shipments),
-            'aftership_extract': self.aftership.retrieve_trackings(pipeline_name= self.pipeline_name)
+            'aftership_extract': self.aftership.retrieve_trackings(pipeline_name= self.pipeline_name, updated_window = timedelta(days=5))
         }
         return data_extract
 

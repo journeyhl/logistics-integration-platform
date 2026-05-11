@@ -108,7 +108,7 @@ class Transform:
         )
         self.logger.info(f'Filtered from {self.aftership_extract.height} records to {aftership_extract_joined.height}')
         for i, row in enumerate(aftership_extract_joined.iter_rows(named=True)):
-            row = self.iterate_rows(row = row)            
+            row = self.iterate_rows(row = row)
             self.data_transformed.append(row)
 
         data_transfiltered = self.filter_update()       
