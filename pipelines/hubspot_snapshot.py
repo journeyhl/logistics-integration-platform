@@ -21,10 +21,11 @@ class HubSpotSnapshot(Pipeline):
         - Tasks: :class:`~connectors.hubspot_api.HubSpotAPI`.:meth:`~connectors.hubspot_api.HubSpotAPI.search_activities` ('tasks')
 
     # Transformation
-     - Inner join the two extracted DataFrames. This leaves us with just the shipments that don't have a Link3PL attribute value in Acu, but have a record in our RMI status tracking table
-    
+     - Transforms Hubspot API response into format required for **hs.deal_snapshots**, **hs.activity_snapshots**, and **hs.deal_tracking**
+        
     # Load
-     - Load the Link3PL value from our RMI centralstore query to AcumaticaDB, in the SOShipmentKvExt table
+     - Inserts a new row for each pipeline execution to **hs.deal_snapshots** and **hs.activity_snapshots**
+     - Upserts to **hs.deal_tracking**
 
     # Results Logging
      - None needed
