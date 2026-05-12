@@ -24,13 +24,45 @@ class HubSpotAPI:
         })
         self._get_deal_pipelines()
         self._get_owners()
-
-
-
-    def _set_endpoints(self):
         self.lists = f'{self.base_url}/crm/v3/lists/'
 
+
+
+
     def _request(self, method: str, path: str, **kwargs) -> dict[str, Any]:
+        '''`_request`(method: *str*, path: *str*, )
+        ---
+        <hr>
+        
+        Method that actually hits the HubSpot api with the method and args passed
+        
+        ### Downstream Calls 
+         #### :meth:`~folder.file.class.method`
+            - Description
+        
+        ### Upstream Calls 
+         #### :meth:`~_get_owners`
+            - Gets distinct owners
+         #### :meth:`~_get_deal_pipelines`
+            - Get each different deal pipeline
+         #### :meth:`~_get_properties`
+            - Get all distinct properties
+         #### :meth:`~search`
+            - Search for the entity specified in the parameters passed
+            
+        <hr>
+        
+        Parameters
+        ---
+        :param (*str*) `method`: API Method to perform
+        :param (*str*) `path`: API endpoint
+        
+        <hr>
+        
+        Returns
+        ---
+        :return `response` (dict[str, Any]): Response from HubSpot API
+        '''
         url = f'{self.base_url}{path}'
         backoff = [1, 2, 4, 8, 16]
         last_status: int | None = None
@@ -59,6 +91,7 @@ class HubSpotAPI:
             f'HubSpot {method} {path} failed after 5 retries (last status {last_status}).'
         )
     
+
     def _get_owners(self) -> dict[str, str]:
         path = '/crm/v3/owners'
         after: str | None = None
@@ -77,6 +110,7 @@ class HubSpotAPI:
         self.owners = owners
         return owners
 
+
     def _get_deal_pipelines(self) -> list[dict]:
         data = self._request('GET', '/crm/v3/pipelines/deals')
         bp = 'here'
@@ -90,6 +124,7 @@ class HubSpotAPI:
         self.outbound_pipeline = next((result for result in results if result['label'].lower() == 'outbound sales'), {})
         return data.get('results', [])
 
+
     def _get_properties(self, object_type: str) -> list[dict]:
         data = self._request('GET', f'/crm/v3/properties/{object_type}')
         return data.get('results', [])
@@ -98,6 +133,32 @@ class HubSpotAPI:
 
 
     def search(self, object_type: str, filter_groups: list[dict], properties: list[str], limit: int = 100) -> Iterator[dict]:
+        '''`search`(self, object_type: *str*, filter_groups: *list[dict]*, properties: *list[str]*)
+        ---
+        <hr>
+        
+        Method that orchestrates how the request payload to the HubSpot API is actually delivered
+        
+        ### Downstream Calls 
+         #### :meth:`~_request`
+            - Method that goes out and hits the Hubspot API 
+        
+        ### Upstream Calls 
+         #### :meth:`~search_deals`
+            - Used to search deals
+         #### :meth:`~search_activities`
+            - Used to search calls, emails, meetings, tasks
+         #### :meth:`~search_new_contacts`
+            - Used to search for newly created contacts
+            
+        <hr>
+        
+        Parameters
+        ---
+        :param (*str*) `object_type`: Type of object that we are searching for (deals, calls, emails, meetings, etc)
+        :param (*list[dict]*) `filter_groups`: How filtering of records should be performed
+        :param (*list[str]*) `properties`: Additional properties that should be included in the response from API
+        '''
         path = f'/crm/v3/objects/{object_type}/search'
         after: str | None = None
         total = 0
@@ -165,7 +226,7 @@ class HubSpotAPI:
 
 
     def search_activities(self, object_type: str) -> list[dict]:
-        '''`search_activities`(object_type: *str*, )
+        '''`search_activities`(self, object_type: *str*)
         ---
         <hr>
         
@@ -174,10 +235,6 @@ class HubSpotAPI:
         ### Downstream Calls 
          #### :meth:`~search`
             - Method that actually performs the API call
-        
-        ### Upstream Calls 
-         #### :meth:`~folder.file.class.method`
-            - Description
             
         <hr>
         
@@ -189,7 +246,7 @@ class HubSpotAPI:
         
         Returns
         ---
-        :return `variablename` (list[dict]): _description_
+        :return `variablename` (list[dict]): Response from :meth:`~search` from the Hubspot API
         '''
         self.logger.info(f'Extracting {object_type}...')
         fiscal_year_start_ms = str(int(self.pipeline.fiscal_year_start.timestamp() * 1000))
@@ -199,6 +256,18 @@ class HubSpotAPI:
         return list(self.search(object_type, filter_groups=filter_groups, properties=["hs_timestamp", "hubspot_owner_id"]))
 
     def search_new_contacts(self) -> list[dict]:
+        '''`search_new_contacts`(self)
+        ---
+        <hr>
+        
+        Method to search Contacts in HubSpot specifically 
+            
+        <hr>
+        
+        Returns
+        ---
+        :return `variablename` (list[dict]): Response from :meth:`~search` containing the contacts found with the Hubspot API
+        '''
         fiscal_year_start_ms = str(int(self.pipeline.fiscal_year_start.timestamp() * 1000))
         filter_groups = [
             {"filters": [{"propertyName": "createdate", "operator": "GTE", "value": fiscal_year_start_ms}]}
@@ -208,3 +277,11 @@ class HubSpotAPI:
 
 
     
+
+
+
+    #TODO Pull in data on all the contacts
+    #Track where they come from, attribute sales 
+    #Here are the data points and how to structure 
+
+    #Requirements around hubspot 
