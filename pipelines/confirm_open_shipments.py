@@ -16,7 +16,6 @@ class ShipmentsReadyToConfirm(Pipeline):
     # Transformation
      - Transforms :attr:`~connectors.sql.AcumaticaDbQueries.ShipmentsReadyToConfirm` result to a list of dictionaries, each containing ShipmentNbr
 
-
     # Load
      - Confirms Shipments coming from :meth:`~transform` via :meth:`~connectors.acu_api.AcumaticaAPI.confirm_shipment`
 
@@ -29,8 +28,7 @@ class ShipmentsReadyToConfirm(Pipeline):
 
 
     def extract(self):
-        '''
-        `extract`()
+        '''`extract`(self)
         ---
         <hr>
         
@@ -50,8 +48,7 @@ class ShipmentsReadyToConfirm(Pipeline):
         return data_extract
     
     def transform(self, data_extract: pl.DataFrame):
-        '''
-        `transform`(self, data_extract: *pl.DataFrame*)
+        '''`transform`(self, data_extract: *pl.DataFrame*)
         ---
         <hr>
     
@@ -76,8 +73,7 @@ class ShipmentsReadyToConfirm(Pipeline):
         return data_transformed
     
     def load(self, data_transformed: list):
-        '''
-        `load`(self, data_transformed: *list*)
+        '''`load`(self, data_transformed: *list*)
         ---
         <hr>
         

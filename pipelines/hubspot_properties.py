@@ -3,7 +3,25 @@ from transform.notify_fulfillment_ops import Transform
 from connectors import HubSpotAPI
 
 
-class HubSpotProperties(Pipeline):
+class HubSpotProperties(Pipeline):    
+    '''`HubSpotProperties`(Pipeline)
+    ---
+    <hr>
+
+    Pipeline to load properties from main ObjectTypes in Hubspot to ***hs.Properties*** in db_CentralStore
+
+    # Extraction
+     - Extracts property data from Hubspot using :class:`~connectors.sql.HubSpotAPI`.:meth:`~connectors.sql.HubSpotAPI._get_properties`
+
+    # Transformation
+     - Transforms property extra into format needed for upsert to **hs.Properties**
+
+    # Load
+     - Upsert to **hs.Properties**
+
+    # Results Logging
+     - Upserts Acumatica API interactions to **_util.acu_api_log** 
+    '''
     def __init__(self):
         super().__init__('hubspot-properties')
         self.transformer = Transform(self)
