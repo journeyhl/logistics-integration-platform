@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING,  Any, Iterator
 if TYPE_CHECKING:
-    from pipelines.hubspot_snapshot import HubSpotSnapshot
+    from pipelines import HubSpotSnapshot, HubSpotProperties
 from config.settings import HUBSPOT
 from datetime import datetime, timezone, timedelta
 import requests
@@ -10,7 +10,7 @@ import time
 
 
 class HubSpotAPI:
-    def __init__(self, pipeline: HubSpotSnapshot):
+    def __init__(self, pipeline: HubSpotSnapshot | HubSpotProperties):
         self.pipeline = pipeline
         if type(pipeline) == str:
             self.logger = logging.getLogger(f'{pipeline}.hubspot_api')
@@ -127,7 +127,10 @@ class HubSpotAPI:
 
     def _get_properties(self, object_type: str) -> list[dict]:
         data = self._request('GET', f'/crm/v3/properties/{object_type}')
-        return data.get('results', [])
+        results = data.get('results', [])
+        for result in results:
+            result['ObjectType'] = object_type
+        return results
     
 
 

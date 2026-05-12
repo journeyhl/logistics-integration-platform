@@ -5,7 +5,6 @@ from connectors import Teams, HubSpotAPI
 from pipelines import HubSpotSnapshot
 
 
-# hubapi = HubSpotAPI('script')
 # for p in hubapi.get_deal_pipelines():
 #     print(p['id'], p['label'])
 #     for s in p.get('stages', []):
@@ -15,8 +14,21 @@ from pipelines import HubSpotSnapshot
 
 
 hubsnap = HubSpotSnapshot()
-hubsnap.run()
 
+properties = hubsnap.hubapi._get_properties('contacts')
+
+# for item in properties:
+#     for key, value in item.items():
+#         print(key)
+#     bp = 'here'
+
+
+# for property in properties
+
+hubsnap.centralstore.checked_upsert_paginated('hs.Properties', properties)
+
+bp = 'here'
+hubsnap.run()
 teams = Teams('script')
 bp = teams.send_message('test')
 bp = 'here'

@@ -100,9 +100,9 @@ class ShipmentsReadyToConfirm(Pipeline):
         :return `self.acu_api.data_log` (list): Data to send to :meth:`~connectors.sql.SQLConnector.checked_upsert`
         '''
         for shipment in data_transformed:
+            self.acu_api.confirm_shipment(shipment)
             self.logger.info(f'Sleeping 3 seconds')
             time.sleep(3)
-            self.acu_api.confirm_shipment(shipment)
         return self.acu_api.data_log
     
     def log_results(self, data_loaded):

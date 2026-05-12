@@ -20,7 +20,12 @@ and p.TrackNumber is not null
 group by s.ShipmentNbr, s.Status, s.CompanyID
 )
 , SecondLevel as(
-select *
+select t.ShipmentNbr
+     , t.Status
+     , t.OrderLines
+     , t.PackageLines
+     , t.ShipmentQty
+     , t.PackageQty
 	 , (select cast(sum(l.ShippedQty) as int) from SOShipLine l where t.CompanyID = l.CompanyID and t.ShipmentNbr = l.ShipmentNbr) ShippedQty
 	 , (select cast(sum(p.PackedQty) as int) from SOShipLineSplitPackage p where t.CompanyID = p.CompanyID and t.ShipmentNbr = p.ShipmentNbr) PackedQty
 from TopLevel t
