@@ -29,13 +29,13 @@ class HubSpotProperties(Pipeline):
 
 
     def extract(self):
-        contacts = self.hubapi._get_properties('contacts')
-        calls = self.hubapi._get_properties('calls')
-        emails = self.hubapi._get_properties('emails')
-        meetings = self.hubapi._get_properties('meetings')
-        tasks = self.hubapi._get_properties('tasks')
+        contacts = self.hubapi.get_properties('contacts')
+        calls = self.hubapi.get_properties('calls')
+        emails = self.hubapi.get_properties('emails')
+        meetings = self.hubapi.get_properties('meetings')
+        tasks = self.hubapi.get_properties('tasks')
         # deals = self.hubapi._get_properties('deals')
-        leads = self.hubapi._get_properties('leads')
+        leads = self.hubapi.get_properties('leads')
         data_extract = contacts + calls + emails + meetings + tasks +  leads
         return data_extract
 

@@ -15,7 +15,7 @@ from pipelines import HubSpotSnapshot
 
 hubsnap = HubSpotSnapshot()
 
-properties = hubsnap.hubapi._get_properties('contacts')
+properties = hubsnap.hubapi.get_properties('contacts')
 
 # for item in properties:
 #     for key, value in item.items():

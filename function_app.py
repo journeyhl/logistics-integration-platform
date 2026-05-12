@@ -614,4 +614,19 @@ def hubspot_snapshots(timer: af.TimerRequest):
     from pipelines import HubSpotSnapshot
     hubspot_snapshot_upsert = HubSpotSnapshot()
     hubspot_snapshot_upsert.run()
-#endregion      aftership_update
+#endregion      hubspot_snapshots
+
+
+#region             rmi_link_to_acumatica
+# Update RMI shipments with RMA ID & link
+#   4x/day (4:30a, 10:30a, 4:30p, 10:30p)
+@app.timer_trigger(
+    schedule = '30 4/6 * * *',
+    arg_name = 'timer',
+    run_on_startup = False
+)
+def rmi_link_to_acumatica(timer: af.TimerRequest):
+    from pipelines import RMILinkToAcu
+    rmi_link = RMILinkToAcu()
+    rmi_link.run()
+#endregion          rmi_link_to_acumatica

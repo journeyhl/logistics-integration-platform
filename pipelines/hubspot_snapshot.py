@@ -35,14 +35,12 @@ class HubSpotSnapshot(Pipeline):
         super().__init__('hubspot-snapshot')
         self.hubapi = HubSpotAPI(self)
         self.transformer = Transform(self)
-        self.fiscal_year_start = datetime(datetime.now(ZoneInfo('America/New_York')).year, datetime.now(ZoneInfo('America/New_York')).month, datetime.now(ZoneInfo('America/New_York')).day)
-        self.week_start = datetime.now(ZoneInfo('America/New_York')).date() - timedelta(datetime.now(ZoneInfo('America/New_York')).date().weekday())
-        self.month_start = datetime.now(ZoneInfo('America/New_York')).date() - timedelta(days=datetime.now(ZoneInfo('America/New_York')).date().day - 1)
+        self.hubapi._set_snapshot_windows()
         pass
 
 
     def extract(self):
-        owners = self.hubapi._get_owners()
+        owners = self.hubapi.owners
         deals = self.hubapi.search_deals()
         data_extract = {
             'owners': owners,

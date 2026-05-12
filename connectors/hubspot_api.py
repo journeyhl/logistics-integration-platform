@@ -4,6 +4,7 @@ if TYPE_CHECKING:
     from pipelines import HubSpotSnapshot, HubSpotProperties
 from config.settings import HUBSPOT
 from datetime import datetime, timezone, timedelta
+from zoneinfo import ZoneInfo
 import requests
 import logging
 import time
@@ -27,7 +28,34 @@ class HubSpotAPI:
         self.lists = f'{self.base_url}/crm/v3/lists/'
 
 
-
+    def _set_snapshot_windows(self):
+        '''`_set_snapshot_windows`()
+        ---
+        <hr>
+        
+        Sets snapshot start windows for :class:`~pipelines.hubspot_snapshot.HubSpotSnapshot`
+        
+        ### Upstream Calls 
+         #### :class:`~pipelines.hubspot_snapshot.HubSpotSnapshot`.:meth:`~pipelines.hubspot_snapshot.HubSpotSnapshot.__init__`
+            - Called when :class:`~pipelines.hubspot_snapshot.HubSpotSnapshot` is initialized and sets snapshot windows
+            
+        <hr>
+        
+        Parameters
+        ---
+        
+        <hr>
+        
+        Sets
+        ---
+        - #### self.:attr:`~fiscal_year_start`
+        - #### self.:attr:`~week_start`
+        - #### self.:attr:`~month_start`
+        '''
+        self.fiscal_year_start = datetime(datetime.now(ZoneInfo('America/New_York')).year, datetime.now(ZoneInfo('America/New_York')).month, datetime.now(ZoneInfo('America/New_York')).day)
+        self.week_start = datetime.now(ZoneInfo('America/New_York')).date() - timedelta(datetime.now(ZoneInfo('America/New_York')).date().weekday())
+        self.month_start = datetime.now(ZoneInfo('America/New_York')).date() - timedelta(days=datetime.now(ZoneInfo('America/New_York')).date().day - 1)
+        
 
     def _request(self, method: str, path: str, **kwargs) -> dict[str, Any]:
         '''`_request`(method: *str*, path: *str*, )
@@ -93,6 +121,32 @@ class HubSpotAPI:
     
 
     def _get_owners(self) -> dict[str, str]:
+        '''`_get_owners`()
+        ---
+        <hr>
+        
+        Method to retrieve Contact OwnerIDs from Hubspot API
+        
+        ### Downstream Calls 
+         #### :meth:`~._request`
+            - Method that actually hits the HubSpot API with args passed from here
+        
+        ### Upstream Calls 
+         #### :meth:`~folder.file.class.method`
+            - Description
+        
+        <hr>
+        
+        Sets
+        ---
+        - #### self.:attr:`~owners`
+        
+        <hr>
+        
+        Returns
+        ---
+        :return `owners` (dict[str, str]): list of owners returned from HubSpot
+        '''
         path = '/crm/v3/owners'
         after: str | None = None
         owners: dict[str, str] = {}
@@ -125,11 +179,39 @@ class HubSpotAPI:
         return data.get('results', [])
 
 
-    def _get_properties(self, object_type: str) -> list[dict]:
+    def get_properties(self, object_type: str) -> list[dict]:
+        '''`_get_properties`(self, object_type: *str*)
+        ---
+        <hr>
+        
+        Method that drives the extraction of HubSpot properties from the **object_type** passed as a parameter
+        
+        ### Downstream Calls 
+         #### :meth:`~_request`
+            - Method that hits the HubSpot API at the endpoint we pass
+        
+        ### Upstream Calls 
+         #### :class:`~pipelines.hubspot_properties.HubSpotProperties`.:meth:`~pipelines.hubspot_properties.HubSpotProperties.extract`
+            - Description
+            
+        <hr>
+        
+        Parameters
+        ---
+        :param (*str*) `object_type`: Hubspot Object Type to retrieve properties for (calls, contacts, emails, meetings, etc...)
+        
+        <hr>
+        
+        Returns
+        ---
+        :return `results` (list[dict]): list of properties belonging to the specified object_type
+        '''
         data = self._request('GET', f'/crm/v3/properties/{object_type}')
         results = data.get('results', [])
         for result in results:
             result['ObjectType'] = object_type
+        # self.logger.info(f'')
+        bp = 'here'
         return results
     
 
@@ -190,9 +272,29 @@ class HubSpotAPI:
 
 
     def search_deals(self) -> list[dict]:
+        '''`search_deals`()
+        ---
+        <hr>
+        
+        put_summary_here
+        
+        ### Downstream Calls 
+         #### :meth:`~search`
+            - Orechestrates how the deal search payload will be delivered to Hubspot API
+
+        ### Upstream Calls 
+         #### :class:`~pipelines.hubspot_snapshot.HubSpotSnapshot`.:meth:`~pipelines.hubspot_snapshot.HubSpotSnapshot.extract`
+            - deals -> data_extract['deals'] in HubSpotSnapshot pipeline execution
+        
+        <hr>
+        
+        Returns
+        ---
+        :return `deals` (list[dict]): list of deals returned from Hubspot API
+        '''
         now = datetime.now(timezone.utc)
         two_years_ago_ms = str(int((now - timedelta(days=730)).timestamp() * 1000))
-        fiscal_year_start_ms = str(int(self.pipeline.fiscal_year_start.timestamp() * 1000))
+        fiscal_year_start_ms = str(int(self.fiscal_year_start.timestamp() * 1000))
 
         filter_groups = [
             {
@@ -252,7 +354,7 @@ class HubSpotAPI:
         :return `variablename` (list[dict]): Response from :meth:`~search` from the Hubspot API
         '''
         self.logger.info(f'Extracting {object_type}...')
-        fiscal_year_start_ms = str(int(self.pipeline.fiscal_year_start.timestamp() * 1000))
+        fiscal_year_start_ms = str(int(self.fiscal_year_start.timestamp() * 1000))
         filter_groups = [
             {"filters": [{"propertyName": "hs_timestamp", "operator": "GTE", "value": fiscal_year_start_ms}]}
         ]
@@ -271,7 +373,7 @@ class HubSpotAPI:
         ---
         :return `variablename` (list[dict]): Response from :meth:`~search` containing the contacts found with the Hubspot API
         '''
-        fiscal_year_start_ms = str(int(self.pipeline.fiscal_year_start.timestamp() * 1000))
+        fiscal_year_start_ms = str(int(self.fiscal_year_start.timestamp() * 1000))
         filter_groups = [
             {"filters": [{"propertyName": "createdate", "operator": "GTE", "value": fiscal_year_start_ms}]}
         ]
