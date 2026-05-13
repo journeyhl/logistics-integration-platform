@@ -584,7 +584,7 @@ def aftership_update(timer: af.TimerRequest):
 #endregion      aftership_update
 
 
-#region             aftership_update
+#region             aftership_to_dbc
 #Update existing Aftership shipments
 #                       1x/hour (22)
 @app.timer_trigger(
@@ -596,7 +596,7 @@ def aftership_to_dbc(timer: af.TimerRequest):
     from pipelines import AfterShipToDbc
     aftership_to_dbc = AfterShipToDbc()
     aftership_to_dbc.run()
-#endregion      aftership_update
+#endregion          aftership_to_dbc
 
 
 

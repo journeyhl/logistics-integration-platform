@@ -34,7 +34,7 @@ class AfterShipToDbc(Pipeline):
 
 
     def extract(self):
-        data_extract = self.aftership.retrieve_trackings(updated_window=timedelta(days=1), pipeline_name = self.pipeline_name)
+        data_extract = self.aftership.retrieve_trackings(updated_window=timedelta(days=7), pipeline_name = self.pipeline_name)
         return data_extract
 
     def transform(self, data_extract):
@@ -44,8 +44,8 @@ class AfterShipToDbc(Pipeline):
     def load(self, data_transformed):
         aftership_export = data_transformed['aftership_export']
         aftership_export_detail = data_transformed['aftership_export_detail']
-        self.centralstore.checked_upsert_paginated('acu.AftershipExportv2', aftership_export)
-        self.centralstore.checked_upsert_paginated('acu.AftershipExportDetailv2', aftership_export_detail)
+        self.centralstore.checked_upsert_paginated('acu.AftershipExportv2', aftership_export, page_size = 300)
+        self.centralstore.checked_upsert_paginated('acu.AftershipExportDetailv2', aftership_export_detail, page_size = 300)
         return data_transformed
     
     def log_results(self, data_loaded):

@@ -84,7 +84,7 @@ class AfterShip:
         ---
         :return self.:attr:`~trackings` (list): List of tracking results from Aftership api
         '''
-        now_aftership = datetime.now(ZoneInfo('America/New_York')) + timedelta(days = 3)
+        now_aftership = datetime.now(ZoneInfo('America/New_York')) + timedelta(hours = 4)
         updated_min = (now_aftership - updated_window).strftime('%Y-%m-%dT%H:%M:%S')
         params = {
             'created_at_min': updated_min
