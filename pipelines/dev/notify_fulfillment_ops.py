@@ -1,4 +1,4 @@
-from . import Pipeline
+from .. import Pipeline
 from transform.notify_fulfillment_ops import Transform
 
 

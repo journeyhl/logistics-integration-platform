@@ -1156,3 +1156,12 @@ TEAMS = {
 AFTERSHIP = {
     'api_key': os.getenv('AFTERSHI_API_KEY')
 }
+
+
+SHAREPOINT = {
+    'directory_id': os.getenv('SHAREPOINT_DIRECTORY_ID'),
+    'client_secret_id': os.getenv('SHAREPOINT_CLIENT_SECRET_ID'),
+    'client_secret_value': os.getenv('SHAREPOINT_CLIENT_SECRET_VALUE'),
+    'object_id': os.getenv('SHAREPOINT_OBJECT_ID'),
+    'app_id': os.getenv('SHAREPOINT_APP_ID'),
+}

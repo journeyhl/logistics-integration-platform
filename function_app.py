@@ -95,7 +95,7 @@ def rmi_data_retrieval_pipeline(timer: af.TimerRequest):
     ===
      *Runs at :25 every hour from 4am-11pm*
     '''
-    from pipelines import GetClosedShipmentsFromRMI, GetReceiptsFromRMI, GetRMAsFromRMI, GetStatusFromRMI, StageRMIStatusRetrieval
+    from pipelines import GetClosedShipmentsFromRMI, GetReceiptsFromRMI, GetRMAsFromRMI, GetStatusFromRMI
     closed_shipment_pipeline = GetClosedShipmentsFromRMI()
     closed_shipment_pipeline.run()
 
