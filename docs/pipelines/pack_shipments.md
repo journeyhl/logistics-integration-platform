@@ -2,25 +2,30 @@
 %%{init: {"flowchart": {"wrappingWidth": 400}}}%%
 flowchart TD
     A([pack_shipments]) --> B[PackShipments.__init__]
-    B --> B1[init AcumaticaAPI]
-    B --> B2[init Transform]
-    B --> B3[init Load]
+    B --> B1[
+        self.acu_api = AcumaticaAPI
+        self.transformer = Transform
+        self.loader = Load
+    ]
     A --> RUN[Pipeline.run]
 
     RUN --> EX[extract]
     EX --> D1[(
         <b><i>CentralStore</i></b>
-        PackShipmentRedStag
+        PackShipmentRedStag: Query
     )]
     EX --> D2[(
         <b><i>CentralStore</i></b>
-        RedStagEvents
+        RedStagEvents: Query
     )]
     EX --> D3[(
         <b><i>CentralStore</i></b>
-        PackShipmentRMI
+        PackShipmentRMI: Query
     )]
-    EX --> D4[(AcuDB: PackShipment)]
+    EX --> D4[(
+        <b><i>AcuDb</i></b>
+        PackShipment: Query
+    )]
 
     RUN --> TR[transform]
     TR --> T1[transform_redstag_events]
@@ -46,5 +51,9 @@ flowchart TD
     LR --> UPS[(
         <b><i>CentralStore</i></b>
         upsert _util.acu_api_log
+    )]
+    RUN --> LOGS[(
+        <b><i>CentralStore</i></b>
+        _util.Logs<br/>insert run logs
     )]
 ```

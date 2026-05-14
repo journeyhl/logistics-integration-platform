@@ -8,7 +8,10 @@ flowchart TD
     A --> RUN[Pipeline.run]
 
     RUN --> EX[extract]
-    EX --> D1[(AcuDB: AcuToDbc_SalesOrders<br/>non-quote/return orders modified in last day)]
+    EX --> D1[(
+        <b><i>AcuDb</i></b>
+        AcuToDbc_SalesOrders: Query
+    )]
 
     RUN --> TR[transform]
     TR --> T1[fill null LineNbr with 99]
@@ -24,6 +27,8 @@ flowchart TD
     )]
     L3 --> CS1
 
-    RUN --> LR[log_results]
-    LR --> LO[pass]
+    RUN --> LOGS[(
+        <b><i>CentralStore</i></b>
+        _util.Logs<br/>insert run logs
+    )]
 ```

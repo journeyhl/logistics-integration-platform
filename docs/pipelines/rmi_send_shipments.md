@@ -2,14 +2,19 @@
 %%{init: {"flowchart": {"wrappingWidth": 400}}}%%
 flowchart TD
     A([run_send_shipments_to_RMI]) --> B[SendRMIShipments.__init__]
-    B --> B1[init Transform]
-    B --> B2[init AcuOData]
-    B --> B3[init RMIXML]
-    B --> B4[init AcumaticaAPI]
+    B --> B1[
+        self.odata_source = AcuOData
+        self.transformer = Transform
+        self.rmi = RMIXML
+        self.acu_api = AcumaticaAPI
+    ]
     A --> RUN[Pipeline.run]
 
     RUN --> EX[extract]
-    EX --> D1[(AcuDB: SOShipment + SOShipLine + SOAddress<br/>via SendRMIShipments.sql<br/>SiteCD=RMI, OrigOrderType != RC,<br/>Status not in C/L/F/I, AttributeSHP2WH=0)]
+    EX --> D1[(
+        <b><i>AcuDb</i></b>
+        SendRMIShipments: Query
+        )]
 
     RUN --> TR[transform]
     TR --> T1[group rows by ShipmentNbr<br/>ShipmentNbr → list of line dicts]
@@ -33,4 +38,8 @@ flowchart TD
     LR --> UPS[(
         <b><i>CentralStore</i></b>
         upsert _util.acu_api_log)]
+    RUN --> LOGS[(
+        <b><i>CentralStore</i></b>
+        _util.Logs<br/>insert run logs
+    )]
 ```

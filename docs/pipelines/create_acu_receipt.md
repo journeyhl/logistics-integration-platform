@@ -2,12 +2,11 @@
 %%{init: {"flowchart": {"wrappingWidth": 400}}}%%
 flowchart TD
     A([create_acu_receipt]) --> B[CreateAcuReceipt.__init__]
-    B --> B1[init SQLConnector: CentralStore]
-    B --> B2[init SQLConnector: AcumaticaDb]
-    B --> B3[init Logger]
-    B --> B4[init AcumaticaAPI]
-    B --> B5[init Transform]
-    B --> B6[init Load]
+    B --> B1[
+        self.acu_api = AcumaticaAPI
+        self.transformer = Transform
+        self.loader = Load
+    ]
     A --> RUN[Pipeline.run]
 
     RUN --> EX[extract]
@@ -15,7 +14,9 @@ flowchart TD
         <b><i>CentralStore</i></b>
         ReturnsPendingReciept: Query
     )]
-    EX --> D2[(AcuDB: OpenRCsNoReceipt<br/>RC orders at RMI warehouse, open, sent to WH, no shipment yet)]
+    EX --> D2[(
+        <b><i>AcuDb</i></b>
+        OpenRCsNoReceipt<br/>RC orders at RMI warehouse, open, sent to WH, no shipment yet)]
 
     RUN --> TR[transform]
     TR --> T1[match AcuDB RC orders to CentralStore RMA records<br/>on ReturnNbr = RMANumber stripped of -1/-2/-3 suffix]
@@ -51,5 +52,9 @@ flowchart TD
     LR --> UPS[(
         <b><i>CentralStore</i></b>
         upsert _util.acu_api_log
+    )]
+    RUN --> LOGS[(
+        <b><i>CentralStore</i></b>
+        _util.Logs<br/>insert run logs
     )]
 ```

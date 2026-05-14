@@ -2,14 +2,19 @@
 %%{init: {"flowchart": {"wrappingWidth": 400}}}%%
 flowchart TD
     A([redstag_send_shipments]) --> B[SendRedStagShipments.__init__]
-    B --> B1[init Transform]
-    B --> B2[init RedStagAPI]
-    B --> B3[init AcumaticaAPI]
-    B --> B4[init Load]
+    B --> B1[
+        self.transformer = Transform
+        self.redstag = RedStagAPI
+        self.acu_api = AcumaticaAPI
+        self.loader = Load
+    ]
     A --> RUN[Pipeline.run]
 
     RUN --> EX[extract]
-    EX --> D1[(AcuDB: SOShipment + SOShipLine<br/>SiteCD=RedStag%, AttributeSHP2WH=0,<br/>Status not in C/L/F/I, OrigOrderType != RC)]
+    EX --> D1[(
+        <b><i>AcuDb</i></b>
+        SendRedStagShipments: Query
+    )]
 
     RUN --> TR[transform]
     TR --> TR1{rsOrderID<br/>already set?}
@@ -33,5 +38,9 @@ flowchart TD
     LR --> UPS[(
         <b><i>CentralStore</i></b>
         upsert _util.acu_api_log
+    )]
+    RUN --> LOGS[(
+        <b><i>CentralStore</i></b>
+        _util.Logs<br/>insert run logs
     )]
 ```

@@ -2,8 +2,10 @@
 %%{init: {"flowchart": {"wrappingWidth": 400}}}%%
 flowchart TD
     A([hubspot_properties]) --> B[HubSpotProperties.__init__]
-    B --> B1[init Transform]
-    B --> B2[init HubSpotAPI connector]
+    B --> B1[
+        self.hubapi = HubSpotAPI
+        self.transformer = Transform
+    ]
     A --> RUN[Pipeline.run]
 
     RUN --> EX[extract]
@@ -26,5 +28,8 @@ flowchart TD
         upsert hs.Properties
     )]
 
-    RUN --> LR[log_results<br/>*Do nothing]
+    RUN --> LOGS[(
+        <b><i>CentralStore</i></b>
+        _util.Logs<br/>insert run logs
+    )]
 ```

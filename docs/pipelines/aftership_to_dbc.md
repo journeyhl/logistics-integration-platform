@@ -2,8 +2,10 @@
 %%{init: {"flowchart": {"wrappingWidth": 400}}}%%
 flowchart TD
     A([aftership_to_dbc]) --> B[AfterShipToDbc.__init__]
-    B --> B1[init AfterShip connector]
-    B --> B2[init Transform]
+    B --> B1[
+        self.aftership = AfterShip
+        self.transformer = Transform
+    ]
     A --> RUN[Pipeline.run]
 
     RUN --> EX[extract]
@@ -28,5 +30,8 @@ flowchart TD
         upsert acu.AftershipExportDetailv2
     )]
 
-    RUN --> LR[log_results<br/>*Do nothing]
+    RUN --> LOGS[(
+        <b><i>CentralStore</i></b>
+        _util.Logs<br/>insert run logs
+    )]
 ```

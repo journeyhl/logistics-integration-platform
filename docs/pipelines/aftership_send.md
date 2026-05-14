@@ -2,8 +2,10 @@
 %%{init: {"flowchart": {"wrappingWidth": 400}}}%%
 flowchart TD
     A([aftership_send]) --> B[SendToAfterShip.__init__]
-    B --> B1[init AfterShip connector<br/>session + tracking_endpoint:<br/>/tracking/2026-01/trackings]
-    B --> B2[init Transform<br/>_set_state_map + _set_tzoffset_map]
+    B --> B1[
+        self.aftership = AfterShip
+        self.transformer = Transform
+    ]
     A --> RUN[Pipeline.run]
 
     RUN --> EX[extract]
@@ -16,7 +18,9 @@ flowchart TD
         <b><i>CentralStore</i></b>
         _util.AftershipLog
     )]
-    EX --> D3[(AcuDB: Aftership_Shipments<br/>shipments w/ tracking data,<br/>ShipDate >= 2026-01-01)]
+    EX --> D3[(
+        <b><i>AcuDb</i></b>
+        Aftership_Shipments<br/>shipments w/ tracking data,<br/>ShipDate >= 2026-01-01)]
     EX --> D4[(
         <b><i>CentralStore</i></b>
         acu.AftershipExport
@@ -41,5 +45,8 @@ flowchart TD
     )]
     GOOD --> CSL
 
-    RUN --> LR[log_results<br/>*Do nothing]
+    RUN --> LOGS[(
+        <b><i>CentralStore</i></b>
+        _util.Logs<br/>insert run logs
+    )]
 ```

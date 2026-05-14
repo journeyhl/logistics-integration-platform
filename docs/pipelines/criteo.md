@@ -2,11 +2,14 @@
 %%{init: {"flowchart": {"wrappingWidth": 400}}}%%
 flowchart TD
     A([criteo]) --> B[Criteo.__init__]
-    B --> B1[init SQLConnector: CentralStore]
-    B --> B2[init SQLConnector: AcumaticaDb]
-    B --> B3[init Logger]
-    B --> B4[init CriteoAPI: OAuth2 auth on init]
-    B --> B5[init Transform]
+    B --> B1[
+        self.criteoapi = CriteoAPI
+        self.transformer = Transform
+        self.lookback_days = 30
+        self.api_max_days = 90
+        self.incremental_end
+        self.backfill_end
+    ]
     A --> RI[_re_init: set start_date, end_date, mode]
     RI --> RUN[Pipeline.run]
 
@@ -38,5 +41,8 @@ flowchart TD
         upsert criteo.campaign_performance_daily
     )]
 
-    RUN --> LR[log_results<br/>*Do nothing]
+    RUN --> LOGS[(
+        <b><i>CentralStore</i></b>
+        _util.Logs<br/>insert run logs
+    )]
 ```

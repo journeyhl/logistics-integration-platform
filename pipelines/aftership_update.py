@@ -31,7 +31,7 @@ class UpdateAfterShip(Pipeline):
     def __init__(self):
         super().__init__('aftership-update')
         self.aftership = AfterShip(self)
-        self.acuapi = AcumaticaAPI
+        # self.acuapi = AcumaticaAPI(self)
         self.transformer = Transform(self)
         pass
 

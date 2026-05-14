@@ -9,23 +9,22 @@ flowchart TD
     A--> RUN[Pipeline.run]
 
     RUN --> EX[extract]
-    EX --> D1[(AcuDB: AcuToDbc_Quotes<br/>QT orders modified in last day)]
-    EX --> D2[(
-        <b><i>CentralStore</i></b>
-        acu.Quotes<br/>distinct QuoteNbr where LastChecked not null)]
+    EX --> D1[(
+        <b><i>AcuDb</i></b>
+        AcuToDbc_Quotes: Query)]
 
     RUN --> TR[transform]
     TR --> T1[fill null LineNbr with 99]
     TR --> T2[convert to list of dicts]
 
     RUN --> LD[load]
-    LD --> L1{rows >= 500?}
-    L1 -->|yes| L2[upsert in batches of 500 with LastChecked timestamp]
-    L1 -->|no| L3[upsert all at once with LastChecked timestamp]
-    L2 --> CS1[(
+    LD --> L1[(
         <b><i>CentralStore</i></b>
-        upsert acu.Quotes)]
-    L3 --> CS1
+        upsert acu.Quotes
+    )]
 
-    RUN --> LR[log_results<br/>*Do nothing]
+    RUN --> LOGS[(
+        <b><i>CentralStore</i></b>
+        _util.Logs<br/>insert run logs
+    )]
 ```

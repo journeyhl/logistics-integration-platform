@@ -2,9 +2,10 @@
 %%{init: {"flowchart": {"wrappingWidth": 400}}}%%
 flowchart TD
     A([aftership_update]) --> B[UpdateAfterShip.__init__]
-    B --> B1[init AfterShip connector<br/>session + tracking_endpoint:<br/>/tracking/2026-01/trackings]
-    B --> B2[bind AcumaticaAPI class<br/>*not instantiated, unused]
-    B --> B3[init Transform<br/>_set_state_map + _set_tzoffset_map]
+    B --> B1[
+        self.aftership = AfterShip
+        self.transformer = Transform
+    ]
     A --> RUN[Pipeline.run]
 
     RUN --> EX[extract]
@@ -13,7 +14,9 @@ flowchart TD
         SlugsAfterShip: Query
         *not being used as of 5/6/26
     )]
-    EX --> D2[(AcuDB: Aftership_Shipments<br/>shipments w/ tracking data)]
+    EX --> D2[(
+        <b><i>AcuDb</i></b>
+        Aftership_Shipments<br/>shipments w/ tracking data)]
     EX --> AS1[(AfterShip: GET<br/>/tracking/2026-01/trackings<br/>updated_window = 5 days<br/>paginated via cursor until<br/>has_next_page = false)]
 
     RUN --> TR[transform → transform_update]
@@ -38,7 +41,6 @@ flowchart TD
     )]
     BAD --> CSL
 
-    RUN --> LR[log_results<br/>*Do nothing]
     RUN --> LOGS[(
         <b><i>CentralStore</i></b>
         _util.Logs

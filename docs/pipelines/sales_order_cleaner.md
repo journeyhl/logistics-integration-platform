@@ -2,7 +2,9 @@
 %%{init: {"flowchart": {"wrappingWidth": 400}}}%%
 flowchart TD
     A([run_sales_order_cleaner]) --> B[SalesOrderCleaner.__init__]
-    B --> B1[init Transform]
+    B --> B1[
+        self.transformer = Transform
+    ]
     A --> RUN[Pipeline.run]
 
     RUN --> EX[extract]
@@ -13,7 +15,9 @@ flowchart TD
 
     RUN --> TR[transform]
     TR --> T1[collect distinct OrderNbrs<br/>from duplicates]
-    T1 --> D2[(AcuDB: SOOrder + jjStatusLookup<br/>get current authoritative status<br/>for each OrderNbr)]
+    T1 --> D2[(
+        <b><i>AcuDb</i></b>
+        SOOrder + jjStatusLookup<br/>get current authoritative status<br/>for each OrderNbr)]
     D2 --> T2[join CentralStore results<br/>with AcuDB statuses]
     T2 --> T3[group orders by<br/>current AcuDB status]
     T3 --> T4[build DELETE command per status group<br/>DELETE FROM acu.SalesOrders<br/>WHERE Status != current AND OrderNumber IN list]
@@ -25,5 +29,8 @@ flowchart TD
         raw DELETE<br/>acu.SalesOrders rows<br/>not matching AcuDB status)]
     LD1 -->|no| SKIP[skip]
 
-    RUN --> LR[log_results<br/>*Do nothing]
+    RUN --> LOGS[(
+        <b><i>CentralStore</i></b>
+        _util.Logs<br/>insert run logs
+    )]
 ```

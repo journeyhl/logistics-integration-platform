@@ -2,10 +2,12 @@
 %%{init: {"flowchart": {"wrappingWidth": 400}}}%%
 flowchart TD
     A([run_redstag_inventory]) --> B[RedStagInventory.__init__]
-    B --> B1[init Transform]
-    B --> B2[init RedStagAPI]
-    B --> B3[init AcumaticaAPI]
-    B --> B4[set payload_target<br/>inventory.detailed]
+    B --> B1[init
+        self.transformer = Transform
+        self.redstag = RedStagAPI
+        self.acu_api = AcumaticaAPI
+        self.payload_target
+    ]
     A --> RUN[Pipeline.run]
 
     RUN --> EX[extract]
@@ -28,5 +30,8 @@ flowchart TD
         upsert RedstagInventoryDetail
     )]
 
-    RUN --> LR[log_results<br/>*Do nothing]
+    RUN --> LOGS[(
+        <b><i>CentralStore</i></b>
+        _util.Logs<br/>insert run logs
+    )]
 ```

@@ -2,10 +2,11 @@
 %%{init: {"flowchart": {"wrappingWidth": 400}}}%%
 flowchart TD
     A([hubspot_snapshot]) --> B[HubSpotSnapshot.__init__]
-    B --> B1[init HubSpotAPI connector<br/>loads owners + deal pipelines on init]
-    B --> B2[init Transform]
-    B --> B3[_set_snapshot_windows:
-     week/month/year]
+    B --> B1[ 
+        self.hubapi = HubSpotAPI
+        self.transformer = Transform
+        self.hubapi._set_snapshot_windows
+    ]
     A --> RUN[Pipeline.run]
 
     RUN --> EX[extract]
@@ -38,5 +39,8 @@ flowchart TD
         insert hs.activity_snapshots
     )]
 
-    RUN --> LR[log_results<br/>*Do nothing]
+    RUN --> LOGS[(
+        <b><i>CentralStore</i></b>
+        _util.Logs<br/>insert run logs
+    )]
 ```

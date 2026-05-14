@@ -2,8 +2,11 @@
 %%{init: {"flowchart": {"wrappingWidth": 400}}}%%
 flowchart TD
     A([get_rmas_from_rmi]) --> B[GetRMAsFromRMI.__init__]
-    B --> B1[init RMIAPI: token auth on init]
-    B --> B2[init Transform]
+    B --> B1[
+        self.rmi = RMIAPI
+        self.transformer = Transform
+        self.payload_template
+    ]
     A --> RUN[Pipeline.run]
 
     RUN --> EX[extract: RMIAPI.target_api 'RMAs']
@@ -17,5 +20,8 @@ flowchart TD
         upsert rmi_RMAStatus
     )]
 
-    RUN --> LR[log_results<br/>*Do nothing]
+    RUN --> LOGS[(
+        <b><i>CentralStore</i></b>
+        _util.Logs<br/>insert run logs
+    )]
 ```
