@@ -42,7 +42,7 @@ class UpdateAfterShip(Pipeline):
         data_extract = {
             'slugs_extract': self.centralstore.query_db('select * from SlugsAfterShip'),
             'shipment_extract': self.acudb.query_to_dataframe(self.acudb.queries.Aftership_Shipments),
-            'aftership_extract': self.aftership.retrieve_trackings(pipeline_name= self.pipeline_name, updated_window = timedelta(hours=4))
+            'aftership_extract': self.aftership.retrieve_trackings(pipeline_name= self.pipeline_name, updated_window = timedelta(hours=12))
         }
         return data_extract
 
