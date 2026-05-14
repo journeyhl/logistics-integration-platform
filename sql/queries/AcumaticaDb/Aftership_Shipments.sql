@@ -72,6 +72,7 @@ where sh.CompanyID = 2
 and sh.ShipDate >= '20260101'
 and pd.TrackNumber is NOT NULL
 and si.SiteCD != 'RLM NEJ HB'
+and so.OrderNbr != 'WB110007'
 )
 , SecondLevel as(
 select case when BadTracking = 1 and len(Tracking) > 0 then right(Tracking, (len(Tracking)-1)) else Tracking end Tracking2ndPass
