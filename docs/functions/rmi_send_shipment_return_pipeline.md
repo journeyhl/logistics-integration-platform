@@ -26,19 +26,24 @@ flowchart TD
 
 ### SendRMIShipments
 #### `SendRMIShipments` Pipeline Documentation — [pipelines/rmi_send_shipments.py](../../pipelines/rmi_send_shipments.py)
-
 ```mermaid
 %%{init: {"flowchart": {"wrappingWidth": 400}}}%%
 flowchart TD
     A([run_send_shipments_to_RMI]) --> B[SendRMIShipments.__init__]
-    B --> B1[init Transform]
-    B --> B2[init AcuOData]
-    B --> B3[init RMIXML]
-    B --> B4[init AcumaticaAPI]
+    B --> B1[inherits Pipeline]
+    B --> B2[
+        self.odata_source = AcuOData
+        self.transformer = Transform
+        self.rmi = RMIXML
+        self.acu_api = AcumaticaAPI
+    ]
     A --> RUN[Pipeline.run]
 
     RUN --> EX[extract]
-    EX --> D1[(AcuDB: SOShipment + SOShipLine + SOAddress<br/>via SendRMIShipments.sql<br/>SiteCD=RMI, OrigOrderType != RC,<br/>Status not in C/L/F/I, AttributeSHP2WH=0)]
+    EX --> D1[(
+        <b><i>AcuDb</i></b>
+        SendRMIShipments: Query
+        )]
 
     RUN --> TR[transform]
     TR --> T1[group rows by ShipmentNbr<br/>ShipmentNbr → list of line dicts]
@@ -54,9 +59,18 @@ flowchart TD
     LD5 -->|error| SKIP[skip Acumatica update<br/>log RMI error]
 
     RUN --> LR[log_results]
-    LR --> LR1[(CentralStore: insert _util.rmi_send_log<br/>Type=Shipment, KeyValue, Lines,<br/>RMI_Response, RMI_Payload,<br/>ACU_Response, Timestamp)]
+    LR --> LR1[(
+        <b><i>CentralStore</i></b>
+        insert _util.rmi_send_log
+    )]
     LR --> LO[AcumaticaAPI._logout]
-    LR --> UPS[(CentralStore: upsert _util.acu_api_log)]
+    LR --> UPS[(
+        <b><i>CentralStore</i></b>
+        upsert _util.acu_api_log)]
+    RUN --> LOGS[(
+        <b><i>CentralStore</i></b>
+        _util.Logs<br/>insert run logs
+    )]
 ```
 
 <hr>
@@ -67,13 +81,18 @@ flowchart TD
 %%{init: {"flowchart": {"wrappingWidth": 400}}}%%
 flowchart TD
     A([run_send_returns_to_RMI]) --> B[SendRMIReturns.__init__]
-    B --> B1[init Transform]
-    B --> B2[init RMIXML]
-    B --> B3[init AcumaticaAPI]
+    B --> B1[inherits Pipeline]
+    B --> B2[ 
+        self.transformer = Transform
+        self.rmi = RMIXML
+        self.acu_api = AcumaticaAPI
+    ]
     A --> RUN[Pipeline.run]
 
     RUN --> EX[extract]
-    EX --> D1[(AcuDB: SOOrder + SOLine + SOContact + SOAddress<br/>via SendRMIReturns.sql<br/>RC orders, Status=Open, SiteCD=RMI,<br/>AttributeRCSHP2WH null or != 1)]
+    EX --> D1[(
+        <b><i>AcuDb</i></b>
+        SOOrder + SOLine + SOContact + SOAddress<br/>via SendRMIReturns.sql<br/>RC orders, Status=Open, SiteCD=RMI,<br/>AttributeRCSHP2WH null or != 1)]
 
     RUN --> TR[transform]
     TR --> T1[group rows by RMANumber<br/>RMANumber → list of line dicts]
@@ -89,10 +108,20 @@ flowchart TD
     LD5 -->|error| SKIP[skip Acumatica update<br/>log RMI error]
 
     RUN --> LR[log_results]
-    LR --> LR1[(CentralStore: insert _util.rmi_send_log<br/>Type=Return, KeyValue, Lines,<br/>RMI_Response, RMI_Payload,<br/>ACU_Response, Timestamp)]
+    LR --> LR1[(
+        <b><i>CentralStore</i></b>
+        insert _util.rmi_send_log
+    )]
     LR --> LO[AcumaticaAPI._logout]
-    LR --> UPS[(CentralStore: upsert _util.acu_api_log)]
+    LR --> UPS[(
+        <b><i>CentralStore</i></b>
+        upsert _util.acu_api_log)]
+    RUN --> LOGS[(
+        <b><i>CentralStore</i></b>
+        _util.Logs<br/>insert run logs
+    )]
 ```
+
 
 ## Queries
 ### AcumaticaDb

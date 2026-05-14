@@ -2,9 +2,7 @@
 %%{init: {"flowchart": {"wrappingWidth": 400}}}%%
 flowchart TD
     A([acu_deletions]) --> B[AcumaticaDeletions.__init__]
-    B --> B1[init SQLConnector: CentralStore]
-    B --> B2[init SQLConnector: AcumaticaDb]
-    B --> B3[init Logger]
+    B --> B1[inherits Pipeline]
     
     A --> RUN[Pipeline.run]
 

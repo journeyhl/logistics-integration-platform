@@ -2,7 +2,8 @@
 %%{init: {"flowchart": {"wrappingWidth": 400}}}%%
 flowchart TD
     A([run_send_shipments_to_RMI]) --> B[SendRMIShipments.__init__]
-    B --> B1[
+    B --> B1[inherits Pipeline]
+    B --> B2[
         self.odata_source = AcuOData
         self.transformer = Transform
         self.rmi = RMIXML

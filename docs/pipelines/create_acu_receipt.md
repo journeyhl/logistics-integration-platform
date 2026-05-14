@@ -2,7 +2,8 @@
 %%{init: {"flowchart": {"wrappingWidth": 400}}}%%
 flowchart TD
     A([create_acu_receipt]) --> B[CreateAcuReceipt.__init__]
-    B --> B1[
+    B --> B1[inherits Pipeline]
+    B --> B2[
         self.acu_api = AcumaticaAPI
         self.transformer = Transform
         self.loader = Load

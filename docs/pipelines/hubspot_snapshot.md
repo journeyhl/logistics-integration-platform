@@ -2,7 +2,8 @@
 %%{init: {"flowchart": {"wrappingWidth": 400}}}%%
 flowchart TD
     A([hubspot_snapshot]) --> B[HubSpotSnapshot.__init__]
-    B --> B1[ 
+    B --> B1[inherits Pipeline]
+    B --> B2[ 
         self.hubapi = HubSpotAPI
         self.transformer = Transform
         self.hubapi._set_snapshot_windows

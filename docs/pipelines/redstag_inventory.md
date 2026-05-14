@@ -2,7 +2,8 @@
 %%{init: {"flowchart": {"wrappingWidth": 400}}}%%
 flowchart TD
     A([run_redstag_inventory]) --> B[RedStagInventory.__init__]
-    B --> B1[init
+    B --> B1[inherits Pipeline]
+    B --> B2[init
         self.transformer = Transform
         self.redstag = RedStagAPI
         self.acu_api = AcumaticaAPI

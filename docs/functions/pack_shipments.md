@@ -26,21 +26,35 @@ Executes single pipeline, **PackShipments**
 
 ### PackShipments
 #### `PackShipments` Pipeline Documentation — [pipelines/pack_shipments.py](../../pipelines/pack_shipments.py)
-
 ```mermaid
 %%{init: {"flowchart": {"wrappingWidth": 400}}}%%
 flowchart TD
     A([pack_shipments]) --> B[PackShipments.__init__]
-    B --> B1[init AcumaticaAPI]
-    B --> B2[init Transform]
-    B --> B3[init Load]
+    B --> B1[inherits Pipeline]
+    B --> B2[
+        self.acu_api = AcumaticaAPI
+        self.transformer = Transform
+        self.loader = Load
+    ]
     A --> RUN[Pipeline.run]
 
     RUN --> EX[extract]
-    EX --> D1[(CentralStore: PackShipmentRedStag)]
-    EX --> D2[(CentralStore: RedStagEvents)]
-    EX --> D3[(CentralStore: PackShipmentRMI)]
-    EX --> D4[(AcuDB: PackShipment)]
+    EX --> D1[(
+        <b><i>CentralStore</i></b>
+        PackShipmentRedStag: Query
+    )]
+    EX --> D2[(
+        <b><i>CentralStore</i></b>
+        RedStagEvents: Query
+    )]
+    EX --> D3[(
+        <b><i>CentralStore</i></b>
+        PackShipmentRMI: Query
+    )]
+    EX --> D4[(
+        <b><i>AcuDb</i></b>
+        PackShipment: Query
+    )]
 
     RUN --> TR[transform]
     TR --> T1[transform_redstag_events]
@@ -57,14 +71,22 @@ flowchart TD
     RUN --> LD[load]
     LD --> LS[load_shipments]
     LS --> SD[acu_api.shipment_details]
-    SD --> PKG{Packages contents = Lines contents?}
+    SD --> PKG{package_count == 0 or != line_count?}
     PKG -->|Yes| AP[acu_api.add_package_v2]
     PKG -->|No| GP[acu_api.get_package_details]
 
     RUN --> LR[log_results]
     LR --> LO[acu_api._logout]
-    LR --> UPS[(CentralStore: upsert _util.acu_api_log)]
+    LR --> UPS[(
+        <b><i>CentralStore</i></b>
+        upsert _util.acu_api_log
+    )]
+    RUN --> LOGS[(
+        <b><i>CentralStore</i></b>
+        _util.Logs<br/>insert run logs
+    )]
 ```
+
 
 ## Queries
 ### AcumaticaDb

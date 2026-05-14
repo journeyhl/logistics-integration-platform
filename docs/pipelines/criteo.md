@@ -2,7 +2,8 @@
 %%{init: {"flowchart": {"wrappingWidth": 400}}}%%
 flowchart TD
     A([criteo]) --> B[Criteo.__init__]
-    B --> B1[
+    B --> B1[inherits Pipeline]
+    B --> B2[
         self.criteoapi = CriteoAPI
         self.transformer = Transform
         self.lookback_days = 30

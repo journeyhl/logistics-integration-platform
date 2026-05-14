@@ -2,7 +2,8 @@
 %%{init: {"flowchart": {"wrappingWidth": 400}}}%%
 flowchart TD
     A([aftership_to_dbc]) --> B[AfterShipToDbc.__init__]
-    B --> B1[
+    B --> B1[inherits Pipeline]
+    B --> B2[
         self.aftership = AfterShip
         self.transformer = Transform
     ]

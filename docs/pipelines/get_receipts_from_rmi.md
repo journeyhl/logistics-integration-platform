@@ -2,7 +2,8 @@
 %%{init: {"flowchart": {"wrappingWidth": 400}}}%%
 flowchart TD
     A([get_receipts_from_rmi]) --> B[GetReceiptsFromRMI.__init__]
-    B --> B1[
+    B --> B1[inherits Pipeline]
+    B --> B2[
         self.rmi = RMIAPI
         self.transformer = Transform
         self.payload_template

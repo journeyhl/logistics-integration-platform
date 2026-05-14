@@ -2,6 +2,7 @@
 %%{init: {"flowchart": {"wrappingWidth": 400}}}%%
 flowchart TD
     A([address_validator]) --> B[AddressValidator.__init__]
+    B --> B1[inherits Pipeline]
     B --> B4[
         self.avs = AddressVerificationSystem
         self.acu_api = AcumaticaAPI

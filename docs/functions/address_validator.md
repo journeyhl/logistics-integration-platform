@@ -18,17 +18,20 @@ Executes single pipeline, **AddressValidator**
 %%{init: {"flowchart": {"wrappingWidth": 400}}}%%
 flowchart TD
     A([address_validator]) --> B[AddressValidator.__init__]
-    B --> B1[init SQLConnector: CentralStore]
-    B --> B2[init SQLConnector: AcumaticaDb]
-    B --> B3[init Logger]
-    B --> B4[init AddressVerificationSystem]
-    B --> B5[init AcumaticaAPI]
-    B --> B6[init Transform]
-    B --> B7[init Load]
+    B --> B1[inherits Pipeline]
+    B --> B4[
+        self.avs = AddressVerificationSystem
+        self.acu_api = AcumaticaAPI
+        self.transformer = Transform
+        self.loader = Load
+    ]
     A --> RUN[Pipeline.run]
 
     RUN --> EX[extract]
-    EX --> D1[(AcuDB: ValidateAddresses<br/>WB orders on hold with unvalidated addresses)]
+    EX --> D1[(
+        <b><i>AcuDb</i></b>
+        ValidateAddresses: Query
+    )]
 
     RUN --> TR[transform]
     TR --> T1[for each order]
@@ -50,8 +53,16 @@ flowchart TD
 
     RUN --> LR[log_results]
     LR --> LO[acu_api._logout]
-    LR --> UPS[(CentralStore: upsert _util.acu_api_log)]
+    LR --> UPS[(
+        <b><i>CentralStore</i></b>
+        upsert _util.acu_api_log
+    )]
+    RUN --> LOGS[(
+        <b><i>CentralStore</i></b>
+        _util.Logs<br/>insert run logs
+    )]
 ```
+
 
 ## Queries
 ### AcumaticaDb

@@ -2,7 +2,8 @@
 %%{init: {"flowchart": {"wrappingWidth": 400}}}%%
 flowchart TD
     A([hubspot_properties]) --> B[HubSpotProperties.__init__]
-    B --> B1[
+    B --> B1[inherits Pipeline]
+    B --> B2[
         self.hubapi = HubSpotAPI
         self.transformer = Transform
     ]

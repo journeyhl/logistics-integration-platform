@@ -13,19 +13,24 @@ Executes single pipeline, **SendRedStagShipments**
 
 ### SendRedStagShipments
 #### `SendRedStagShipments` Pipeline Documentation — [pipelines/redstag_send_shipments.py](../../pipelines/redstag_send_shipments.py)
-
 ```mermaid
 %%{init: {"flowchart": {"wrappingWidth": 400}}}%%
 flowchart TD
     A([redstag_send_shipments]) --> B[SendRedStagShipments.__init__]
-    B --> B1[init Transform]
-    B --> B2[init RedStagAPI]
-    B --> B3[init AcumaticaAPI]
-    B --> B4[init Load]
+    B --> B1[inherits Pipeline]
+    B --> B2[
+        self.transformer = Transform
+        self.redstag = RedStagAPI
+        self.acu_api = AcumaticaAPI
+        self.loader = Load
+    ]
     A --> RUN[Pipeline.run]
 
     RUN --> EX[extract]
-    EX --> D1[(AcuDB: SOShipment + SOShipLine<br/>SiteCD=RedStag%, AttributeSHP2WH=0,<br/>Status not in C/L/F/I, OrigOrderType != RC)]
+    EX --> D1[(
+        <b><i>AcuDb</i></b>
+        SendRedStagShipments: Query
+    )]
 
     RUN --> TR[transform]
     TR --> TR1{rsOrderID<br/>already set?}
@@ -46,8 +51,16 @@ flowchart TD
 
     RUN --> LR[log_results]
     LR --> LO[AcumaticaAPI._logout]
-    LR --> UPS[(CentralStore: upsert _util.acu_api_log)]
+    LR --> UPS[(
+        <b><i>CentralStore</i></b>
+        upsert _util.acu_api_log
+    )]
+    RUN --> LOGS[(
+        <b><i>CentralStore</i></b>
+        _util.Logs<br/>insert run logs
+    )]
 ```
+
 
 ## Queries
 ### AcumaticaDb

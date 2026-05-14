@@ -22,21 +22,27 @@ Executes single pipeline, **Criteo**
 
 ### Criteo
 #### `Criteo` Pipeline Documentation — [pipelines/criteo.py](../../pipelines/criteo.py)
-
 ```mermaid
 %%{init: {"flowchart": {"wrappingWidth": 400}}}%%
 flowchart TD
     A([criteo]) --> B[Criteo.__init__]
-    B --> B1[init SQLConnector: CentralStore]
-    B --> B2[init SQLConnector: AcumaticaDb]
-    B --> B3[init Logger]
-    B --> B4[init CriteoAPI: OAuth2 auth on init]
-    B --> B5[init Transform]
+    B --> B1[inherits Pipeline]
+    B --> B2[
+        self.criteoapi = CriteoAPI
+        self.transformer = Transform
+        self.lookback_days = 30
+        self.api_max_days = 90
+        self.incremental_end
+        self.backfill_end
+    ]
     A --> RI[_re_init: set start_date, end_date, mode]
     RI --> RUN[Pipeline.run]
 
     RUN --> EX[extract]
-    EX --> D1[(CentralStore: criteo.campaign_performance_daily)]
+    EX --> D1[(
+        <b><i>CentralStore</i></b>
+        criteo.campaign_performance_daily
+    )]
     EX --> API[CriteoAPI.fetch_campaign_data]
     API --> D2[(CriteoAPI: statistics/report)]
 
@@ -50,12 +56,22 @@ flowchart TD
 
     RUN --> LD[load]
     LD --> LS1[upsert diff entries]
-    LS1 --> CS1[(CentralStore: criteo.diff_log)]
+    LS1 --> CS1[(
+        <b><i>CentralStore</i></b>
+        upsert criteo.diff_log
+    )]
     LD --> LS2[upsert campaign performance]
-    LS2 --> CS2[(CentralStore: criteo.campaign_performance_daily)]
+    LS2 --> CS2[(
+        <b><i>CentralStore</i></b>
+        upsert criteo.campaign_performance_daily
+    )]
 
-    RUN --> LR[log_results<br/>*Do nothing]
+    RUN --> LOGS[(
+        <b><i>CentralStore</i></b>
+        _util.Logs<br/>insert run logs
+    )]
 ```
+
 
 ## Queries
 ### db_CentralStore

@@ -2,7 +2,8 @@
 %%{init: {"flowchart": {"wrappingWidth": 400}}}%%
 flowchart TD
     A([run_sales_order_cleaner]) --> B[SalesOrderCleaner.__init__]
-    B --> B1[
+    B --> B1[inherits Pipeline]
+    B --> B2[
         self.transformer = Transform
     ]
     A --> RUN[Pipeline.run]
@@ -10,7 +11,7 @@ flowchart TD
     RUN --> EX[extract]
     EX --> D1[(
         <b><i>CentralStore</i></b>
-        acu.SalesOrders<br/>find OrderNumbers with duplicate statuses<br/>via SalesOrderCleaner.sql
+        SalesOrderCleaner: Query
         )]
 
     RUN --> TR[transform]

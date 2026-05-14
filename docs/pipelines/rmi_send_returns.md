@@ -2,7 +2,8 @@
 %%{init: {"flowchart": {"wrappingWidth": 400}}}%%
 flowchart TD
     A([run_send_returns_to_RMI]) --> B[SendRMIReturns.__init__]
-    B --> B1[ 
+    B --> B1[inherits Pipeline]
+    B --> B2[ 
         self.transformer = Transform
         self.rmi = RMIXML
         self.acu_api = AcumaticaAPI

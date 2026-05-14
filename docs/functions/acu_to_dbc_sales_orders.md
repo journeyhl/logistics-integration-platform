@@ -11,18 +11,18 @@ Executes single pipeline, **AcuToDbcSalesOrders**
 
 ### AcuToDbcSalesOrders
 #### `AcuToDbcSalesOrders` Pipeline Documentation — [pipelines/acu_to_dbc_sales_orders.py](../../pipelines/acu_to_dbc_sales_orders.py)
-
 ```mermaid
 %%{init: {"flowchart": {"wrappingWidth": 400}}}%%
 flowchart TD
     A([run_acu_to_dbc_sales_orders]) --> B[AcuToDbcSalesOrders.__init__]
-    B --> B1[init SQLConnector: CentralStore]
-    B --> B2[init SQLConnector: AcumaticaDb]
-    B --> B3[init Logger]
+    B --> B1[inherits Pipeline]
     A --> RUN[Pipeline.run]
 
     RUN --> EX[extract]
-    EX --> D1[(AcuDB: AcuToDbc_SalesOrders<br/>non-quote/return orders modified in last day)]
+    EX --> D1[(
+        <b><i>AcuDb</i></b>
+        AcuToDbc_SalesOrders: Query
+    )]
 
     RUN --> TR[transform]
     TR --> T1[fill null LineNbr with 99]
@@ -32,12 +32,18 @@ flowchart TD
     LD --> L1{rows >= 100?}
     L1 -->|yes| L2[upsert in batches of 100 with LastChecked timestamp]
     L1 -->|no| L3[upsert all at once with LastChecked timestamp]
-    L2 --> CS1[(CentralStore: acu.SalesOrders)]
+    L2 --> CS1[(
+        <b><i>CentralStore</i></b>
+        upsert acu.SalesOrders
+    )]
     L3 --> CS1
 
-    RUN --> LR[log_results]
-    LR --> LO[pass]
+    RUN --> LOGS[(
+        <b><i>CentralStore</i></b>
+        _util.Logs<br/>insert run logs
+    )]
 ```
+
 
 ## Queries
 ### AcumaticaDb
