@@ -630,3 +630,19 @@ def rmi_link_to_acumatica(timer: af.TimerRequest):
     rmi_link = RMILinkToAcu()
     rmi_link.run()
 #endregion          rmi_link_to_acumatica
+
+
+
+#region               sales_order_cleaner
+#       Clean orders with status mismatch
+#   1x/day (1:05am)
+@app.timer_trigger(
+    schedule = '5 1 * * *',
+    arg_name = 'timer',
+    run_on_startup = False
+)
+def sales_order_cleaner(timer: af.TimerRequest):
+    from pipelines import SalesOrderCleaner
+    sales_order_cleaner = SalesOrderCleaner()
+    sales_order_cleaner.run()
+#endregion          sales_order_cleaner
