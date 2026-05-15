@@ -113,18 +113,18 @@ class Pipeline(ABC):
         self.logger.info(f'Starting {self.pipeline_name}')
 
 
-        if self.pipeline_name != 'rmi-status': self.logger.info('Extracting...')
+        self.logger.info('Extracting...')
         data_extract = self.extract()
 
 
-        if self.pipeline_name != 'rmi-status': self.logger.info('Transforming...')
+        self.logger.info('Transforming...')
         data_transformed = self.transform(data_extract)
 
 
-        if self.pipeline_name != 'rmi-status': self.logger.info('Loading...')
+        self.logger.info('Loading...')
         data_loaded = self.load(data_transformed)
 
-        if self.pipeline_name != 'rmi-status': self.logger.info('Logging...')
+        self.logger.info('Logging...')
         self.log_results(data_loaded)
         try:
             self.centralstore.insert_df(pl.DataFrame(self.logs), '_util.Logs')
