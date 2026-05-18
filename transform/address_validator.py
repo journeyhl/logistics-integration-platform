@@ -21,6 +21,8 @@ class Transform:
                 self.logger.info(f'{order['OrderNbr']}: Customer has different original Shipping/ Billing addresses')
                 order_avs = self.pipeline.avs.validate(order_data=order, s_or_b='s') #validate both
                 order_avs = self.pipeline.avs.validate(order_data=order, s_or_b='b') #validate both
+            if order_avs['Match'] == 0 and order_avs.get(f'vbAddressLine1') == None and order_avs.get(f'vsAddressLine1') != None:
+                self.logger.warning(f'{order['OrderNbr']}: Issue parsing billing address, only validating shipping address')
             if order_avs.get(f'vsAddressLine1') == None:
                 self.logger.error(f'{order_avs['OrderNbr']}: No AddressLine1 returned from AVS')
                 bp = 'ERROR'
@@ -84,7 +86,7 @@ class Transform:
                 "PostalCode":   {"value": order_avs['vsPostalCode']},
                 "Country":      {"value": order_avs['vsCountryID']},                
             }
-        elif order_avs['Match'] == 0:
+        elif order_avs['Match'] == 0 and order_avs.get('vbAddressLine1') != None:
             payload['BillToAddressOverride'] = { "value": True }            
             payload['BillToAddress'] = {
                 "AddressLine1": {"value": order_avs['vbAddressLine1']},
@@ -163,7 +165,7 @@ class Transform:
         Notes differences between the original address we got from Acumatica and the response from AVS
         '''
         self.logger.info(f'{order_avs['OrderNbr']}: Comparing AVS address to original...')
-        if order_avs['Match'] == 1:
+        if order_avs['Match'] == 1 or order_avs.get('vbAddressLine1') == None:
             for (current, new, name) in [
                 (order_avs['sAddressLine1'], order_avs['vsAddressLine1'], 'AddressLine1'),
                 (order_avs['sAddressLine2'], order_avs['vsAddressLine2'], 'AddressLine2'),
