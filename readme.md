@@ -125,7 +125,7 @@ from pipelines import kustomer
    - `_util.acu_api_log`, `_util.AfterShipLog`
 
    **Acumatica writeback (AcumaticaDb):**
-   - `SOShipmentKvExt` — written by [`RMILinkToAcu`](#pipeline---rmi_link_to_acupy)
+   - `SOShipmentKvExt`, written by [`RMILinkToAcu`](#pipeline---rmi_link_to_acupy)
 
    **Ad / marketing data:**
    - `AdDetails`
@@ -1111,7 +1111,7 @@ Pipeline to sync phone-channel revenue line items (`OrderType` of **`PH`** or **
 
 ### `SendOrderDetailsToKustomer`
 
-Pipeline to ship complete order details (order + lines + shipments + packages) to Kustomer via webhook. Same class is used by the `kustomer_order_ingest` and `kustomer_order_backfill` Azure Functions — only the query bound by `_re_init` differs.
+Pipeline to ship complete order details (order + lines + shipments + packages) to Kustomer via webhook. Same class is used by the `kustomer_order_ingest` and `kustomer_order_backfill` Azure Functions, only the query bound by `_re_init` differs.
 
 ### Execution Behavior
 
@@ -1230,7 +1230,7 @@ Sends newly-tracking-able shipments to AfterShip's `POST /tracking/2026-01/track
 ### Execution Behavior
 
 #### Extraction
-- `SlugsAfterShip` query (currently inert — kept for the future slug catalogue)
+- `SlugsAfterShip` query (currently commented out, kept for the future slug catalogue)
 - Reads existing log rows from **`_util.AftershipLog`** so already-sent trackings can be filtered
 - [`AcumaticaDbQueries.Aftership_Shipments`](sql/queries/AcumaticaDb/Aftership_Shipments.sql): shipments with tracking data shipped on/after `2026-01-01`
 - Reads existing `acu.AftershipExport*` rows for additional dedup
@@ -2071,12 +2071,11 @@ Every pipeline subclasses `Pipeline`. The base class:
 
 In addition to this README, the [`docs/`](docs/) folder contains per-pipeline and per-Azure-Function reference material:
 
-- [`docs/pipelines/`](docs/pipelines/) — one mermaid flowchart per pipeline, showing the `__init__` → `extract` → `transform` → `load` → `log_results` path with all SQL queries, API calls, and downstream tables labeled in-line
-- [`docs/functions/`](docs/functions/) — one document per Azure Function in [`function_app.py`](function_app.py). Each includes:
+- [`docs/pipelines/`](docs/pipelines/), one mermaid flowchart per pipeline, showing the `__init__` → `extract` → `transform` → `load` → `log_results` path with all SQL queries, API calls, and downstream tables labeled in-line
+- [`docs/functions/`](docs/functions/), one document per Azure Function in [`function_app.py`](function_app.py). Each includes:
   - the cron schedule
   - which pipeline(s) it invokes
   - the embedded pipeline flowchart(s)
   - the SQL queries each pipeline depends on, with relative links to the `.sql` files
-- [`docs/pipeline_docstring_analysis.md`](docs/pipeline_docstring_analysis.md) — conformance report comparing every pipeline's class-level docstring against the reference format used by [`GetRMAsFromRMI`](#pipeline---get_rmas_from_rmipy). Useful when adding a new pipeline so the docstring matches the rest of the repo
 
 The mermaid diagrams in `docs/` render directly in GitHub's web UI and in most Markdown previewers.
