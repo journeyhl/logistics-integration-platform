@@ -132,7 +132,7 @@ class Pipeline(ABC):
         try:
             self.centralstore.insert_df(pl.DataFrame(self.logs), '_util.Logs')
         except Exception as e:
-            self.logger.warning("Couldn't insert logs to SQL but pipeline execution was successful")
+            self.logger.warning(f"{e}: Couldn't insert logs to SQL but pipeline execution was successful")
         return{
             'pipeline': self.pipeline_name,
             'status': 'success',
