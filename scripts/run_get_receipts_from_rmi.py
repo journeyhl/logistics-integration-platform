@@ -7,7 +7,7 @@ from pipelines import GetReceiptsFromRMI
 
 
 
-rmi_receipts = GetReceiptsFromRMI()
+rmi_receipts = GetReceiptsFromRMI('.debug')
 rmi_receipts_result = rmi_receipts.run()
 bp = 'here'
 

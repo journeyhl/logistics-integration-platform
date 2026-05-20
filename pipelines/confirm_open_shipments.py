@@ -22,8 +22,8 @@ class ShipmentsReadyToConfirm(Pipeline):
     # Results Logging
      - Upserts Acumatica API interactions to **_util.acu_api_log** 
     '''
-    def __init__(self):
-        super().__init__('shipment-confirmations')
+    def __init__(self, function: str):
+        super().__init__('shipment-confirmations', function)
         self.acu_api = AcumaticaAPI(self)
 
 

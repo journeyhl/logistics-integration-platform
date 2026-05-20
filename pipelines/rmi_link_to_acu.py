@@ -23,8 +23,8 @@ class RMILinkToAcu(Pipeline):
     # Results Logging
      - None needed
     '''
-    def __init__(self):
-        super().__init__('rmi-link-to-acu')
+    def __init__(self, function: str):
+        super().__init__('rmi-link-to-acu', function)
         
     def extract(self):
         acu_extract = self.acudb.query_to_dataframe(self.acudb.queries.RMI_Link3PL)

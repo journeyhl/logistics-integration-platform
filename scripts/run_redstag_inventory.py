@@ -5,7 +5,7 @@ from pipelines import RedStagInventory
 
 
 
-redstag_inventory = RedStagInventory()
+redstag_inventory = RedStagInventory('.debug')
 redstag_inventory.run()
 
 

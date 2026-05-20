@@ -22,8 +22,8 @@ class HubSpotProperties(Pipeline):
     # Results Logging
      - Upserts Acumatica API interactions to **_util.acu_api_log** 
     '''
-    def __init__(self):
-        super().__init__('hubspot-properties')
+    def __init__(self, function: str):
+        super().__init__('hubspot-properties', function)
         self.transformer = Transform(self)
         self.hubapi = HubSpotAPI(self)
 

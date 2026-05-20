@@ -34,8 +34,8 @@ class PackShipments(Pipeline):
      - Upserts Acumatica API interactions to **_util.acu_api_log** 
     '''
 
-    def __init__(self):
-        super().__init__('pack-shipments')
+    def __init__(self, function: str):
+        super().__init__('pack-shipments', function)
         self.acu_api = AcumaticaAPI(self)
         self.transformer = Transform(self)
         self.loader = Load(self)

@@ -27,8 +27,8 @@ class AcuToDbcPhoneRevenue(Pipeline):
     # Results Logging
      - None needed
     '''
-    def __init__(self):
-        super().__init__('acu-to-dbc-phone-revenue')
+    def __init__(self, function: str):
+        super().__init__('acu-to-dbc-phone-revenue', function)
 
 
     def extract(self) -> pl.DataFrame:

@@ -58,8 +58,8 @@ class SendRedStagShipments(Pipeline):
      - Upserts Acumatica API interactions to **_util.acu_api_log** 
     '''
     
-    def __init__(self):
-        super().__init__('redstag-send-shipments')
+    def __init__(self, function: str):
+        super().__init__('redstag-send-shipments', function)
         self.transformer = Transform(self)
         self.redstag = RedStagAPI(self)
         self.acu_api = AcumaticaAPI(self)

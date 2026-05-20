@@ -27,8 +27,8 @@ class SendRMIReturns(Pipeline):
      - Upserts Acumatica API interactions to **_util.acu_api_log** 
      - Inserts RMI XML interactions to **_util.rmi_send_log**
     '''
-    def __init__(self):
-        super().__init__('rmi-send-returns')
+    def __init__(self, function: str):
+        super().__init__('rmi-send-returns', function)
         self.transformer = Transform(self)
         self.rmi = RMIXML(self)
         self.acu_api = AcumaticaAPI(self)

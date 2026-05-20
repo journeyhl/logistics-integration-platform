@@ -24,7 +24,7 @@ class GetClosedShipmentsFromRMI(Pipeline):
     # Results Logging
      - None needed
     '''
-    def __init__(self):
+    def __init__(self, function: str):
         '''`init`(self)
         ---
         <hr>
@@ -37,7 +37,7 @@ class GetClosedShipmentsFromRMI(Pipeline):
         >>> self.transformer = Transform(self)
         >>> self.payload_template = ["fromDate", "toDate"]
         '''
-        super().__init__('rmi-shipments')
+        super().__init__('rmi-shipments', function)
         self.rmi = RMIAPI(self)
         self.transformer = Transform(self)
         self.payload_template = ["fromDate", "toDate"]

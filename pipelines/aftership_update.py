@@ -28,8 +28,8 @@ class UpdateAfterShip(Pipeline):
     # Results Logging
      - None needed
     '''
-    def __init__(self):
-        super().__init__('aftership-update')
+    def __init__(self, function: str):
+        super().__init__('aftership-update', function)
         self.aftership = AfterShip(self)
         # self.acuapi = AcumaticaAPI(self)
         self.transformer = Transform(self)

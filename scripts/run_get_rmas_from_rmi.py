@@ -7,7 +7,7 @@ from pipelines import GetRMAsFromRMI
 
 
 
-rmi_rmas = GetRMAsFromRMI()
+rmi_rmas = GetRMAsFromRMI('.debug')
 rmi_rmas_result = rmi_rmas.run()
 bp = 'here'
 

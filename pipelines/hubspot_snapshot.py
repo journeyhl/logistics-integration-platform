@@ -31,8 +31,8 @@ class HubSpotSnapshot(Pipeline):
      - None needed
     '''
 
-    def __init__(self):
-        super().__init__('hubspot-snapshot')
+    def __init__(self, function: str):
+        super().__init__('hubspot-snapshot', function)
         self.hubapi = HubSpotAPI(self)
         self.transformer = Transform(self)
         self.hubapi._set_snapshot_windows()

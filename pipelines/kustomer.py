@@ -27,8 +27,8 @@ class SendOrderDetailsToKustomer(Pipeline):
     # Results Logging
      - None needed
     '''    
-    def __init__(self):
-        super().__init__('kustomer-orders')
+    def __init__(self, function: str):
+        super().__init__('kustomer-orders', function)
         self.transformer = Transform(self)
         self.api = Kustomer(self)
         self.loader = Load(self)

@@ -4,8 +4,8 @@ from connectors import AcumaticaAPI
 from transform.audit_fulfillment import Transform
 
 class AuditFulfillment(Pipeline):
-    def __init__(self):
-        super().__init__('audit-fulfillment')
+    def __init__(self, function: str):
+        super().__init__('audit-fulfillment', function)
         self.acu_api = AcumaticaAPI(self)
         self.transformer = Transform(self)
 

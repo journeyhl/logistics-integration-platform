@@ -6,7 +6,7 @@ from pipelines import GetClosedShipmentsFromRMI
 
 
 
-rmi_closed_shipments = GetClosedShipmentsFromRMI()
+rmi_closed_shipments = GetClosedShipmentsFromRMI('.debug')
 rmi_closed_shipments_result = rmi_closed_shipments.run()
 bp = 'here'
 

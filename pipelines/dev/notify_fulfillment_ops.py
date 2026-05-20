@@ -3,8 +3,8 @@ from transform.notify_fulfillment_ops import Transform
 
 
 class NotifyFulfillmentOps(Pipeline):
-    def __init__(self):
-        super().__init__('notify-fulfillment-ops')
+    def __init__(self, function: str):
+        super().__init__('notify-fulfillment-ops', function)
         self.transformer = Transform(self)
 
 

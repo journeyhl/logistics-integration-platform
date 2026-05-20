@@ -35,8 +35,8 @@ class SendRMIShipments(Pipeline):
      - Upserts Acumatica API interactions to **_util.acu_api_log** 
      - Inserts RMI XML interactions to **_util.rmi_send_log**
     '''
-    def __init__(self):
-        super().__init__('rmi-send-shipments')
+    def __init__(self, function: str):
+        super().__init__('rmi-send-shipments', function)
         self.url = 'https://erp.journeyhl.com/ODATA/JHL/JHL RMI Shipment API'
         self.odata_source = AcuOData(self)
         self.transformer = Transform(self)

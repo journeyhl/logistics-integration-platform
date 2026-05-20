@@ -6,7 +6,7 @@ from datetime import datetime, timedelta, date
 
 
 
-criteo_pipeline = Criteo()
+criteo_pipeline = Criteo('.debug')
 criteo_pipeline._re_init(
     start_date =  criteo_pipeline.incremental_end - timedelta(days=criteo_pipeline.lookback_days - 1),
     end_date = criteo_pipeline.incremental_end,

@@ -6,6 +6,6 @@ from pipelines import AcuToDbcPhoneRevenue
 
 
 
-phone_rev_to_dbc = AcuToDbcPhoneRevenue()
+phone_rev_to_dbc = AcuToDbcPhoneRevenue('.debug')
 completed_phone_rev_to_dbc = phone_rev_to_dbc.run()
 

@@ -46,8 +46,8 @@ class CreateAcuReceipt(Pipeline):
     # Results Logging
      - Upserts Acumatica API interactions to **_util.acu_api_log** 
     '''
-    def __init__(self):
-        super().__init__('create-receipts')
+    def __init__(self, function: str):
+        super().__init__('create-receipts', function)
         self.acu_api = AcumaticaAPI(self)
         self.transformer = Transform(self)
         self.loader = Load(self)
@@ -83,6 +83,6 @@ class CreateAcuReceipt(Pipeline):
 
 
 if __name__ == '__main__':
-    test = CreateAcuReceipt()
+    test = CreateAcuReceipt('test')
     tester = test.run()
     bp = 'here'

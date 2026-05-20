@@ -5,7 +5,7 @@ from connectors import AcumaticaAPI
 from pipelines import AuditFulfillment
 
 
-audit_fulfillment = AuditFulfillment()
+audit_fulfillment = AuditFulfillment('.debug')
 audit_fulfillment.run()
 bp = 'here'
 # acu = AcumaticaAPI('acu')

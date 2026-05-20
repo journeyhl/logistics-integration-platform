@@ -19,10 +19,11 @@ class MillisecondFormatter(colorlog.ColoredFormatter):
         return time.isoformat()
 
 class LogHistory(logging.Handler):
-    def __init__(self, logs: list, pipe_start: datetime):
+    def __init__(self, logs: list, pipe_start: datetime, function: str):
         super().__init__()
         self.logs = logs
         self.pipe_start = pipe_start
+        self.function = function
     
     def emit(self, log_entry):
         self.logs.append(self.format(log_entry))
@@ -32,6 +33,7 @@ class LogHistory(logging.Handler):
         time = datetime.fromtimestamp(log_entry.created, ZoneInfo('America/New_York'))
         pipeline = log_entry.name if '.' not in log_entry.name else log_entry.name.split('.')[0]
         new_log_entry = {
+            'AzureFunction': self.function,
             'Pipeline': pipeline,
             'LogID': log_id,
             'PipeLogName': log_entry.name,
@@ -48,7 +50,7 @@ class LogHistory(logging.Handler):
         return new_log_entry
 
 class Pipeline(ABC):
-    def __init__(self, pipeline_name):
+    def __init__(self, pipeline_name: str, function: str):
         '''`init`(self, pipeline_name: *str*)
         ---
         <hr>
@@ -71,12 +73,13 @@ class Pipeline(ABC):
         >>> self.logger = logging.getLogger(pipeline_name)
         '''
         self.pipeline_name = pipeline_name
+        self.function = function
         self.centralstore: SQLConnector[CentralStoreQueries] = SQLConnector(self, 'db_CentralStore')
         self.acudb: SQLConnector[AcumaticaDbQueries] = SQLConnector(self, 'AcumaticaDb')
         self.logger = logging.getLogger(pipeline_name)
         self.logs = []
         self.run_timestamp = datetime.now(ZoneInfo('America/New_York'))
-        self.logger.addHandler(LogHistory(self.logs, self.run_timestamp))        
+        self.logger.addHandler(LogHistory(self.logs, self.run_timestamp, self.function))        
         if not logging.root.handlers:
             handler = colorlog.StreamHandler()
             handler.setFormatter(MillisecondFormatter(

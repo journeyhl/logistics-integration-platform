@@ -26,8 +26,8 @@ class SalesOrderCleaner(Pipeline):
     # Results Logging
      - None needed
     '''
-    def __init__(self):
-        super().__init__('sales-orders-cleaner')
+    def __init__(self, function: str):
+        super().__init__('sales-orders-cleaner', function)
         self.transformer = Transform(self)
 
 

@@ -5,7 +5,7 @@ from pipelines import AddressValidator
 from connectors import SQLConnector, AcumaticaAPI, AddressVerificationSystem
 import polars as pl
 
-addy_validator = AddressValidator()
+addy_validator = AddressValidator('.debug')
 completed_addy_validator = addy_validator.run()
 
 

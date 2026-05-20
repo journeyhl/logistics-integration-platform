@@ -31,8 +31,8 @@ class AddressValidator(Pipeline):
     # Results Logging
      - Upserts Acumatica API interactions to **_util.acu_api_log**
     '''
-    def __init__(self):
-        super().__init__('address-validator')
+    def __init__(self, function: str):
+        super().__init__('address-validator', function)
         self.avs = AddressVerificationSystem(self)
         self.acu_api = AcumaticaAPI(self)
         self.transformer = Transform(self)

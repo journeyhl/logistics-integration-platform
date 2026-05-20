@@ -33,8 +33,8 @@ class AcumaticaDeletions(Pipeline):
     # Results Logging
      - None needed
     '''
-    def __init__(self):
-        super().__init__('acumatica-deletions')
+    def __init__(self, function: str):
+        super().__init__('acumatica-deletions', function)
 
 
     def extract(self):

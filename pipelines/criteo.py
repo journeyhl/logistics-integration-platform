@@ -30,7 +30,7 @@ class Criteo(Pipeline):
     # Results Logging
      - None needed
     '''
-    def __init__(self):
+    def __init__(self, function: str):
         '''`init`()
         ---
         <hr>
@@ -48,7 +48,7 @@ class Criteo(Pipeline):
         >>> self.incremental_end = datetime.now(ZoneInfo('America/New_York')).date()
         >>> self.backfill_end = datetime.now(ZoneInfo('America/New_York')).date() - timedelta(days=1)        
         '''
-        super().__init__('criteo')
+        super().__init__('criteo', function)
         self.criteoapi = CriteoAPI(self)
         self.transformer = Transform(self)
         self.lookback_days = 30

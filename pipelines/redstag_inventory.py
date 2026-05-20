@@ -27,8 +27,8 @@ class RedStagInventory(Pipeline):
      - None needed
     '''
 
-    def __init__(self):
-        super().__init__('redstag-inventory')
+    def __init__(self, function: str):
+        super().__init__('redstag-inventory', function)
         self.transformer = Transform(self)
         self.redstag = RedStagAPI(self)
         self.acu_api = AcumaticaAPI(self)

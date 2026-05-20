@@ -6,6 +6,6 @@ from pipelines import AcuToDbcQuotes
 
 
 
-quotes_to_dbc = AcuToDbcQuotes()
+quotes_to_dbc = AcuToDbcQuotes('.debug')
 completed_quotes_to_dbc = quotes_to_dbc.run()
 

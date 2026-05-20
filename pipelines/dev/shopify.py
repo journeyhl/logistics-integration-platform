@@ -4,8 +4,8 @@ from connectors import ShopifyAPI
 from transform.audit_fulfillment import Transform
 
 class ShopifyGraphQL(Pipeline):
-    def __init__(self):
-        super().__init__('shopify-gql')
+    def __init__(self, function: str):
+        super().__init__('shopify-gql', function)
         self.shop = ShopifyAPI(self)
         self.transformer = Transform(self)
 

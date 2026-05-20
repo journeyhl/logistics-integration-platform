@@ -5,7 +5,7 @@ from pipelines import AcuToDbcSalesOrders
 
 
 
-sales_orders_to_dbc = AcuToDbcSalesOrders()
+sales_orders_to_dbc = AcuToDbcSalesOrders('.debug')
 completed_sales_orders_to_dbc = sales_orders_to_dbc.run()
 
 bp = 'here'

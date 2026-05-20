@@ -5,7 +5,7 @@ from pipelines import SendRedStagShipments, RedStagInventory
 
 
 
-send_redstag = SendRedStagShipments()
+send_redstag = SendRedStagShipments('.debug')
 send_redstag.run()
 
 

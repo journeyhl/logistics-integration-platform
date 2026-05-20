@@ -6,6 +6,6 @@ from pipelines import SendRMIReturns
 
 
 
-rmi_returns = SendRMIReturns()
+rmi_returns = SendRMIReturns('.debug')
 returns_result = rmi_returns.run()
 bp = 'here'

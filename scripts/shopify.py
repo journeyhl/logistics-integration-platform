@@ -5,7 +5,7 @@ from connectors.shopify import ShopifyAPI
 from pipelines.dev.shopify import ShopifyGraphQL
 
 
-shop = ShopifyGraphQL()
+shop = ShopifyGraphQL('.debug')
 
 response = shop.extract()
 
