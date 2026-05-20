@@ -38,7 +38,7 @@ class LogHistory(logging.Handler):
             'LogID': log_id,
             'PipeLogName': log_entry.name,
             'FileName': log_entry.filename,
-            'FunctionName': log_entry.funcName,
+            'Method': log_entry.funcName,
             'LineNbr': log_entry.lineno,
             'PLevel': log_entry.levelno,
             'Msg': log_entry.msg,
